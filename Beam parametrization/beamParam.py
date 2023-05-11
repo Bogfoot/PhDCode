@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import optimize, integrate
 
-z1 = 6.6 + 19.5
-z2 = z1 + 62.7
+# z1 = 6.6 + 19.5
+# z2 = z1 + 62.7
 
 data1 = np.array(
     [
