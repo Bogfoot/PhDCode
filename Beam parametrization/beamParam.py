@@ -54,8 +54,8 @@ data2 = np.array(
     ]
 )
 
-x1 = data2.T[0]
-y1 = data2.T[1]
+x1 = data1.T[0]
+y1 = data1.T[1]
 
 
 # Fitting to model
@@ -79,7 +79,8 @@ def cerf(x, a, b, c, func_integr=True):
 
 
 # provide reasonable start values...
-start_p = [y1[0], x1[9], y1[-1]]
+index_ = int(len(x1) / 2)
+start_p = [y1[0], x1[index_], y1[-1]]
 # pars, pcov = optimize.curve_fit(cerf, x1, y1, y1[0], x1[9], False)
 pars, cov = optimize.curve_fit(cerf, x1, y1, start_p)
 print(pars)
