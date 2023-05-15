@@ -1,4 +1,5 @@
 import numpy as np
+import sympy as smp
 from scipy.special import erfc
 from scipy.optimize import curve_fit, fsolve
 import matplotlib.pyplot as plt
@@ -75,18 +76,15 @@ z1 /= 100
 z2 /= 100
 
 # Print the optimized parameters
-print(z1)
 perr1 = np.sqrt(np.diag(pcov1))
 np.set_printoptions(precision=3, suppress=False)
 print(
     f"Optimized parameters for z2: P0={popt1[0]} +/- {perr1[0]}, r0={popt1[1]} +/- {perr1[1]}, w={popt1[2]} +/- {perr1[2]}, Poffset={popt1[3]} +/- {perr1[3]}"
 )
-print(z2)
 perr2 = np.sqrt(np.diag(pcov2))
 print(
     f"Optimized parameters for z2: P0={popt2[0]} +/- {perr2[0]}, r0={popt2[1]} +/- {perr2[1]}, w={popt2[2]} +/- {perr2[2]}, Poffset={popt2[3]} +/- {perr2[3]}"
 )
-# print("Optimized parameters for z2: P0=%g, r0=%g, w=%g, Poffset=%g" % tuple(popt2))
 
 # Plot the data and the fitted function
 plt.plot(data1.T[0], data1.T[1], "r-", label="Knife edge profile at z1 = 0.261 m")
@@ -112,19 +110,28 @@ plt.show()
 
 # fslove
 # equations to be solved
-def equations(vrs, z1, z2, zwaist, w0, waveLength):
-    w1, w2 = vrs
-    eq1 = w1 - w0 * np.sqrt(1 + (((z1 - zwaist) * waveLength) / (np.pi * w0**2)) ** 2)
-    eq2 = w2 - w0 * np.sqrt(1 + (((z2 - zwaist) * waveLength) / (np.pi * w0**2)) ** 2)
-    return [eq1, eq2]
+def equations(vrs, z, zwaist, w0, waveLength):
+    w = vrs
+    eq = w - w0 * np.sqrt(1 + (((z - zwaist) * waveLength) / (np.pi * w0**2)) ** 2)
+    return eq
+    # eq2 = w2 - w0 * np.sqrt(1 + (((z2 - zwaist) * waveLength) / (np.pi * w0**2)) ** 2)
+    # , eq2]
 
 
 # Guesses
-w0 = 0.0001
+w0 = 0.0008
 zwaist = 0.0005
 waveLength = 775e-9  # nm
 initial_guesses = [popt1[2], popt2[2]]
-w1, w2 = fsolve(equations, initial_guesses, args=(z1, z2, zwaist, w0, waveLength))
+w1 = fsolve(equations, initial_guesses[0], args=(z1, zwaist, w0, waveLength))
+w2 = fsolve(equations, initial_guesses[1], args=(z2, zwaist, w0, waveLength))
 
-print(f"w1 = {w1:.8f}")
-print(f"w2 = {w2:.8f}")
+print(f"w1 = {w1}")
+print(f"w2 = {w2}")
+
+
+w, z, lam, w0, zwaist = smp.symbols("w z lambda w_0 z_waist")
+eq = smp.symbols("eq", cls=smp.Function)
+eq = w - w0 * smp.sqrt(1 + (((z - zwaist) * lam) / (smp.pi * w0**2)) ** 2)
+print(eq)
+print(smp.solvers.solvers.solve(eq, w, zwaist))
