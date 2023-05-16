@@ -88,17 +88,18 @@ print(
 
 # Plot the data and the fitted function
 plt.plot(data1.T[0], data1.T[1], "r-", label="Knife edge profile at z1 = 0.261 m")
+x = np.linspace(0, 5.5, 5500)
 plt.plot(
-    data1.T[0],
-    func(data1.T[0], *popt1),
+    x,
+    func(x, *popt1),
     "g:",
     label="Fit of z1 = 0.261 m data to erfc(x); x = (r - r0) / (w / np.sqrt(2))",
 )
 
 plt.plot(data2.T[0], data2.T[1], "b-", label="Knife edge profile at z2 = 0.888 m")
 plt.plot(
-    data2.T[0],
-    func(data2.T[0], *popt2),
+    x,
+    func(x, *popt2),
     "y:",
     label="Fit of z2 = 0.261 m data to erfc(x); x = (r - r0) / (w / np.sqrt(2))",
 )
@@ -126,6 +127,8 @@ initial_guesses = [popt1[2], popt2[2]]
 w1 = fsolve(equations, initial_guesses[0], args=(z1, zwaist, w0, waveLength))
 w2 = fsolve(equations, initial_guesses[1], args=(z2, zwaist, w0, waveLength))
 
+# zR = np.pi *
+# (\[Pi] w0^2)/\[Lambda]
 print(f"w1 = {w1}")
 print(f"w2 = {w2}")
 
