@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.0)
-project(SlowAnalogPins)
+project(analogVoltage)
 
 # Set the source file
-set(SOURCE_FILE readSlowAnalog.c)
+set(SOURCE_FILE analogVoltage.c)
 
 # Set the CFLAGS
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -Wall") ## -Werror

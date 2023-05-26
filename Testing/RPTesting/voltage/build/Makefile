@@ -117,41 +117,41 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named SlowAnalogPins
+# Target rules for targets named analogVoltage
 
 # Build rule for target.
-SlowAnalogPins: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 SlowAnalogPins
-.PHONY : SlowAnalogPins
+analogVoltage: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 analogVoltage
+.PHONY : analogVoltage
 
 # fast build rule for target.
-SlowAnalogPins/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/SlowAnalogPins.dir/build.make CMakeFiles/SlowAnalogPins.dir/build
-.PHONY : SlowAnalogPins/fast
+analogVoltage/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/analogVoltage.dir/build.make CMakeFiles/analogVoltage.dir/build
+.PHONY : analogVoltage/fast
 
-readSlowAnalog.o: readSlowAnalog.c.o
-.PHONY : readSlowAnalog.o
+analogVoltage.o: analogVoltage.c.o
+.PHONY : analogVoltage.o
 
 # target to build an object file
-readSlowAnalog.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/SlowAnalogPins.dir/build.make CMakeFiles/SlowAnalogPins.dir/readSlowAnalog.c.o
-.PHONY : readSlowAnalog.c.o
+analogVoltage.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/analogVoltage.dir/build.make CMakeFiles/analogVoltage.dir/analogVoltage.c.o
+.PHONY : analogVoltage.c.o
 
-readSlowAnalog.i: readSlowAnalog.c.i
-.PHONY : readSlowAnalog.i
+analogVoltage.i: analogVoltage.c.i
+.PHONY : analogVoltage.i
 
 # target to preprocess a source file
-readSlowAnalog.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/SlowAnalogPins.dir/build.make CMakeFiles/SlowAnalogPins.dir/readSlowAnalog.c.i
-.PHONY : readSlowAnalog.c.i
+analogVoltage.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/analogVoltage.dir/build.make CMakeFiles/analogVoltage.dir/analogVoltage.c.i
+.PHONY : analogVoltage.c.i
 
-readSlowAnalog.s: readSlowAnalog.c.s
-.PHONY : readSlowAnalog.s
+analogVoltage.s: analogVoltage.c.s
+.PHONY : analogVoltage.s
 
 # target to generate assembly for a file
-readSlowAnalog.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/SlowAnalogPins.dir/build.make CMakeFiles/SlowAnalogPins.dir/readSlowAnalog.c.s
-.PHONY : readSlowAnalog.c.s
+analogVoltage.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/analogVoltage.dir/build.make CMakeFiles/analogVoltage.dir/analogVoltage.c.s
+.PHONY : analogVoltage.c.s
 
 # Help Target
 help:
@@ -161,10 +161,10 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... SlowAnalogPins"
-	@echo "... readSlowAnalog.o"
-	@echo "... readSlowAnalog.i"
-	@echo "... readSlowAnalog.s"
+	@echo "... analogVoltage"
+	@echo "... analogVoltage.o"
+	@echo "... analogVoltage.i"
+	@echo "... analogVoltage.s"
 .PHONY : help
 
 

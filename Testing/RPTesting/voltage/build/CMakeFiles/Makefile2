@@ -63,7 +63,7 @@ CMAKE_BINARY_DIR = /root/RPTesting/voltage/build
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles/SlowAnalogPins.dir/all
+all: CMakeFiles/analogVoltage.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -71,34 +71,34 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean: CMakeFiles/SlowAnalogPins.dir/clean
+clean: CMakeFiles/analogVoltage.dir/clean
 .PHONY : clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/SlowAnalogPins.dir
+# Target rules for target CMakeFiles/analogVoltage.dir
 
 # All Build rule for target.
-CMakeFiles/SlowAnalogPins.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/SlowAnalogPins.dir/build.make CMakeFiles/SlowAnalogPins.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/SlowAnalogPins.dir/build.make CMakeFiles/SlowAnalogPins.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/RPTesting/voltage/build/CMakeFiles --progress-num=1,2 "Built target SlowAnalogPins"
-.PHONY : CMakeFiles/SlowAnalogPins.dir/all
+CMakeFiles/analogVoltage.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/analogVoltage.dir/build.make CMakeFiles/analogVoltage.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/analogVoltage.dir/build.make CMakeFiles/analogVoltage.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/RPTesting/voltage/build/CMakeFiles --progress-num=1,2 "Built target analogVoltage"
+.PHONY : CMakeFiles/analogVoltage.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/SlowAnalogPins.dir/rule: cmake_check_build_system
+CMakeFiles/analogVoltage.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /root/RPTesting/voltage/build/CMakeFiles 2
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/SlowAnalogPins.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/analogVoltage.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /root/RPTesting/voltage/build/CMakeFiles 0
-.PHONY : CMakeFiles/SlowAnalogPins.dir/rule
+.PHONY : CMakeFiles/analogVoltage.dir/rule
 
 # Convenience name for target.
-SlowAnalogPins: CMakeFiles/SlowAnalogPins.dir/rule
-.PHONY : SlowAnalogPins
+analogVoltage: CMakeFiles/analogVoltage.dir/rule
+.PHONY : analogVoltage
 
 # clean rule for target.
-CMakeFiles/SlowAnalogPins.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/SlowAnalogPins.dir/build.make CMakeFiles/SlowAnalogPins.dir/clean
-.PHONY : CMakeFiles/SlowAnalogPins.dir/clean
+CMakeFiles/analogVoltage.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/analogVoltage.dir/build.make CMakeFiles/analogVoltage.dir/clean
+.PHONY : CMakeFiles/analogVoltage.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.
