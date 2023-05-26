@@ -1,0 +1,1 @@
+/usr/bin/cc  -std=gnu11 -Wall  -L/opt/redpitaya/lib -rdynamic CMakeFiles/ExternalTrigger.dir/externalTrigger.c.o -o ExternalTrigger  -static -lrp -lm -lstdc++ -lpthread 

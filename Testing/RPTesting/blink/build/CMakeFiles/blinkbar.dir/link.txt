@@ -1,0 +1,1 @@
+/usr/bin/cc  -std=gnu11 -Wall  -L/opt/redpitaya/lib -rdynamic CMakeFiles/blinkbar.dir/blinkbar.c.o -o blinkbar  -static -lrp -lm -lstdc++ -lpthread 

@@ -1,0 +1,1 @@
+/usr/bin/cc  -std=gnu11 -Wall  -L/opt/redpitaya/lib -rdynamic CMakeFiles/SlowAnalogPins.dir/readSlowAnalog.c.o -o SlowAnalogPins  -static -lrp -lm -lstdc++ -lpthread 

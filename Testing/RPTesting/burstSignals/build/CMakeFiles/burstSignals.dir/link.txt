@@ -1,0 +1,1 @@
+/usr/bin/cc  -std=gnu11 -Wall  -L/opt/redpitaya/lib -rdynamic CMakeFiles/burstSignals.dir/burstSignals.c.o -o burstSignals  -static -lrp -lm -lstdc++ -lpthread 

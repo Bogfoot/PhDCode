@@ -1,0 +1,1 @@
+/usr/bin/cc -rdynamic CMakeFiles/rpreadandwrite.dir/main.c.o -o rpreadandwrite  -Wl,-rpath,/root/slow/build: librpreadandwrite_lib.so 

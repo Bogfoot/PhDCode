@@ -1,0 +1,1 @@
+/usr/bin/cc  -std=gnu11 -Wall  -L/opt/redpitaya/lib -rdynamic CMakeFiles/TriggerWithThreshold.dir/triggerWTH.c.o -o TriggerWithThreshold  -static -lrp -lm -lstdc++ -lpthread 

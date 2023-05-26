@@ -1,0 +1,1 @@
+/usr/bin/cc  -std=gnu11 -Wall  -L/opt/redpitaya/lib -rdynamic CMakeFiles/HWI2C.dir/HWI2C.c.o -o HWI2C  -static -lrp -lm -lstdc++ -lpthread 

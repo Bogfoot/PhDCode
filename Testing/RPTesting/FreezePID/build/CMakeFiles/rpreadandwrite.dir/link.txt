@@ -1,0 +1,1 @@
+/usr/bin/cc -rdynamic CMakeFiles/rpreadandwrite.dir/main.c.o -o rpreadandwrite   -L/opt/redpitaya/lib  -Wl,-rpath,/opt/redpitaya/lib:/root/RPTesting/FreezePID/build: librpreadandwrite_lib.so 

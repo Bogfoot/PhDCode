@@ -1,0 +1,8 @@
+/root/slow/build/CMakeFiles/install/local.dir
+/root/slow/build/CMakeFiles/install.dir
+/root/slow/build/CMakeFiles/list_install_components.dir
+/root/slow/build/CMakeFiles/rpreadandwrite_lib.dir
+/root/slow/build/CMakeFiles/rpreadandwrite.dir
+/root/slow/build/CMakeFiles/install/strip.dir
+/root/slow/build/CMakeFiles/edit_cache.dir
+/root/slow/build/CMakeFiles/rebuild_cache.dir

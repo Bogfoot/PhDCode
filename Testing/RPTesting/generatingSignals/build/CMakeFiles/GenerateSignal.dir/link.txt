@@ -1,0 +1,1 @@
+/usr/bin/cc  -std=gnu11 -Wall  -L/opt/redpitaya/lib -rdynamic CMakeFiles/GenerateSignal.dir/GenerateSignals.c.o -o GenerateSignal  -static -lrp -lm -lstdc++ -lpthread 

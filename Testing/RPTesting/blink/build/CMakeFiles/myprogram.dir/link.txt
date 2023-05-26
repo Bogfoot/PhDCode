@@ -1,0 +1,1 @@
+/usr/bin/cc -rdynamic CMakeFiles/myprogram.dir/blink.c.o -o myprogram 
