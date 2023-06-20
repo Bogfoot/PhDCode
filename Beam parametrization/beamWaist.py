@@ -1,7 +1,7 @@
 from scipy.optimize import fsolve
 import math
 
-wavelength = 775e-9
+wavelength = 780e-9
 
 z1 = 261e-3
 w1 = 0.815309e-3
