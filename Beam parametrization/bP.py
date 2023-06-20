@@ -1,7 +1,7 @@
 import numpy as np
-import sympy as smp
 from scipy.special import erfc
 from scipy.optimize import curve_fit, fsolve
+import math
 import matplotlib.pyplot as plt
 
 #
@@ -101,40 +101,46 @@ plt.plot(
     x,
     func(x, *popt2),
     "y:",
-    label="Fit of z2 = 0.261 m data to erfc(x); x = (r - r0) / (w / np.sqrt(2))",
+    label="Fit of z2 = 0.888 m data to erfc(x); x = (r - r0) / (w / np.sqrt(2))",
 )
 plt.xlabel("x [mm]")
 plt.ylabel("P [mW]")
 plt.legend()
+
+
+wavelength = 775e-9
+
+z1 = 261e-3
+w1 = round(popt1[2], 5)
+
+z2 = 888e-3
+w2 = round(popt2[2], 5)
+
+
+def sys2(variables):
+    w0, zwaist = variables
+    eq1 = w1 - w(z1 - zwaist, w0, wavelength)
+    eq2 = w2 - w(z2 - zwaist, w0, wavelength)
+    return [eq1, eq2]
+
+
+def w(z, w0, wavelength):
+    return w0 * math.sqrt(1 + ((z * wavelength) / (math.pi * w0**2)) ** 2)
+
+
+# Initial guess for the solution
+initial_guess = [1e-4, 0]
+
+# Solve the equations
+solutions, info, ier, mesg = fsolve(sys2, initial_guess, full_output=True)
+
+# Check if the solver converged successfully
+if ier == 1:
+    w0_solution, zwaist_solution = solutions
+    print("Solution found:")
+    print(f"w0 = {w0_solution}")
+    print(f"zwaist = {zwaist_solution}")
+else:
+    print("Solver did not converge. Error message:", mesg)
+
 plt.show()
-
-
-# fslove
-# equations to be solved
-def equations(vrs, z, zwaist, w0, waveLength):
-    w = vrs
-    eq = w - w0 * np.sqrt(1 + (((z - zwaist) * waveLength) / (np.pi * w0**2)) ** 2)
-    return eq
-    # eq2 = w2 - w0 * np.sqrt(1 + (((z2 - zwaist) * waveLength) / (np.pi * w0**2)) ** 2)
-    # , eq2]
-
-
-# Guesses
-w0 = 0.0008
-zwaist = 0.0005
-waveLength = 775e-9  # nm
-initial_guesses = [popt1[2], popt2[2]]
-w1 = fsolve(equations, initial_guesses[0], args=(z1, zwaist, w0, waveLength))
-w2 = fsolve(equations, initial_guesses[1], args=(z2, zwaist, w0, waveLength))
-
-# zR = np.pi *
-# (\[Pi] w0^2)/\[Lambda]
-print(f"w1 = {w1}")
-print(f"w2 = {w2}")
-
-
-w, z, lam, w0, zwaist = smp.symbols("w z lambda w_0 z_waist")
-eq = smp.symbols("eq", cls=smp.Function)
-eq = w - w0 * smp.sqrt(1 + (((z - zwaist) * lam) / (smp.pi * w0**2)) ** 2)
-print(eq)
-print(smp.solvers.solvers.solve(eq, w, zwaist))
