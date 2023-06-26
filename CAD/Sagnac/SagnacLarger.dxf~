@@ -907,7 +907,7 @@ $EXTNAMES
   9
 $PSVPSCALE
  40
-1.118469075321491
+1.11847
   9
 $OLESTARTUP
 290
@@ -96737,89 +96737,9 @@ AcDbLine
  21
 69.9999
   0
-MTEXT
+ELLIPSE
   5
 A80
-100
-AcDbEntity
-  8
-0
-  6
-ByLayer
- 62
-  256
-370
-   13
-100
-AcDbMText
- 10
-259.2222222222222
- 20
-66
- 30
-0
- 40
-10
- 41
-12.22222222222284
- 71
-    1
- 72
-    1
-  1
-L3
-  7
-STANDARD
-210
-0
-220
-0
-230
-1
- 50
-0
- 73
-    2
- 44
-1
-  0
-ELLIPSE
-  5
-A81
-100
-AcDbEntity
-  8
-0
-  6
-ByLayer
- 62
-  256
-370
-   13
-100
-AcDbEllipse
- 10
-268
- 20
-76
- 30
-0
- 11
--1.846504074052392e-15
- 21
--10.0519
- 31
-0
- 40
-0.07737619532404534
- 41
-0
- 42
-6.283185307179586
-  0
-ELLIPSE
-  5
-A82
 100
 AcDbEntity
   8
@@ -96853,7 +96773,7 @@ AcDbEllipse
   0
 DIMENSION
   5
-A83
+A81
 100
 AcDbEntity
   8
@@ -96911,7 +96831,7 @@ AcDbAlignedDimension
   0
 MTEXT
   5
-A84
+A82
 100
 AcDbEntity
   8
@@ -96957,7 +96877,7 @@ STANDARD
   0
 DIMENSION
   5
-A85
+A83
 100
 AcDbEntity
   8
@@ -97015,7 +96935,7 @@ AcDbAlignedDimension
   0
 ELLIPSE
   5
-A86
+A84
 100
 AcDbEntity
   8
@@ -97049,7 +96969,7 @@ AcDbEllipse
   0
 MTEXT
   5
-A87
+A85
 100
 AcDbEntity
   8
@@ -97095,7 +97015,7 @@ STANDARD
   0
 DIMENSION
   5
-A88
+A86
 100
 AcDbEntity
   8
@@ -97153,7 +97073,7 @@ AcDbAlignedDimension
   0
 ELLIPSE
   5
-A89
+A87
 100
 AcDbEntity
   8
@@ -97187,7 +97107,7 @@ AcDbEllipse
   0
 LINE
   5
-A8A
+A88
 100
 AcDbEntity
   8
@@ -97211,7 +97131,7 @@ AcDbLine
   0
 LINE
   5
-A8B
+A89
 100
 AcDbEntity
   8
@@ -97235,7 +97155,7 @@ AcDbLine
   0
 MTEXT
   5
-A8C
+A8A
 100
 AcDbEntity
   8
@@ -97311,7 +97231,7 @@ AcDbDictionary
   0
 PLOTSETTINGS
   5
-A8D
+A8B
 100
 AcDbPlotSettings
   6
