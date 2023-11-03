@@ -22,7 +22,7 @@ def plot_profile(data):
     plt.ylim((0, 255))
 
 
-cap = cv.VideoCapture(0)
+cap = cv.VideoCapture(1)
 cv.namedWindow("frame")
 cv.setMouseCallback("frame", get_pts)
 
