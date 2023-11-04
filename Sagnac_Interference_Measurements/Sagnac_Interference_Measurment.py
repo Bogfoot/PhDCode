@@ -2,7 +2,7 @@ import csv
 import plotly.graph_objects as go
 
 # Read data from CSV file
-with open("SIM.csv", "r") as csvfile:
+with open("SIM1.csv", "r") as csvfile:
     data = list(csv.reader(csvfile))
 
 # Extract angles and powers from the CSV data
