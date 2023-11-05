@@ -1,5 +1,5 @@
 import csv
-import plotly.graph_objects as go
+import plotly.graph_objects as go, numpy as np
 
 # Read data from CSV file
 with open("SIM1.csv", "r") as csvfile:
@@ -30,22 +30,15 @@ maxima_indices = [
 minima_points = [(sorted_angles[i], sorted_powers[i]) for i in minima_indices]
 maxima_points = [(sorted_angles[i], sorted_powers[i]) for i in maxima_indices]
 
-# Calculate the ratio of the higher peak by the lower one at the last maximum
-if len(maxima_points) >= 2:
-    higher_peak = max(maxima_points[-2][1], maxima_points[-1][1])
-    lower_peak = min(maxima_points[-2][1], maxima_points[-1][1])
-    maxima_ratios = higher_peak / lower_peak
-else:
-    maxima_ratios = None
+#formula for visibility
+# \ni = (I_max - I_min)/(I_max + I_min)
+visibility = []
+for i in range(len(minima_points)):
+    visibility.append((maxima_points[i][1]-minima_points[i][1])/(maxima_points[i][1]+minima_points[i][1]))
 
-# Calculate the ratio of the higher peak by the lower one at the last minimum
-if len(minima_points) >= 2:
-    higher_peak = max(minima_points[-2][1], minima_points[-1][1])
-    lower_peak = min(minima_points[-2][1], minima_points[-1][1])
-    minima_ratios = higher_peak / lower_peak
-else:
-    minima_ratios = None
-
+mean_vis = np.mean(visibility)
+std_vis = np.std(visibility)
+print(f"The mean visibility is: {mean_vis} +/- {std_vis}")
 # Define color scale for data points
 color_scale = [powers[i] for i in sorted_indices]
 color_scale = [
@@ -58,8 +51,8 @@ fig = go.Figure()
 # Add scatter plot trace for data points with color scale
 fig.add_trace(
     go.Scatter(
-        x=sorted_angles,
-        y=sorted_powers,
+        x=angles,
+        y=powers,
         mode="markers",
         marker=dict(
             color=color_scale,
@@ -94,39 +87,21 @@ fig.add_trace(
     )
 )
 
-# Add text annotations for ratios
-if maxima_ratios is not None:
-    fig.add_annotation(
-        go.layout.Annotation(
-            x=maxima_points[-1][0],
-            y=maxima_points[-1][1],
-            text=f"Highest Maximum Peak / 2nd Highest Maximum Peak: {maxima_ratios:.2f}",
-            showarrow=True,
-            arrowhead=2,
-            arrowsize=1,
-            arrowwidth=2,
-            arrowcolor="black",
-            ax=40,
-            ay=-40,
-            bgcolor="white",
-        )
-    )
-if minima_ratios is not None:
-    fig.add_annotation(
-        go.layout.Annotation(
-            x=minima_points[-1][0],
-            y=minima_points[-1][1],
-            text=f"Lower Minimum Peak / 2nd Lowest Minimum Peak: {minima_ratios:.2f}",
-            showarrow=True,
-            arrowhead=2,
-            arrowsize=1,
-            arrowwidth=2,
-            arrowcolor="black",
-            ax=-60,
-            ay=15,
-            bgcolor="white",
-        )
-    )
+if visibility is not None:
+    for i in range(len(visibility)):
+        fig.add_annotation(
+                x=maxima_points[i][0],
+                y=maxima_points[i][1],
+                text=f"Visibility: {visibility[i]:.2f}",
+                showarrow=True,
+                arrowhead=2,
+                arrowsize=1,
+                arrowwidth=2,
+                arrowcolor="black",
+                ax=40,
+                ay=-40,
+                bgcolor="white",
+                )
 
 # Add legend point for ratios
 fig.add_trace(
