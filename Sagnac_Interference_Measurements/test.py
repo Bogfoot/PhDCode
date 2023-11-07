@@ -1,4 +1,4 @@
-import visa, pylab as pl
+import pyvisa as visa, pylab as pl
 
 
 def main():
