@@ -1,53 +1,45 @@
-import tkinter as tk
-from tkinter import filedialog
-import csv
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-import plotly.io as pio
-from PIL import Image, ImageTk
+import visa, pylab as pl
 
-# Function to load data from a CSV file and update the plot
-def load_data():
-    file_path = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
-    if file_path:
-        with open(file_path, 'r') as csvfile:
-            data = list(csv.reader(csvfile))
-        # Process the data and update the plot
-        update_plot(data)
 
-# Function to update the plot and save it as an image
-def update_plot(data):
-    # Extract angles and powers from the loaded data (customize based on your CSV structure)
-    angles = [float(row[0]) for row in data]
-    powers = [float(row[1]) for row in data]
+def main():
+    _rm = visa.ResourceManager()
+    dso = _rm.open_resource("USB0::0xF4EC::0xEE38::0123456789::INSTR")
+    dso.write("chdr off")
+    vdiv = dso.query("c1:vdiv?")
+    ofst = dso.query("c1:ofst?")
+    tdiv = dso.query("tdiv?")
+    sara = dso.query("sara?")
+    sara_unit = {"G": 1e9, "M": 1e6, "k": 1e3}
+    for unit in sara_unit.keys():
+        if sara.find(unit) != -1:
+            sara = sara.split(unit)
+            sara = float(sara[0]) * sara_unit[unit]
+            break
+    sara = float(sara)
+    dso.timeout = 30000  # default value is 2000(2s)
+    dso.chunk_size = 20 * 1024 * 1024  # default value is 20*1024(20k bytes)
+    dso.write("c1:wf? dat2")
+    recv = list(dso.read_raw())[15:]
+    recv.pop()
+    recv.pop()
+    volt_value = []
+    for data in recv:
+        if data > 127:
+            data = data - 255
+        else:
+            pass
+        volt_value.append(data)
+    time_value = []
+    for idx in range(0, len(volt_value)):
+        volt_value[idx] = volt_value[idx] / 25 * float(vdiv) - float(ofst)
+        time_data = -(float(tdiv) * 14 / 2) + idx * (1 / sara)
+        time_value.append(time_data)
+    pl.figure(figsize=(7, 5))
+    pl.plot(time_value, volt_value, markersize=2, label="Y-T")
+    pl.legend()
+    pl.grid()
+    pl.show()
 
-    # Create a subplot with a scatter plot for the data
-    fig = make_subplots(rows=1, cols=1, shared_xaxes=True, shared_yaxes=True)
-    fig.add_trace(go.Scatter(x=angles, y=powers, mode='markers', marker=dict(size=12), name='Data'))
 
-    # Update subplot layout
-    fig.update_layout(title='Angles vs Powers', xaxis_title='Angles', yaxis_title='Powers')
-
-    # Save the plot as an image file
-    pio.write_image(fig, "plot.png")
-
-    # Load the saved image and display it in the Tkinter window
-    image = Image.open("plot.png")
-    photo = ImageTk.PhotoImage(image)
-    label.config(image=photo)
-    label.image = photo
-
-# Create the Tkinter GUI
-root = tk.Tk()
-root.title("Data Visualization App")
-
-# Create a button to load data
-load_button = tk.Button(root, text="Load Data", command=load_data)
-load_button.pack(pady=20)
-
-# Create a label to display the image
-label = tk.Label(root)
-label.pack()
-
-# Start the Tkinter main loop
-root.mainloop()
+if __name__ == "__main__":
+    main()
