@@ -1,45 +1,78 @@
-import pyvisa as visa, pylab as pl
+# Lookup environment variable OSCOPE_IP and use it as the resource
+# name or use the TCPIP0 string if the environment variable does
+# not exist
 
+from oscope_scpi import Oscilloscope
+from os import environ
 
-def main():
-    _rm = visa.ResourceManager()
-    dso = _rm.open_resource("USB0::0xF4EC::0xEE38::0123456789::INSTR")
-    dso.write("chdr off")
-    vdiv = dso.query("c1:vdiv?")
-    ofst = dso.query("c1:ofst?")
-    tdiv = dso.query("tdiv?")
-    sara = dso.query("sara?")
-    sara_unit = {"G": 1e9, "M": 1e6, "k": 1e3}
-    for unit in sara_unit.keys():
-        if sara.find(unit) != -1:
-            sara = sara.split(unit)
-            sara = float(sara[0]) * sara_unit[unit]
-            break
-    sara = float(sara)
-    dso.timeout = 30000  # default value is 2000(2s)
-    dso.chunk_size = 20 * 1024 * 1024  # default value is 20*1024(20k bytes)
-    dso.write("c1:wf? dat2")
-    recv = list(dso.read_raw())[15:]
-    recv.pop()
-    recv.pop()
-    volt_value = []
-    for data in recv:
-        if data > 127:
-            data = data - 255
-        else:
-            pass
-        volt_value.append(data)
-    time_value = []
-    for idx in range(0, len(volt_value)):
-        volt_value[idx] = volt_value[idx] / 25 * float(vdiv) - float(ofst)
-        time_data = -(float(tdiv) * 14 / 2) + idx * (1 / sara)
-        time_value.append(time_data)
-    pl.figure(figsize=(7, 5))
-    pl.plot(time_value, volt_value, markersize=2, label="Y-T")
-    pl.legend()
-    pl.grid()
-    pl.show()
+resource = environ.get("OSCOPE_IP", "TCPIP0::10.11.13.220::INSTR")
 
+# create your visa instrument
+instr = Oscilloscope(resource)
 
-if __name__ == "__main__":
-    main()
+# Upgrade Object to best match based on IDN string
+instr = instr.getBestClass()
+
+# Open connection to instrument
+instr.open()
+
+# set to channel 1
+#
+# NOTE: can pass channel to each method or just set it
+# once and it becomes the default for all following calls. If pass the
+# channel to a Class method call, it will become the default for
+# following method calls.
+instr.channel = "1"
+
+# Enable output of channel, if it is not already enabled
+if not instr.isOutputOn():
+    instr.outputOn()
+
+# Install measurements to display in statistics display and also
+# return their current values here
+print(
+    "Ch. {} Settings: {:6.4e} V  PW {:6.4e} s\n".format(
+        instr.channel,
+        instr.measureVoltAverage(install=True),
+        instr.measurePosPulseWidth(install=True),
+    )
+)
+
+# Add an annotation to the screen before hardcopy
+instr.annotate(
+    "{} {} {}".format("Example of Annotation", "for Channel", instr.channel), "ch1"
+)
+
+# Change label of the channel to "MySig1"
+instr.channelLabel("MySig1")
+
+# Make sure the statistics display is showing for the hardcopy
+instr.measureStatistics()
+
+# STOP Oscilloscope (not required for hardcopy - only showing example of how to do it)
+instr.modeStop()
+
+# Save a hardcopy of the screen to file 'outfile.png'
+instr.hardcopy("outfile.png")
+
+# SINGLE mode (just an example)
+instr.modeSingle()
+
+# Change label back to the default
+#
+# NOTE: can use instr.channelLabelOff() but showing an example of sending a SCPI command directly
+instr._instWrite("DISPlay:LABel OFF")
+
+# RUN mode (since demo Stop and Single, restore Run mode)
+instr.modeRun()
+
+# Turn off the annotation
+instr.annotateOff()
+
+# turn off the channel
+instr.outputOff()
+
+# return to LOCAL mode
+instr.setLocal()
+
+instr.close()

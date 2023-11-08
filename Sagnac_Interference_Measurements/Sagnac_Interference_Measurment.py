@@ -30,11 +30,14 @@ maxima_indices = [
 minima_points = [(sorted_angles[i], sorted_powers[i]) for i in minima_indices]
 maxima_points = [(sorted_angles[i], sorted_powers[i]) for i in maxima_indices]
 
-#formula for visibility
+# formula for visibility
 # \ni = (I_max - I_min)/(I_max + I_min)
 visibility = []
 for i in range(len(minima_points)):
-    visibility.append((maxima_points[i][1]-minima_points[i][1])/(maxima_points[i][1]+minima_points[i][1]))
+    visibility.append(
+        (maxima_points[i][1] - minima_points[i][1])
+        / (maxima_points[i][1] + minima_points[i][1])
+    )
 
 mean_vis = np.mean(visibility)
 std_vis = np.std(visibility)
@@ -54,14 +57,14 @@ fig.add_trace(
         x=angles,
         y=powers,
         mode="markers",
-        marker=dict(
-            color=color_scale,
-            colorscale="Viridis",
-            size=12,
-            colorbar=dict(title="Power", xanchor="right"),
-            colorbar_x=0.98,
-        ),
-        name="Data",
+        # marker=dict(
+        #     color=color_scale,
+        #     colorscale="Viridis",
+        #     size=12,
+        #     colorbar=dict(title="Power", xanchor="right"),
+        #     colorbar_x=0.98,
+        # ),
+        name="Power on power meter",
     )
 )
 
@@ -90,18 +93,18 @@ fig.add_trace(
 if visibility is not None:
     for i in range(len(visibility)):
         fig.add_annotation(
-                x=maxima_points[i][0],
-                y=maxima_points[i][1],
-                text=f"Visibility: {visibility[i]:.2f}",
-                showarrow=True,
-                arrowhead=2,
-                arrowsize=1,
-                arrowwidth=2,
-                arrowcolor="black",
-                ax=40,
-                ay=-40,
-                bgcolor="white",
-                )
+            x=maxima_points[i][0],
+            y=maxima_points[i][1],
+            text=f"Visibility: {visibility[i]:.2f}",
+            showarrow=True,
+            arrowhead=2,
+            arrowsize=1,
+            arrowwidth=2,
+            arrowcolor="black",
+            ax=40,
+            ay=-40,
+            bgcolor="white",
+        )
 
 # Add legend point for ratios
 fig.add_trace(
