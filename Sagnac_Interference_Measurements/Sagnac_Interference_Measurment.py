@@ -1,8 +1,16 @@
 import csv
 import plotly.graph_objects as go, numpy as np
 
+
+def visibility(extrema, maxs, mins):
+    vis = []
+    for i in range(len(extrema)):
+        vis.append((maxs[i][1] - mins[i][1]) / (maxs[i][1] + mins[i][1]))
+    return vis
+
+
 # Read data from CSV file
-with open("SIM2.csv", "r") as csvfile:
+with open("SIM3.csv", "r") as csvfile:
     data = list(csv.reader(csvfile))
 
 # Extract angles and powers from the CSV data
@@ -32,17 +40,16 @@ maxima_points = [(sorted_angles[i], sorted_powers[i]) for i in maxima_indices]
 
 # formula for visibility
 # \ni = (I_max - I_min)/(I_max + I_min)
-visibility = []
-for i in range(len(minima_points)):
-    visibility.append(
-        (maxima_points[i][1] - minima_points[i][1])
-        / (maxima_points[i][1] + minima_points[i][1])
-    )
+vis = []
+if len(maxima_points) >= len(minima_points):
+    vis = visibility(maxima_points, maxima_points, minima_points)
+else:
+    vis = visibility(minima_points, maxima_points, minima_points)
 
-print(f"Max visibility: {np.max(visibility)}")
-mean_vis = np.mean(visibility)
-std_vis = np.std(visibility)
-print(f"The mean visibility is: {mean_vis} +/- {std_vis}")
+print(f"Max visibility: {np.max(vis)*100:4f}")
+mean_vis = np.mean(vis)
+std_vis = np.std(vis)
+print(f"The mean visibility is: {mean_vis*100:4f} +/- {std_vis*100:4f}")
 # Define color scale for data points
 color_scale = [powers[i] for i in sorted_indices]
 color_scale = [
@@ -92,11 +99,11 @@ fig.add_trace(
 )
 
 if visibility is not None:
-    for i in range(len(visibility)):
+    for i in range(len(vis)):
         fig.add_annotation(
             x=maxima_points[i][0],
             y=maxima_points[i][1],
-            text=f"Visibility: {visibility[i]:.4f}",
+            text=f"Visibility: {vis[i]*100:.4f}%",
             showarrow=True,
             arrowhead=2,
             arrowsize=1,
@@ -114,16 +121,16 @@ fig.add_trace(
         y=[maxima_points[-1][1]],
         mode="markers",
         marker=dict(color="white", size=15, symbol="circle"),
-        name="Ratios Mean",
+        name=f"Visibility, {mean_vis*100:4f} +/- {std_vis*100:4f}",
     )
 )
 
 # Set plot labels and title
 fig.update_layout(
-    title="Power vs Angle by variying the L/2 WP of the Pump, measuring after Quantum Eraser H output",
+    title="Power vs Angle by variying the L/2 WP of the Pump, measuring after Quantum Eraser H output.\nSet diode current is 82 mA. Max diode current is 262 mA.",
     xaxis_title="Angle/°",
     yaxis_title="Power/mW",
-    legend=dict(x=0.01, y=0.99),
+    legend=dict(x=0.01, y=0.10),
 )
 
 # Show the interactive plot
