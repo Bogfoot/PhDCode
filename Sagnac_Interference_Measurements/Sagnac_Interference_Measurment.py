@@ -2,7 +2,7 @@ import csv
 import plotly.graph_objects as go, numpy as np
 
 # Read data from CSV file
-with open("SIM1.csv", "r") as csvfile:
+with open("SIM2.csv", "r") as csvfile:
     data = list(csv.reader(csvfile))
 
 # Extract angles and powers from the CSV data
@@ -39,6 +39,7 @@ for i in range(len(minima_points)):
         / (maxima_points[i][1] + minima_points[i][1])
     )
 
+print(f"Max visibility: {np.max(visibility)}")
 mean_vis = np.mean(visibility)
 std_vis = np.std(visibility)
 print(f"The mean visibility is: {mean_vis} +/- {std_vis}")
@@ -95,7 +96,7 @@ if visibility is not None:
         fig.add_annotation(
             x=maxima_points[i][0],
             y=maxima_points[i][1],
-            text=f"Visibility: {visibility[i]:.2f}",
+            text=f"Visibility: {visibility[i]:.4f}",
             showarrow=True,
             arrowhead=2,
             arrowsize=1,
