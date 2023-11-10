@@ -2,6 +2,7 @@ import csv
 import plotly.graph_objects as go, numpy as np
 
 
+# Change function to account for last measurement being a max, compare the angles to do so.
 def visibility(extrema, maxs, mins):
     vis = []
     for i in range(len(extrema)):
@@ -46,18 +47,19 @@ if len(maxima_points) >= len(minima_points):
 else:
     vis = visibility(minima_points, maxima_points, minima_points)
 
-print(f"Max visibility: {np.max(vis)*100:4f}")
 mean_vis = np.mean(vis)
 std_vis = np.std(vis)
+print(f"Max visibility: {np.max(vis)*100:4f}")
 print(f"The mean visibility is: {mean_vis*100:4f} +/- {std_vis*100:4f}")
-# Define color scale for data points
-color_scale = [powers[i] for i in sorted_indices]
-color_scale = [
-    (x - min(color_scale)) / (max(color_scale) - min(color_scale)) for x in color_scale
-]  # Normalize to [0, 1] range
 
 # Create a Plotly scatter plot with lines connecting minima and maxima
 fig = go.Figure()
+
+# Define color scale for data points
+# color_scale = [powers[i] for i in sorted_indices]
+# color_scale = [
+#     (x - min(color_scale)) / (max(color_scale) - min(color_scale)) for x in color_scale
+# ]  # Normalize to [0, 1] range
 
 # Add scatter plot trace for data points with color scale
 fig.add_trace(
