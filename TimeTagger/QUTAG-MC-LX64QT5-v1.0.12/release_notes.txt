@@ -1,0 +1,63 @@
+quTAG MC Software Release Notes
+===============================
+
+Version 1.0.12 (DLL 6.3)
+=======================
+- Bugfix: Fixed a bug in tarec resulting in wrong timestamps
+
+
+Version 1.0.11 (DLL 6.3)
+=======================
+- Bugfix: Fixes histogram when using start channel
+
+Version 1.0.10 (DLL 6.3)
+========================
+- Bugfix: Threshold of stop channels on new hardware did't work properly for all cases
+
+Version 1.0.9  (DLL 6.3)
+========================
+- Bugfix: Updated configuration file to extended timestamp encoding
+
+Version 1.0.8  (DLL 6.3)
+========================
+- Extended timestamp encoding to prevent overflows (previously at ~75 minutes)
+- Bugfix: TDC_enableHbt ended in a dead lock (DLL)
+
+Version 1.0.7  (DLL 6.2)
+========================
+- Added external clock to dll
+
+Version 1.0.6  (DLL 6.1)
+========================
+- Bugfix Demo mode was broken in DLL
+- Bugfix: Timetag logs > 4GB were not written
+
+Version 1.0.5 (DLL 5.2)
+=======================
+- Bugfix channel enumeration of markers
+- Bugfix timer tick (Ch. 104) always on in DLL
+- Bugfix "off" state display on front panel for channels > 8
+
+Version 1.0.4 (DLL 5.1)
+=======================
+- Bugfix: channel enumeration in HBT and Liftime functions
+
+Version 1.0.3 (DLL 5.0)
+=======================
+- Bugfix in device discovery (Linux version only)
+
+Version 1.0.2 (DLL 5.0)
+=======================
+- Bugfix missing DLL
+- Selftest now working
+- Bugfix external clock status LED
+
+Version 1.0.1 (DLL 5.0)
+=======================
+- Added installer program
+- Selftest now working
+
+Version 1.0.0 (DLL 5.0)
+=======================
+- Initial release
+- Selftest not yet implemented

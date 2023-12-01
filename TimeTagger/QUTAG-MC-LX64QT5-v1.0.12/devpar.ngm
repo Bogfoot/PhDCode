@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: devpar.ngm,v 1.5 2021/07/22 12:24:43 cooper Exp $ -->
+<!-- Parameter der 8 Kanaele eines Moduls einstellen
+     Parameter: P0 = Erste Kanalnummer (0,8,16,24) 
+-->
+
+<Module>
+  <Widget Type="Label" Caption="Signal Conditioning" X="2" Y="0" Width="3"/>
+  <Widget Type="Label" Caption="Compensation"        X="5" Y="0" Width="1" Alignment="Left"/>
+  <Widget Type="Label" Caption="Filter"              X="6" Y="0" Width="2" Condition="and(FltrAv,!(P0))"/>
+  <Widget Type="Label" Caption="Connector"           X="0" Y="1" Alignment="Left"/>
+  <Widget Type="Label" Caption="Enabled"             X="1" Y="1" Alignment="Left"/>
+  <Widget Type="Label" Caption="Signal Type"         X="2" Y="1" Alignment="Left"/>
+  <Widget Type="Label" Caption="Trigger"             X="3" Y="1" Alignment="Left"/>
+  <Widget Type="Label" Caption="Threshold"           X="4" Y="1" Alignment="Left"/>
+  <Widget Type="Label" Caption="Signal Delay"        X="5" Y="1" Alignment="Left"/>
+  <Widget Type="Label" Caption="Type"                X="6" Y="1" Alignment="Left" Condition="and(FltrAv,!(P0))"/>
+  <Widget Type="Label" Caption="Ch.Mask"             X="7" Y="1" Alignment="Left" Condition="and(FltrAv,!(P0))"/>
+  <Macro Type="Repeater" Count="8" >
+    <Widget Type="Label"    X="0" Y="$+(3,Counter)$" Alignment="Left" Caption="Stop $+(Counter,P0,1)$"/>
+    <Widget Type="Bitfield" X="1" Y="$+(3,Counter)$" Address="0x2A6" Bits="=$+(Counter,P0)$" Persist="1"/>
+    <Widget Type="Combo"    X="2" Y="$+(3,Counter)$" Address="0x3C0" Index="$+(Counter,P0,1)$" Choices="LVTTL=1:NIM=2:Misc=3" Persist="1"/>
+    <Widget Type="Combo"    X="3" Y="$+(3,Counter)$" Address="0x3C6" Index="$+(Counter,P0,1)$" Choices="Falling Edge:Rising Edge" Condition="??(CndType#+(Counter,P0,1),0,0,0,1)" HideOnCond="0" Persist="1"/>
+    <Widget Type="Xedit"    X="4" Y="$+(3,Counter)$" Address="0x3C5" Index="$+(Counter,P0,1)$" Unit="V" Prefix=" " Scale="6553.5" Offset="-5" Min="-3" Max="3" Condition="??(CndType#+(Counter,P0,1),0,0,0,1)" HideOnCond="0" Persist="1"/>
+    <Widget Type="Xedit"    X="5" Y="$+(3,Counter)$" Address="0x3BE" Index="$+(Counter,P0,1)$" Unit="s" Prefix="p" Scale="209.7152" Offset="-1.e5" Min="-1.e5" Max="1.e5" Condition="==(HwType,0x6A00)" Persist="1"/>
+    <Widget Type="Xedit"    X="5" Y="$+(3,Counter)$" Address="0x3BE" Index="$+(Counter,P0,1)$" Unit="s" Prefix="p" Scale="32.768"   Offset="-5.e4" Min="-5.e4" Max="5.e4" Condition="!=(HwType,0x6A00)" Persist="1"/>
+    <Widget Type="Combo"    X="6" Y="$+(3,Counter)$" Address="0x800" Index="$+(Counter,P0,1)$" Choices="None:Mute:Coinc:Sync" Condition="and(FltrAv,!(P0),<(Counter,5))" Persist="1"/>
+    <Dialog                 X="7" Y="$+(3,Counter)$" Modal="0" Caption="Edit" Popup="Button"                                  Condition="and(FltrAv,!(P0),<(Counter,5))">
+      <Widget Type="Label"    X="0" Y="0" Caption="Channels for Coinc and Sync Filter"/>
+      <Widget Type="Bitfield" X="0" Y="1" Address="0x801" Index="$+(Counter,P0,1)$" Horizontal="1" Strips="1" BitStart="0" BitOffs="1" BitCount="5" Persist="1"/>
+    </Dialog>
+  </Macro>
+</Module>

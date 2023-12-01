@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: qutag.ngc,v 1.14 2021/12/17 14:21:57 trurl Exp $ -->
+<Panel Name="quTAG" Icon="clock.xpm" Product="0xC0" >
+
+  <Widget Type="Constant" Address="0x31" Index="1" DefVal="5"/>    <!-- Timestamps 52 -->
+  <Widget Type="Constant" Address="0x32" Index="1" DefVal="0"/>
+  <Widget Type="Constant" Address="0x35" Index="1" DefVal="1"/>
+  <Widget Type="Constant" Address="0x3B" Index="1" DefVal="12"/>
+  <Widget Type="Constant" Address="0x31" Index="2" DefVal="3"/>    <!-- Coincidences -->
+  <Widget Type="Constant" Address="0x3B" Index="2" DefVal="13"/>
+  <Widget Type="Constant" Address="0x31" Index="3" DefVal="4"/>    <!-- Single Counts -->
+  <Widget Type="Constant" Address="0x3B" Index="3" DefVal="13"/>
+
+  <Widget Type="Tabs"                                  X="1" Y="0">
+
+    <Tab Name="Counts">
+      <Widget Type="Box"   Caption="Parameters"          X="0" Y="0">
+        <Widget Type="Box"   Style="Flat"                  X="0" Y="0" Align="Left">
+          <Widget Type="Label" Caption="Exposure Time"       X="0" Y="0" Align="Left"/>
+          <Widget Type="Xedit" Caption=""                    X="1" Y="0" Address="0x2A8" Unit="s" Prefix="m" Min="0" Max="65535" Persist="1"/>
+        </Widget>
+      </Widget>
+      <Widget Type="Label" Caption="All Channel Counts"  X="0" Y="1" Align="Left"/>
+      <View Channel="3"         Caption=""               X="0" Y="2" Height="3" ChannelSelector="Hide" TriggerSnapshotButtons="Hide">
+        <Plugin Caption="SingleCounts" Type="Sync Writer">
+          <Option Name="Caption"     Value="Save Counts"/>
+          <Option Name="Description" Value="Single Counts"/>
+          <Option Name="ShowCyclic"  Value="1"/>
+          <Option Name="ColumnDescr" Value="Channel:Counts"/>
+        </Plugin>
+        <Plugin Caption="CounterDisplay" Type="Counter Display">
+          <Option Name="NumChannels" Value="33"/>
+          <Option Name="NumChAddr"   Value="0x860"/>
+          <Option Name="IndexBased"  Value="2"/>
+          <Option Name="AutoScale"   Value="1"/>
+          <Option Name="Chname_x"    Value="Ch x"/>
+          <Option Name="Chname_0"    Value="Start"/>
+        </Plugin>
+      </View>
+      <View Channel="3"         Caption=""               X="0" Y="5" Height="3" ChannelSelector="Hide" TriggerSnapshotButtons="Hide" >
+        <Plugin Caption="Single Count Rates" Type="Muxed Channel Filter">
+          <Option Name="NumChannels" Value="9"/>
+          <Option Name="IndexBased"  Value="2"/>
+          <Option Name="Chname_0"    Value="Start"/>
+          <Option Name="Chname_1"    Value="Ch 1"/>
+          <Option Name="Chname_2"    Value="Ch 2"/>
+          <Option Name="Chname_3"    Value="Ch 3"/>
+          <Option Name="Chname_4"    Value="Ch 4"/>
+          <Option Name="Chname_5"    Value="Ch 5"/>
+          <Option Name="Chname_6"    Value="Ch 6"/>
+          <Option Name="Chname_7"    Value="Ch 7"/>
+          <Option Name="Chname_8"    Value="Ch 8"/>
+        </Plugin>
+        <Plugin Caption="ChHistoryDisplay" Type="Line Display 2">
+          <Option Name="InitialXRange"        Value="300"/>
+          <Option Name="DisplaySelectButtons" Value="0"/>
+          <Option Name="SynthIndex"           Value="1"/>
+        </Plugin>
+      </View>
+      <View Channel="1"     Caption="Time Diffs"          X="0" Y="8" ChannelSelector="Hide" TriggerSnapshotButtons="Hide" >
+        <Plugin Caption="TimeTags" Type="Sync Writer">
+          <Option Name="Caption"     Value="Save Time Tags"/>
+          <Option Name="Description" Value="Time Tags"/>
+          <Option Name="ColumnDescr" Value="Time Tag:Channel"/>
+          <Option Name="AllowBinary" Value="1"/>
+        </Plugin>
+      </View>
+    </Tab>
+
+    
+    <Tab Name="Coincidences">
+      <Widget Type="Box"   Caption="Parameters"          X="0" Y="0">
+        <Widget Type="Box"   Style="Flat"                  X="0" Y="0" Align="Left">
+          <Widget Type="Label" Caption="Coincidence Window"  X="0" Y="0" Align="Left"/>
+          <Widget Type="Xedit" Caption=""                    X="1" Y="0" Address="0x2A7" Unit="s" Prefix="p" Min="0" Max="2e9" Accuracy="6" Persist="1"/>  
+        </Widget>
+      </Widget>
+      <Widget Type="Label" Caption="Coincidence Counts"  X="0" Y="1" Align="Left"/>
+      <View Channel="2"         Caption=""               X="0" Y="2" Height="3" ChannelSelector="Hide" TriggerSnapshotButtons="Hide" >
+        <Plugin Caption="Coincidences" Type="Sync Writer">
+          <Option Name="Caption"     Value="Save Coincidences"/>
+          <Option Name="Description" Value="Coincidences"/>
+          <Option Name="ColumnDescr" Value="Channel:CoincCounts"/>
+          <Option Name="ShowCyclic"  Value="1"/>
+        </Plugin>
+        <Plugin Caption="HistogramDisplay" Type="Counter Display">
+          <Option Name="NumChannels" Value="26"/>
+          <Option Name="IndexBased"  Value="2"/>
+          <Option Name="AutoScale"   Value="1"/>
+          <Option Name="Chname_0"    Value="12 "/>
+          <Option Name="Chname_1"    Value="13 "/>
+          <Option Name="Chname_2"    Value="23 "/>
+          <Option Name="Chname_3"    Value="14 "/>
+          <Option Name="Chname_4"    Value="24 "/>
+          <Option Name="Chname_5"    Value="34 "/>
+          <Option Name="Chname_6"    Value="15 "/>
+          <Option Name="Chname_7"    Value="25 "/>
+          <Option Name="Chname_8"    Value="35 "/>
+          <Option Name="Chname_9"    Value="45 "/>
+          <Option Name="Chname_10"   Value="123 "/>
+          <Option Name="Chname_11"   Value="124 "/>
+          <Option Name="Chname_12"   Value="134 "/>
+          <Option Name="Chname_13"   Value="234 "/>
+          <Option Name="Chname_14"   Value="125 "/>
+          <Option Name="Chname_15"   Value="135 "/>
+          <Option Name="Chname_16"   Value="235 "/>
+          <Option Name="Chname_17"   Value="145 "/>
+          <Option Name="Chname_18"   Value="245 "/>
+          <Option Name="Chname_19"   Value="345 "/>
+          <Option Name="Chname_20"   Value="!5 "/>
+          <Option Name="Chname_21"   Value="!4 "/>
+          <Option Name="Chname_22"   Value="!3 "/>
+          <Option Name="Chname_23"   Value="!2 "/>
+          <Option Name="Chname_24"   Value="!1 "/>
+          <Option Name="Chname_25"   Value="1-5 "/>
+        </Plugin>
+      </View>
+      <View Channel="2"         Caption=""               X="0" Y="5" Height="3" ChannelSelector="Hide" TriggerSnapshotButtons="Hide" >
+        <Plugin Caption="Coincdence Rates" Type="Muxed Channel Filter">
+          <Option Name="NumChannels" Value="26" />
+          <Option Name="IndexBased"  Value="2 " />
+          <Option Name="Chname_0"    Value="12 "/>
+          <Option Name="Chname_1"    Value="13 "/>
+          <Option Name="Chname_2"    Value="23 "/>
+          <Option Name="Chname_3"    Value="14 "/>
+          <Option Name="Chname_4"    Value="24 "/>
+          <Option Name="Chname_5"    Value="34 "/>
+          <Option Name="Chname_6"    Value="15 "/>
+          <Option Name="Chname_7"    Value="25 "/>
+          <Option Name="Chname_8"    Value="35 "/>
+          <Option Name="Chname_9"    Value="45 "/>
+          <Option Name="Chname_10"   Value="123 "/>
+          <Option Name="Chname_11"   Value="124 "/>
+          <Option Name="Chname_12"   Value="134 "/>
+          <Option Name="Chname_13"   Value="234 "/>
+          <Option Name="Chname_14"   Value="125 "/>
+          <Option Name="Chname_15"   Value="135 "/>
+          <Option Name="Chname_16"   Value="235 "/>
+          <Option Name="Chname_17"   Value="145 "/>
+          <Option Name="Chname_18"   Value="245 "/>
+          <Option Name="Chname_19"   Value="345 "/>
+          <Option Name="Chname_20"   Value="!5 "/>
+          <Option Name="Chname_21"   Value="!4 "/>
+          <Option Name="Chname_22"   Value="!3 "/>
+          <Option Name="Chname_23"   Value="!2 "/>
+          <Option Name="Chname_24"   Value="!1 "/>
+          <Option Name="Chname_25"   Value="1-5 "/>
+        </Plugin>
+        <Plugin Caption="ChHistoryDisplay" Type="Line Display 2">
+          <Option Name="InitialXRange"        Value="300"/>
+          <Option Name="DisplaySelectButtons" Value="0"/>
+          <Option Name="SynthIndex"           Value="1"/>
+        </Plugin>
+      </View>
+    </Tab>
+
+    
+    <Tab Name="Histogram">
+      <View Channel="1"     Caption="Time Diffs"          X="0" Y="0" ChannelSelector="Hide" TriggerSnapshotButtons="Hide" >
+        <Plugin Caption="TimeDiffsFilter" Type="Histogram Filter">
+          <Option Name="Decoration"   Value="Parameters"/>
+          <Option Name="Channels0"    Value="32"/>
+          <Option Name="ChannelsAddr" Value="0x860"/>
+          <Option Name="StartStop"    Value="0"/>
+          <Option Name="BinWidth"     Value="1000"/>
+        </Plugin>
+        <Plugin Caption="TagsHistogram" Type="Sync Writer">
+          <Option Name="Caption"     Value="Save Histogram"/>
+          <Option Name="Description" Value="Time Tags Distribution"/>
+          <Option Name="ShowCyclic"  Value="1"/>
+          <Option Name="ColumnDescr" Value="Time Diff:Count"/>
+        </Plugin>
+        <Plugin Caption="TimeDiffsDisplay" Type="Line Display 2">
+          <Option Name="DisplayToolBar"       Value="0"/>
+          <Option Name="HistogramMode"        Value="1"/>
+        </Plugin>
+      </View>
+    </Tab>
+
+
+    <Tab Name="Cross Correlation" Condition="$HbtAv$">
+      <Widget Type="Box" Style="Flat"                    X="0" Y="0" Condition="$!(SingleSt)$" HideOnCond="0">
+        <Widget Type="Box"   Caption="Parameters"          X="0" Y="0" Width="2">
+          <Widget Type="Box"   Style="Flat"                  X="0" Y="0" Align="Left">
+            <Widget Type="Label" Caption="Active"              X="0" Y="0" Alignment="Left"/>
+            <Widget Type="Check"                               X="1" Y="0" Address="0x39B"/>
+            <Widget Type="Label" Caption="Input Channel 1"     X="0" Y="1" Alignment="Left"/>
+            <Widget Type="Label" Caption="Input Channel 2"     X="0" Y="2" Alignment="Left"/>
+            <Widget Type="AutoCombo" Address="0x3B8"           X="1" Y="1" Min="1" Max="31" Exponential="0" Persist="1"/>
+            <Widget Type="AutoCombo" Address="0x3B9"           X="1" Y="2" Min="1" Max="31" Exponential="0" Persist="1"/>
+            <Widget Type="Label" Caption="Histogram Width"     X="3" Y="1" Alignment="Left"/>
+            <Widget Type="Label" Caption="Bin Count"           X="3" Y="2" Alignment="Left"/>
+            <Widget Type="Label"                               X="2" Y="1" Alignment="Left"/>
+            <Widget Type="Xedit" Address="0x3A1"               X="4" Y="1" Unit="s" Prefix="n" Min="1"  Max="1000000" Persist="1"/>
+            <Widget Type="Xedit" Address="0x39D"               X="4" Y="2" Unit=""  Prefix="X" Min="16" Max="65535" Persist="1"/>
+            <Widget Type="Label"                               X="5" Y="1" Alignment="Left"/>
+            <Widget Type="Button"  Caption="Reset"             X="6" Y="1" Address="0x3A0" Align="Normal"/>
+            <Dialog Caption="Data Generation"                  X="6" Y="2" Modal="0" Popup="Button">
+              <Widget Type="Label"   Caption="Function Type"     X="0" Y="0" Alignment="Left"/>
+              <Widget Type="Combo"                               X="1" Y="0" Width="2" Address="0x3A2" Choices="None:Coherent:Thermal:Single Photon:Three Level System:Thermal+Jitter:Single Ph.+Jitter:Three Lv.+Jitter"/>
+              <Widget Type="Label"   Caption="Noise Level"       X="0" Y="1" Alignment="Left"/>
+              <Widget Type="Xedit"   Address="0x39F"             X="1" Y="1" Width="2" Unit="" Prefix="X" Scale="1000000" Min="0." Max="1." Persist="1"/>
+              <Widget Type="Box"  Caption="Generator Parameters" X="0" Y="2" Width="3">
+                <Macro Type="Include" File="fitpar.ngm" P0="2" P1="0x3A2" P2="0"/>
+              </Widget>
+            </Dialog>
+          </Widget>
+        </Widget>
+
+        <View Channel="6"     Caption="G2"                 X="0" Y="1" Width="2" ChannelSelector="Hide" TriggerSnapshotButtons="Hide">
+          <Plugin Caption="g2fork" Type="Fork" >
+            <Option Name="Target" Value="g2Union"/>
+          </Plugin>
+        </View>
+        <View Channel="5"     Caption="G2 Fit"             X="0" Y="2" Width="2" Height="3" ChannelSelector="Hide" TriggerSnapshotButtons="Hide">
+          <Plugin Caption="g2Union" Type="Union">
+            <Option Name="Mode" Value="Multiline"/>
+          </Plugin>
+          <Plugin Caption="G2Functions" Type="Sync Writer">
+            <Option Name="Caption"     Value="Save G<sup>(2)</sup> Function"/>
+            <Option Name="Description" Value="G(2) Function"/>
+            <Option Name="ColumnDescr" Value="dt:G(2):G(2)-fitted"/>
+            <Option Name="Snapshot"    Value="Histogram Width:0x3A1"/>
+            <Option Name="Snapshot"    Value="Events Ch. 0:0x3A8"/>
+            <Option Name="Snapshot"    Value="Events Ch. 1:0x3A9"/>
+            <Option Name="Snapshot"    Value="Integr. Time:0x3AA"/>
+            <Option Name="Snapshot"    Value="G(2) Norm:0x3AE"/>
+            <Option Name="Snapshot"    Value="Fit Function:0x3A3"/>
+            <Option Name="Snapshot"    Value="Fit - A:0x3B0"/>
+            <Option Name="Snapshot"    Value="Fit - c:0x3B2"/>
+            <Option Name="Snapshot"    Value="Fit - B:0x3B1"/>
+            <Option Name="Snapshot"    Value="Fit - T_a:0x3B3"/>
+            <Option Name="Snapshot"    Value="Fit - p_f^2:0x3B4"/>
+            <Option Name="Snapshot"    Value="Fit - c:0x3B5"/>
+            <Option Name="Snapshot"    Value="Fit - T_b:0x3B7"/>
+            <Option Name="Snapshot"    Value="Fit - T_a:0x3B6"/>
+          </Plugin>
+          <Plugin Caption="G2Display" Type="Line Display 2">
+            <Option Name="DisplayToolBar"       Value="0"/>
+            <Option Name="HistogramMode"        Value="1"/>
+            <Option Name="HorizontalLines"      Value="1"/>
+          </Plugin>
+        </View>
+
+        <Widget Type="Box"   Caption="Results"             X="0" Y="5">
+          <Widget Type="Box"   Style="Flat"                  X="0" Y="0" Align="Top">
+            <Widget Type="Label" Caption="Rate Ch. 1/2"        X="0" Y="0" Alignment="Left"/>
+            <Widget Type="Label" Caption="Events Ch. 1/2"      X="0" Y="1" Alignment="Left"/>
+            <Widget Type="Label" Caption="Integr. Time"        X="0" Y="2" Alignment="Left"/>
+            <Widget Type="Label" Caption="G<sup>(2)</sup>(0)"  X="0" Y="3" Alignment="Left"/>
+            <Widget Type="Label" Caption="G<sup>(2)</sup> Norm" X="0" Y="4" Alignment="Left"/>
+            <Widget Type="Xedit" Address="0x3A6"               X="1" Y="0" Width="1" Unit="Hz" Prefix=" " Scale="100"     ReadOnly="1"/>
+            <Widget Type="Xedit" Address="0x3A7"               X="2" Y="0" Width="1" Unit="Hz" Prefix=" " Scale="100"     ReadOnly="1"/>
+            <Widget Type="Xedit" Address="0x3A8"               X="1" Y="1" Width="1" Unit=""   Prefix="X"                 ReadOnly="1"/>
+            <Widget Type="Xedit" Address="0x3A9"               X="2" Y="1" Width="1" Unit=""   Prefix="X"                 ReadOnly="1"/>
+            <Widget Type="Xedit" Address="0x3AA"               X="1" Y="2" Width="2" Unit="s"  Prefix=" " Scale="1000"    ReadOnly="1"/>
+            <Widget Type="Xedit" Address="0x3AC"               X="1" Y="3" Width="2" Unit=""   Prefix="X" Scale="1000000" ReadOnly="1"/>
+            <Widget Type="Xedit" Address="0x3AE"               X="1" Y="4" Width="2" Unit=""   Prefix="X" Scale="10"      ReadOnly="1"/>
+            <Dialog Caption="Show Total Count Rate"            X="1" Y="5" Width="2" Modal="0" Popup="Button">
+              <Widget Type="Label" Caption="Integration Time"    X="8" Y="0" Align="Left" />
+              <Widget Type="Xedit" Address="0x39E"               X="9" Y="0" Unit="s" Prefix=" " Scale="10" Min=".1" Max="1000" Persist="1"/>
+              <View Channel="7"     Caption="Total Count Rate"   X="0" Y="1" Width="10" Height="10" ChannelSelector="Hide" TriggerSnapshotButtons="Hide" >
+                <Plugin Caption="CountRate" Type="Sync Writer">
+                  <Option Name="Caption"     Value="Save Count Rate" />
+                  <Option Name="Description" Value="Count Rate" />
+                  <Option Name="ColumnDescr" Value="t:Rate" />
+                  <Option Name="SynthIndex"  Value="1"/>
+                </Plugin>
+                <Plugin Caption="RateDisplay" Type="Line Display 2">
+                  <Option Name="DisplaySelectButtons" Value="0"/>
+                  <Option Name="SynthIndex"           Value="1"/>
+                  <Option Name="InitialXRange"        Value="300"/>
+                  <Option Name="DataCompress"         Value="1"/>
+                </Plugin>
+              </View>
+            </Dialog>
+          </Widget>
+        </Widget>
+
+        <Widget Type="Box"     Caption="Fitting"           X="1" Y="5">
+          <Widget Type="Label"   Caption="Detector Offset"   X="0" Y="0" Alignment="Left"/>
+          <Widget Type="Label"   Caption="Detector Jitter"   X="0" Y="1" Alignment="Left"/>
+          <Widget Type="Xedit"   Address="0x3A4"             X="1" Y="0" Width="2" Unit="s" Prefix="p" Scale="1" Min="-1000000" Max="1000000" Persist="1"/>
+          <Widget Type="Xedit"   Address="0x3A5"             X="1" Y="1" Width="2" Unit="s" Prefix="p" Scale="1" Min="1" Max="100000" Persist="1"/>
+          <Widget Type="Label"   Caption="Model Function"    X="0" Y="2" Alignment="Left"/>
+          <Widget Type="Combo"                               X="1" Y="2" Width="2" Address="0x3A3" Choices="None:Coherent:Thermal:Single Photon:Three Level System:Thermal+Jitter:Single Ph.+Jitter:Three Lv.+Jitter"/>
+          <Dialog Caption="Edit Start Values"                X="1" Y="3" Width="2" Modal="0" Popup="Button">
+            <Widget Type="Box" Caption="Parameter Start Values" X="0" Y="0">
+              <Macro Type="Include" File="fitpar.ngm" P0="1" P1="0x3A3" P2="0"/>
+            </Widget>
+          </Dialog>
+          <Widget Type="Label" Caption="Fit Success"         X="0" Y="4" Alignment="Left"/>
+          <Widget Type="Label" Caption="G<sup>(2)</sup>(0)"  X="0" Y="5" Alignment="Left"/>
+          <Widget Type="Xedit" Address="0x3AB"               X="1" Y="4" Width="2" Unit="" Prefix="X" Scale="1"  ReadOnly="1" Tip="0: no fit; positive: no of rounds; negative: failed"/>
+          <Widget Type="Xedit"   Address="0x3AD"             X="1" Y="5" Width="2" Unit="" Prefix="X" Scale="1000000" ReadOnly="1"/>
+          <Widget Type="Box"     Caption="" Style="Flat"     X="0" Y="6" Width="3">
+            <Macro Type="Include" File="fitpar.ngm" P0="0" P1="0x3A3" P2="1"/>
+          </Widget>
+        </Widget>
+      </Widget>
+    </Tab>
+
+
+    <Tab Name="Lifetime" Condition="$LifetmAv$">
+      <Widget Type="Box" Style="Flat"                    X="0" Y="0" Condition="$!(SingleSt)$" HideOnCond="0">
+        <Widget Type="Box"   Caption="Parameters"          X="0" Y="0" Width="2">
+          <Widget Type="Box"   Style="Flat"                  X="0" Y="0" Align="Left">
+            <Widget Type="Label" Caption="Active"              X="0" Y="0" Alignment="Left"/>
+            <Widget Type="Check"                               X="1" Y="0" Address="0x39C"/>
+            <Widget Type="Label" Caption="Start Channel"       X="0" Y="1" Alignment="Left"/>
+            <Widget Type="Label" Caption="Stop Channel"        X="0" Y="2" Alignment="Left"/>
+            <Widget Type="Combo" Address="0x3D4"               X="1" Y="1" Choices="Start:1:2:3:4:5:6:7" Persist="1"/>
+            <Widget Type="Combo" Address="0x3D5"               X="1" Y="2" Choices="1=1:2=2:3=3:4=4:5=5:6=6:7=7" Persist="1"/>
+            <Widget Type="Label" Caption="Histogram Width"     X="3" Y="1" Alignment="Left"/>
+            <Widget Type="Label" Caption="Bin Count"           X="3" Y="2" Alignment="Left"/>
+            <Widget Type="Label"                               X="2" Y="1" Alignment="Left"/>
+            <Widget Type="Xedit" Address="0x3D6"               X="4" Y="1" Unit="s" Prefix="n" Min="1"  Max="1000000" Persist="1"/>
+            <Widget Type="Xedit" Address="0x3D7"               X="4" Y="2" Unit=""  Prefix="X" Min="16" Max="65535" Persist="1"/>
+            <Widget Type="Label"                               X="5" Y="1" Alignment="Left"/>
+            <Widget Type="Button"  Caption="Reset"             X="6" Y="1" Address="0x3DB" Align="Normal"/>
+            <Dialog Caption="Data Generation"                  X="6" Y="2" Modal="0" Popup="Button">
+              <Widget Type="Label"   Caption="Function Type"     X="0" Y="0" Alignment="Left"/>
+              <Widget Type="Combo"                               X="1" Y="0" Width="2" Address="0x3D8" Choices="None:Exponential:double Exp.:Kohlrausch"/>
+              <Widget Type="Label"   Caption="Noise Level"       X="0" Y="1" Alignment="Left"/>
+              <Widget Type="Xedit"   Address="0x3DA"             X="1" Y="1" Width="2" Unit="" Prefix="X" Scale="1000000" Min="0." Max="1." Persist="1"/>
+              <Widget Type="Box"  Caption="Generator Parameters" X="0" Y="2" Width="3">
+                <Macro Type="Include" File="lftpar.ngm" P0="2" P1="0x3D8" P2="0"/>
+              </Widget>
+            </Dialog>
+          </Widget>
+        </Widget>
+
+        <View Channel="9"     Caption="MsHistogram"        X="0" Y="1" Width="2" ChannelSelector="Hide" TriggerSnapshotButtons="Hide">
+          <Plugin Caption="Msfork" Type="Fork" >
+            <Option Name="Target" Value="MsUnion"/>
+          </Plugin>
+        </View>
+        <View Channel="8"     Caption="Ms Fit"             X="0" Y="2" Width="2" Height="3" ChannelSelector="Hide" TriggerSnapshotButtons="Hide">
+          <Plugin Caption="MsUnion" Type="Union">
+            <Option Name="Mode" Value="Multiline"/>
+          </Plugin>
+          <Plugin Caption="MultiStopHistogram" Type="Sync Writer">
+            <Option Name="Caption"     Value="Save Histogram"/>
+            <Option Name="Description" Value="Multistop Histogram"/>
+            <Option Name="ColumnDescr" Value="dt:MS Histogram:Histogram-fitted"/>
+            <Option Name="Snapshot"    Value="Histogram Width:0x3D6"/>
+            <Option Name="Snapshot"    Value="Events Start:0x3DC"/>
+            <Option Name="Snapshot"    Value="Events Stop:0x3DD"/>
+            <Option Name="Snapshot"    Value="Integr. Time:0x3DE"/>
+            <Option Name="Snapshot"    Value="Fit Function:0x3D0"/>
+            <Option Name="Snapshot"    Value="Fit (exp) - I_0:0x3E0"/>
+            <Option Name="Snapshot"    Value="Fit (exp) - T_0:0x3E1"/>
+            <Option Name="Snapshot"    Value="Fit (dbl) - I_0:0x3E2"/>
+            <Option Name="Snapshot"    Value="Fit (dbl) - alpha:0x3E3"/>
+            <Option Name="Snapshot"    Value="Fit (dbl) - T_0:0x3E4"/>
+            <Option Name="Snapshot"    Value="Fit (dbl) - T_1:0x3E5"/>
+            <Option Name="Snapshot"    Value="Fit (kr)  - I_0:0x3E6"/>
+            <Option Name="Snapshot"    Value="Fit (kr)  - T_=:0x3E7"/>
+            <Option Name="Snapshot"    Value="Fit (kr)  - beta:0x3E8"/>
+          </Plugin>
+          <Plugin Caption="MsDisplay" Type="Line Display 2">
+            <Option Name="DisplayToolBar"       Value="0"/>
+            <Option Name="HistogramMode"        Value="1"/>
+          </Plugin>
+        </View>
+
+        <Widget Type="Box"   Caption="Results"             X="0" Y="5">
+          <Widget Type="Box"   Style="Flat"                  X="0" Y="0" Align="Top">
+            <Widget Type="Label" Caption="Start Events"        X="0" Y="0" Alignment="Left"/>
+            <Widget Type="Label" Caption="Stop Events"         X="0" Y="1" Alignment="Left"/>
+            <Widget Type="Label" Caption="Integr. Time"        X="0" Y="2" Alignment="Left"/>
+            <Widget Type="Xedit" Address="0x3DC"               X="1" Y="0" Unit=""   Prefix="X"              ReadOnly="1"/>
+            <Widget Type="Xedit" Address="0x3DD"               X="1" Y="1" Unit=""   Prefix="X"              ReadOnly="1"/>
+            <Widget Type="Xedit" Address="0x3DE"               X="1" Y="2" Unit="s"  Prefix=" " Scale="1000" ReadOnly="1"/>
+          </Widget>
+        </Widget>
+
+        <Widget Type="Box"     Caption="Fitting"           X="1" Y="5">
+          <Widget Type="Label"   Caption="Model Function"    X="0" Y="0" Alignment="Left"/>
+          <Widget Type="Combo"                               X="1" Y="0" Width="2" Address="0x3D9" Choices="None:Exponential:double Exp.:Kohlrausch"/>
+          <Dialog Caption="Edit Start Values"                X="1" Y="1" Width="2" Modal="0" Popup="Button">
+            <Widget Type="Box" Caption="Parameter Start Values" X="0" Y="0">
+              <Macro Type="Include" File="lftpar.ngm" P0="1" P1="0x3D9" P2="0"/>
+            </Widget>
+          </Dialog>
+          <Widget Type="Label" Caption="Fit Success"         X="0" Y="2" Alignment="Left"/>
+          <Widget Type="Xedit" Address="0x3DF"               X="1" Y="2" Width="2" Unit="" Prefix="X" Scale="1"  ReadOnly="1" Tip="0: no fit; positive: no of rounds; negative: failed"/>
+          <Widget Type="Box"     Caption="" Style="Flat"     X="0" Y="3" Width="3">
+            <Macro Type="Include" File="lftpar.ngm" P0="0" P1="0x3D9" P2="1"/>
+          </Widget>
+        </Widget>
+      </Widget>
+    </Tab>
+
+
+    <Tab Name="Detector Parameters">
+      <Widget Type="Box" Style="Flat"                    X="0" Y="0" Align="Right">
+        <Widget Type="Label" Caption="Modules"             X="0" Y="0"/>
+        <Widget Type="Bitfield"                            X="1" Y="0" Address="0x860" Horizontal="1" Bits="1=0:2=1:3=2:4=3" ReadOnly="1"/>
+      </Widget>
+
+      <Widget Type="Tabs"                                X="0" Y="1">
+        <Tab Name="Channels Start...8">
+          <Widget Type="Label" Caption="Start"               X="0" Y="2" Alignment="Left"/>
+          <Widget Type="Check"                               X="1" Y="2" Address="0x861" Persist="1"/>
+          <Widget Type="Combo"                               X="2" Y="2" Address="0x3C0" Index="0" Choices="LVTTL=1:NIM=2:Misc=3" Persist="1"/>
+          <Widget Type="Combo"                               X="3" Y="2" Address="0x3C6" Index="0" Choices="Falling Edge:Rising Edge" Condition="??(CndType#0,0,0,0,1)" HideOnCond="0" Persist="1"/>
+          <Widget Type="Xedit"                               X="4" Y="2" Address="0x3C5" Index="0" Unit="V" Prefix=" " Scale="6553.5" Offset="-5" Min="-3" Max="3" Condition="??(CndType#0,0,0,0,1)" HideOnCond="0" Persist="1"/>
+          <Widget Type="Xedit"                               X="5" Y="2" Address="0x3BE" Index="0" Unit="s" Prefix="p" Scale="209.7152" Offset="-1.e5" Min="-1.e5" Max="1.e5" Condition="==(HwType,0x6A00)" Persist="1"/>
+          <Widget Type="Xedit"                               X="5" Y="2" Address="0x3BE" Index="0" Unit="s" Prefix="p" Scale="32.768"   Offset="-5.e4" Min="-5.e4" Max="5.e4" Condition="!=(HwType,0x6A00)" Persist="1"/>
+          <Macro Type="Include" File="devpar.ngm" P0="0"/>
+        </Tab>
+        <Tab Name="Channels 9...16" Condition="band(ModMask,2)">
+          <Macro Type="Include" File="devpar.ngm" P0="8"/>
+        </Tab>
+        <Tab Name="Channels 17...24" Condition="band(ModMask,4)">
+          <Macro Type="Include" File="devpar.ngm" P0="16"/>
+        </Tab>
+        <Tab Name="Channels 25...32" Condition="band(ModMask,8)">
+          <Macro Type="Include" File="devpar.ngm" P0="24"/>
+        </Tab>
+      </Widget>
+
+      <Widget Type="Box" Style="Flat"                    X="0" Y="2">
+      </Widget>
+
+      <Widget Type="Box" Caption="Marker Options"        X="0" Y="3">
+        <Widget Type="Box" Style="Flat"                    X="0" Y="0" Align="Left">
+          <Widget Type="Label" Caption="Rising Edge"         X="0" Y="0" Alignment="Left"                       Condition="MarkAv"/>
+          <Widget Type="Bitfield" Horizontal="1"             X="2" Y="0" Address="0x802"  Bits="Marker 1:Marker 2:Marker 3:Marker 4" Condition="MarkAv"/>
+
+          <Widget Type="Label" Caption="Falling Edge"        X="0" Y="1" Alignment="Left"                       Condition="MarkAv"/>
+          <Widget Type="Bitfield" Horizontal="1"             X="2" Y="1" Address="0x802"  Bits="Marker 1=5:Marker 2=6:Marker 3=7:Marker 4=8" Condition="MarkAv"/>
+
+          <Widget Type="Label" Caption="Enable Timer Tick "  X="0" Y="2" Alignment="Left"/>
+          <Widget Type="Label" Caption=" "                   X="1" Y="2" />
+          <Widget Type="Bitfield"                            X="2" Y="2" Address="0x802"  Bits="=4" Persist="1"/>
+        </Widget>
+      </Widget>
+
+      <Widget Type="Box" Style="Flat"                    X="0" Y="4"/>
+      <Widget Type="Box" Caption="Start Input Options"   X="0" Y="5">
+        <Widget Type="Box" Style="Flat"                    X="0" Y="0" Align="Left">
+          <Widget Type="Label" Caption="Stop Behaviour"    X="0" Y="0" Alignment="Left"/>
+          <Widget Type="Label" Caption="  "                X="1" Y="0"/>
+          <Widget Type="Radio" Choices="Multi Stop:Single Stop"       X="2" Y="0" Width="2" Style="Flat" Address="0x2B9"/>
+        </Widget>
+        <Widget Type="Box" Style="Flat"                    X="0" Y="1" Align="Left" Condition="==(HwType,0x6A00)">
+          <Widget Type="Label" Caption="Input Divider"       X="0" Y="0"/>
+          <Widget Type="Combo"                               X="1" Y="0" Address="0x3C3" Index="0" Choices="1=0:2=1:4=2:8=3"/>
+          <Widget Type="Check" Caption="Reconstruct Events"  X="2" Y="0" Width="2" Address="0x3C1"/>
+          <Widget Type="Check" Caption="Start Input to Stop Channel " X="0" Y="1" Width="3" Address="0x2B8"/>
+        </Widget>
+      </Widget>
+
+      <Widget Type="Box" Style="Flat"                    X="0" Y="6"/>
+      <Widget Type="Box" Caption="HiRes"                 X="0" Y="7" Condition="==(HwType,0x6A00)">
+        <Widget Type="Box" Style="Flat"                    X="0" Y="0" Align="Left">
+          <Widget Type="Label" Caption="Link Channels"       X="0" Y="0" Alignment="Left"/>
+          <Widget Type="Label" Caption=" "                   X="1" Y="0"/>
+          <Widget Type="Combo"                               X="2" Y="0" Address="0x867" Index="0" Choices="None:1+2, 4+3, 5+6, 8+7:1..4, 5..8:1..8"/>
+          <Widget Type="Combo"                               X="3" Y="0" Address="0x867" Index="1" Choices="None:9+10, 12+11, 13+14, 16+15:9..12, 13..16:9..16" Condition="band(ModMask,2)"/>
+        </Widget>
+      </Widget>
+
+      <Widget Type="Box" Style="Flat"                    X="0" Y="8"/>
+      <Widget Type="Box" Caption="External Clock"        X="0" Y="9" Condition="or(ClkAv,SyncAv)">
+        <Widget Type="Box" Style="Flat"                    X="0" Y="0" Align="Left" Condition="ClkAv">
+          <Widget Type="Label" Caption=""                    X="0" Y="0" Align="Left"/>
+          <Widget Type="Check" Caption="Enable"              X="1" Y="0" Address="0x862"/>
+          <Widget Type="Led"                                 X="2" Y="0" Align="Right" Address="0x3D0" Green="1" Grey="0"/>
+          <Widget Type="Label" Caption="Locked"              X="3" Y="0" Align="Left"/>
+          <Widget Type="Label"                               X="4" Y="0" Align="Left"/>
+          <Dialog Caption="Configure Clock"                  X="5" Y="0" Modal="0" Popup="Button" Condition="$UClkAv$">
+            <Widget Type="PllCtrl"                             X="0" Y="0" Width="2" Height="4" LockLed="0">
+              <Connect Name="DivR"   Address="0x811" />
+              <Connect Name="DivN"   Address="0x812" />
+              <Connect Name="DivK"   Address="0x813" />
+            </Widget>
+          </Dialog>
+        </Widget>
+        <Widget Type="Box" Style="Flat"                    X="1" Y="0" Align="Left" Condition="SyncAv">
+          <Widget Type="Check" Caption="Clock Out"           X="0" Y="0" Address="0x866"/>
+        </Widget>
+      </Widget>
+
+      <Widget Type="Box" Style="Flat"                    X="0" Y="10"/>
+      <Widget Type="Box" Caption="Calibration"           X="0" Y="11">
+        <Widget Type="Box" Style="Flat"                    X="0" Y="0" Align="Left">
+          <Widget Type="Button" Caption="Start"              X="0" Y="0" Address="0x2A5" Toggle="0"/>
+          <Widget Type="Label"  Caption=" "                  X="1" Y="0"/>
+          <Widget Type="Led"                                 X="2" Y="0" Address="0x0803" Grey="0" Red="1" Green="-1"/>
+        </Widget>
+      </Widget>
+      <Widget Type="Box" Style="Flat"                    X="0" Y="12" Height="5"/>
+    </Tab>
+	
+    <Tab Name="FLIM" Condition="and(FlimAv,!=(HwType,0x6A00))">
+	    <Widget Type="Box"   Caption="Data Acquisition"          X="0" Y="0" >
+		    <Widget Type="Led"                              X="0" Y="0" Address="0x3F0" Grey="0" Red="-1" Green="1" />
+    <!--<Widget Type="Check"  Caption="Simulation"      X="0" Y="1" Address="0x300"  />-->
+		    <Widget Type="Button" Caption="Start"           X="1" Y="0" Address="0x3F0" Data="1" />
+		    <Widget Type="Button" Caption="Stop"           	X="1" Y="1" Address="0x3F0" Data="0" />
+		    <Widget Type="Label"  Caption="Stop Channel"	X="0" Y="2" />
+		    <Widget Type="Combo"                        	X="1" Y="2" Address="0x3F5"  Choices="Start:Stop 1:Stop 2:Stop 3: Stop 4"  Persist="1" />
+	    </Widget>
+	    
+	    <Widget Type="Box"   Caption="Image Size"          X="1" Y="0" >
+    <!--<Widget Type="Radio" Choices="Manual:Auto"   X="0" Y="0" Style="Flat" Address="addr_imageSizeAuto"/>-->
+		    <Widget Type="Xedit"  X="0" Y="1" Address="0x3F1" Caption="x" Unit="px" Min="1" Max="2048"/>
+		    <Widget Type="Xedit"  X="1" Y="1" Address="0x3F2" Caption="y" Unit="px" Min="1" Max="2048"/>
+        <Widget Type="Xedit"  X="0" Y="2" Address="0x3F3" Caption="bins" Unit=" " Min="1" Max="2048"/>
+        <Widget Type="Xedit"  X="1" Y="2" Address="0x3F4" Caption="binwidth^2 ps" Unit=" " Min="1" Max="2048"/>    
+	    </Widget>
+	    
+	    <Widget Type="Box"   Caption="External Linetrigger"        X="2" Y="0" Width="2">
+		    <Widget Type="Label" Caption="Trigger Input"           X="0" Y="0" Alignment="Left"                       Condition="MarkAv"/>
+		    <Widget Type="Bitfield" Horizontal="1"                 X="1" Y="0" Address="0x802"  Bits="enable=1" Condition="MarkAv"/>
+        <!--        <Widget Type="Bitfield" Horizontal="1"                 X="3" Y="0" Address="0x802"  Bits="Falling Edge=6" Condition="MarkAv"/>-->
+		    
+		    <Widget Type="Label" Caption="Measured Line Period"  	X="0" Y="1"  Alignment="Left" />
+		    <Widget Type="Xedit"           							X="1" Y="1" Prefix="n" Unit="s" Scale="1." Address="0x855" Index="0" />
+		    <Widget Type="Label" Caption="Auto"  					X="2" Y="1" Alignment="Left"  />
+		    <Widget Type="Check"                                    X="3" Y="1" Address="0x859" Index="0" />
+		    <Widget Type="Label" Caption="Flyback Reseve"           X="0" Y="2" Alignment="Left"  />
+		    <Widget Type="Xedit" 									X="1" Y="2" Address="0x857" Index="0" Unit="%" Prefix="X" Scale="1000." />
+		    <Widget Type="Label" Caption="Pixel Lost"           	X="2" Y="2" Alignment="Left"  />
+		    <Widget Type="Xedit" 									X="3" Y="2" Address="0x858" Index="0" Prefix="X" ReadOnly="1" />
+		    <Widget Type="Label" Caption="Pixel Period"             X="0" Y="3" Alignment="Left"  />
+		    <Widget Type="Xedit" 									X="1" Y="3" Address="0x856" Index="0" Unit="s" Prefix="n" Scale="1." ReadOnly="1" />
+		    <Widget Type="Label" Caption="Single Frame"             X="2" Y="3" Alignment="Left"  />
+		    <Widget Type="Check"                                    X="3" Y="3" Address="0x854" Index="0" />
+	    </Widget>
+	    
+	    
+      <Widget Type="Box"   Caption="Scanner coupled displays"                   X="0" Y="1" Width="4"  Height="10" Style="Flat" >  
+        <View Dgroup="13"    Caption="Intensity"    X="0" Y="0" >
+          
+		      <Plugin Caption="Histogram" Type="Disc Writer" >
+			      <Option Name="displayread"   Value="1" />
+		      </Plugin>
+	        <Plugin Type="Flim 3D Filter" >
+            <Option Name="fitenable"        Value="0" />
+          </Plugin>
+          <Plugin Type="Frame Display" Caption="Intensity">
+            <Option Name="size"   Value="260" />
+            <Option Name="DisplayPathButton" Value="0" />
+            <Option Name="DisplayGridButton" Value="0" />
+            <Option Name="displayscanbuttons" Value="0" />
+            <Option Name="displaydirbutton" Value="0" />
+            <Option Name="sendcoordtopeers"  Value="1" />
+            <Option Name="displaytoolbar"    Value="1" />
+          </Plugin>
+        </View>
+        
+        <View Dgroup="13"    Caption="Dye"    X="1" Y="0" >
+          <Plugin Type="Flim 3D Filter" >
+            <Option Name="fitenable"        Value="1" />
+            <Option Name="fixedcolorcoding"  Value="1" />
+          </Plugin>
+          <Plugin Type="Frame Display" Caption="Dye">
+            <Option Name="size"   Value="260" />
+            <Option Name="DisplayPathButton" Value="0" />
+            <Option Name="DisplayGridButton" Value="0" />
+            <Option Name="displayscanbuttons" Value="0" />
+            <Option Name="displaydirbutton" Value="0" />
+            <Option Name="sendcoordtopeers"  Value="1" />
+            <Option Name="displaytoolbar"    Value="1" />
+            <Option Name="fixedcolorcoding"  Value="1" />
+          </Plugin>
+        </View>
+        
+        <Widget Type="Box" Style="Flat"                X="0" Y="1" Width="2" >
+          <View Dgroup="13"    Caption="AFM-RightLine"    X="0" Y="1" >
+            <Plugin Type="Flim 2D Filter"/>
+            <Plugin Type="Line Display 2" Caption="AFM-RightLine">
+              <Option Name="StoreLocal" Value="1"/>
+            </Plugin>
+          </View>
+          
+          <View Dgroup="13"    Caption="AFM-RightLine"    X="1" Y="1" >
+            <Plugin Type="Flim Control Filter"/>
+          </View>
+        </Widget>
+        
+      </Widget>
+      
+    </Tab>
+    
+  </Widget> 
+</Panel>
