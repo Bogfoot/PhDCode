@@ -27,7 +27,7 @@ def exampleCode(comments=None):
     path.append(Space(d=180))
     path.append(olympus.LUMPlanFL40X())
     path.append(Space(d=10))
-    path.display(beams=[GaussianBeam(w=1.0100)], comments=comments)
+    path.display(beams=[GaussianBeam(w=1.0100, z=1)], comments=comments)
 
 
 if __name__ == "__main__":
