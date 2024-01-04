@@ -1,0 +1,25 @@
+# 2023-05-29 1550 SPDC measurment TEST
+# both crystals are (again) oriented in the same direction
+# temperature scan betwen 24 and 80 C 
+# this measurement now includes the coincidence stage where we seperate single photons based on polarization per channel 
+# rainer slightly readjusted the alignment 
+# --------------------------------- 
+# input laser power: 30 mW at 1550 nm (245 mA) 
+# pump polarization: H# periodic pooling: 9.03 um# initial setup alignment at 22.0 C# integration time: 60 s 
+# single photon detector darkcounts: 3.4 kHz 
+# single photon detector QE: 30% 
+# single photon detector dead time: 20 us 
+# ---------------------------------- 
+# Temperature    Clicks_1    Clicks_2    Correlations 
+# [C]    [/]    [/]    [/] 
+38.0    203707    206964    20
+38.1    204762    205434    8
+38.2    204643    204503    14
+38.3    204270    205487    12
+38.4    204141    206095    16
+38.5    205422    207167    14
+38.6    204934    206226    12
+38.7    204888    204486    15
+38.8    204013    205459    12
+38.9    204572    205436    18
+39.0    205030    204813    15

@@ -1,5 +1,6 @@
 TITLE = "Laser beam and vendor lenses"
 
+from matplotlib.pyplot import box
 from raytracing import *
 
 
@@ -22,3 +23,4 @@ def SagnacWaistEvolution(comments=None):
 
 if __name__ == "__main__":
     SagnacWaistEvolution()
+
