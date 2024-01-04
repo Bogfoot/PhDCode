@@ -25,11 +25,13 @@ import os
 import socket
 import time
 from datetime import date
-import serial.serialwin32
+
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy
+import serial.serialwin32
 import serial.tools.list_ports as port_list
+
 ##################### setting correct working directory:
 
 

@@ -110,10 +110,10 @@ class QuTAG:
 
         if (
             platform.system() == "Linux"
-        ):  # if you want to switch to linux you also need to change self.tdclib into self.qutools_dll throughout this code... or just use the other code
+        ):  # if you want to swith to linux you also need to change self.tdclib into self.qutools_dll throughout this code... or just use the other code
             self.tdclib = ctypes.cdll.LoadLibrary("libtdcbase.so")
             self.coincLib = ctypes.cdll.LoadLibrary(
-                "/home/rainer/OneDrive/Lab_folder/Programs/python/timetagger/qutag_histogram.so"
+                "/home/bogfootlj/Documents/PhDCode/TimeTagger/TTCode/2023-09-15_1560nmtemperaturescan/qutag_histogram.so"
             )
 
         self.declareAPI()
