@@ -3,6 +3,9 @@ import serial
 
 oven = serial.Serial()
 
+usb_port = "COM7"
+
+
 oven.baudrate = 19200
 oven.port = usb_port
 oven.parity = serial.PARITY_NONE
@@ -31,14 +34,10 @@ print(a)
 # print(oven.read(20))
 
 print()
-oven.close()
 print("is the serial port closed? ", oven.is_open * False == 0)
 
-#%% read oven temperature --- WORKS
-
-oven = serial.serialwin32.Serial()
-usb_port = "COM7"
 
 covesion_enable_oven(oven, port=usb_port)
 
 print("current T = ", covesion_check_temperature(oven), " C")
+oven.close()
