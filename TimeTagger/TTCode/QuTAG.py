@@ -114,10 +114,12 @@ class QuTAG:
             self.tdclib = ctypes.windll.LoadLibrary(dll_name)
 
         if platform.system() == "Linux":
-            self.tdclib = ctypes.cdll.LoadLibrary("libtdcbase.so")
-            self.coincLib = ctypes.cdll.LoadLibrary(
-                "qutag_histogram.so"
-            )
+            baseso = "libtdcbase.so"
+            full_path_to_baseso = file_path + os.path.sep + os.path.join(baseso)
+            self.tdclib = ctypes.cdll.LoadLibrary(full_path_to_baseso)
+            histogramso = "qutag_histogram.so"
+            full_path_to_so = file_path + os.path.sep + os.path.join(histogramso)
+            self.coincLib = ctypes.cdll.LoadLibrary(full_path_to_so)
 
         self.declareAPI()
         self.dev_nr = -1
@@ -238,12 +240,6 @@ class QuTAG:
         self.tdclib.TDC_checkFeatureHbt.restype = ctypes.c_int32
         # self.tdclib.TDC_checkFeatureLifeTime.argtypes = None
         # self.tdclib.TDC_checkFeatureLifeTime.restype = ctypes.c_int32
-        self.tdclib.TDC_getFiveChannelMode.argtypes = None
-        self.tdclib.TDC_getFiveChannelMode.restype = ctypes.c_int32
-        self.tdclib.TDC_setFiveChannelMode.argtypes = [ctypes.c_int32]
-        self.tdclib.TDC_setFiveChannelMode.restype = ctypes.c_int32
-        self.tdclib.TDC_getFiveChannelMode.argtypes = [ctypes.POINTER(ctypes.c_int32)]
-        self.tdclib.TDC_getFiveChannelMode.restype = ctypes.c_int32
         self.tdclib.TDC_preselectSingleStop.argtypes = [ctypes.c_int32]
         self.tdclib.TDC_preselectSingleStop.restype = ctypes.c_int32
         self.tdclib.TDC_getSingleStopPreselection.argtypes = [
@@ -742,17 +738,6 @@ class QuTAG:
         ans = self.tdclib.TDC_checkFeatureLifeTime()
         return ans == 1
 
-    def checkFeatureFiveChan(self):
-        ans = self.tdclib.TDC_checkFeatureFiveChan()
-        return ans == 1
-
-    def getFiveChannelMode(self):
-        enable = ctypes.c_int32()
-        ans = self.tdclib.TDC_getFiveChannelMode(ctypes.byref(enable))
-        if ans != 0:
-            print("Error in TDC_getFiveChannelMode: " + self.err_dict[ans])
-        return enable.value == 1
-
     def getSingleStopPreselection(self):
         enable = ctypes.c_int32()
         ans = self.tdclib.TDC_getSingleStopPreselection(ctypes.byref(enable))
@@ -906,16 +891,6 @@ class QuTAG:
         ans = self.tdclib.TDC_setDeadTime(chn, deadTime)
         if ans != 0:
             print("Error in TDC_setDeadTime: " + self.err_dict[ans])
-        return ans
-
-    def setFiveChannelMode(self, enable):
-        if enable:
-            ena = 1
-        else:
-            ena = 0
-        ans = self.tdclib.TDC_setFiveChannelMode(ena)
-        if ans != 0:
-            print("Error in TDC_setFiveChannelMode: " + self.err_dict[ans])
         return ans
 
     def enableTDCInput(self, enable):

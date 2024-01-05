@@ -80,7 +80,7 @@ class QuTAG:
         Set some parameters
         """
         file_path = os.path.dirname(os.path.abspath(__file__))
-        dll_name = "tdcbase.dll"
+        dll_name = "libtdcbase.so"
         # check Python bit version
         if sys.maxsize > 2 ** 32:
             # load DLL 64 Bit -------------------------------------------
@@ -96,12 +96,12 @@ class QuTAG:
         os.environ["PATH"] += full_path
 
         # load DLL -------------------------------------------
-        self.qutools_dll = ctypes.windll.LoadLibrary(dll_name)
+        self.qutools_dll = ctypes.cdll.LoadLibrary(dll_name)
 
         self.declareAPI()
         self.dev_nr = -1
 
-        # wrapper function Initiallize to connect to quTAG
+        # wrapper function Initialize to connect to quTAG
         self.Initialize()
 
         self._bufferSize = 1000000

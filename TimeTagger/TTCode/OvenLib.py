@@ -22,13 +22,12 @@ connecting to oven uses "pyserial" package.
 import os
 
 import matplotlib.pyplot as plt
-import numpy as np
-import serial.serialwin32
+import serial
 
 ##################### setting correct working directory:
 
 
-directorypath = "/home/bogfootlj/Documents/PhDCode/TimeTagger/TTCode/2023-09-15_1560nmtemperaturescan/"
+directorypath = "/home/bogfootlj/Documents/PhDCode/TimeTagger/TTCode/"
 # os.chdir(directorypath)
 os.chdir(directorypath)  # change
 ###########################
@@ -58,6 +57,7 @@ def covesion_enable_oven(
     oven.write(send_message.encode())
     oven.close()
     return
+
 
 def string_bit_converter(input_list):
     output_string = [""]

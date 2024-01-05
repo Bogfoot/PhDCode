@@ -240,9 +240,7 @@ class QuTAG:
         self.tdclib.TDC_getFiveChannelMode.restype = ctypes.c_int32
         self.tdclib.TDC_setFiveChannelMode.argtypes = [ctypes.c_int32]
         self.tdclib.TDC_setFiveChannelMode.restype = ctypes.c_int32
-        self.tdclib.TDC_getFiveChannelMode.argtypes = [
-            ctypes.POINTER(ctypes.c_int32)
-        ]
+        self.tdclib.TDC_getFiveChannelMode.argtypes = [ctypes.POINTER(ctypes.c_int32)]
         self.tdclib.TDC_getFiveChannelMode.restype = ctypes.c_int32
         self.tdclib.TDC_preselectSingleStop.argtypes = [ctypes.c_int32]
         self.tdclib.TDC_preselectSingleStop.restype = ctypes.c_int32
@@ -252,9 +250,7 @@ class QuTAG:
         self.tdclib.TDC_getSingleStopPreselection.restype = ctypes.c_int32
         self.tdclib.TDC_enableChannels.argtypes = [ctypes.c_int32]
         self.tdclib.TDC_enableChannels.restype = ctypes.c_int32
-        self.tdclib.TDC_getChannelsEnabled.argtypes = [
-            ctypes.POINTER(ctypes.c_int32)
-        ]
+        self.tdclib.TDC_getChannelsEnabled.argtypes = [ctypes.POINTER(ctypes.c_int32)]
         self.tdclib.TDC_getChannelsEnabled.restype = ctypes.c_int32
         self.tdclib.TDC_enableMarkers.argtypes = [ctypes.c_int32]
         self.tdclib.TDC_enableMarkers.restype = ctypes.c_int32
@@ -290,13 +286,9 @@ class QuTAG:
             ctypes.POINTER(ctypes.c_int32),
         ]
         self.tdclib.TDC_getDeviceParams.restype = ctypes.c_int32
-        self.tdclib.TDC_setChannelDelays.argtypes = [
-            ctypes.POINTER(ctypes.c_int32)
-        ]
+        self.tdclib.TDC_setChannelDelays.argtypes = [ctypes.POINTER(ctypes.c_int32)]
         self.tdclib.TDC_setChannelDelays.restype = ctypes.c_int32
-        self.tdclib.TDC_getChannelDelays.argtypes = [
-            ctypes.POINTER(ctypes.c_int32)
-        ]
+        self.tdclib.TDC_getChannelDelays.argtypes = [ctypes.POINTER(ctypes.c_int32)]
         self.tdclib.TDC_getChannelDelays.restype = ctypes.c_int32
         self.tdclib.TDC_setDeadTime.argtypes = [ctypes.c_int32, ctypes.c_int32]
         self.tdclib.TDC_setDeadTime.restype = ctypes.c_int32
@@ -548,9 +540,7 @@ class QuTAG:
             ctypes.POINTER(QuTAG.TDC_HbtFunction),
         ]
         self.tdclib.TDC_getHbtCorrelations.restype = ctypes.c_int32
-        self.tdclib.TDC_calcHbtG2.argtypes = [
-            ctypes.POINTER(QuTAG.TDC_HbtFunction)
-        ]
+        self.tdclib.TDC_calcHbtG2.argtypes = [ctypes.POINTER(QuTAG.TDC_HbtFunction)]
         self.tdclib.TDC_calcHbtG2.restype = ctypes.c_int32
         self.tdclib.TDC_fitHbtG2.argtypes = [
             ctypes.POINTER(QuTAG.TDC_HbtFunction),
@@ -564,9 +554,7 @@ class QuTAG:
             ctypes.c_int32,
             ctypes.POINTER(ctypes.c_double),
         ]
-        self.tdclib.TDC_getHbtFitStartParams.restype = ctypes.POINTER(
-            ctypes.c_double
-        )
+        self.tdclib.TDC_getHbtFitStartParams.restype = ctypes.POINTER(ctypes.c_double)
         self.tdclib.TDC_calcHbtModelFct.argtypes = [
             ctypes.c_int32,
             ctypes.POINTER(ctypes.c_double),
@@ -614,9 +602,7 @@ class QuTAG:
         self.tdclib.TDC_setLftStartInput.restype = ctypes.c_int32
         self.tdclib.TDC_addLftHistogram.argtypes = [ctypes.c_int32, ctypes.c_int32]
         self.tdclib.TDC_addLftHistogram.restype = ctypes.c_int32
-        self.tdclib.TDC_getLftStartInput.argtypes = [
-            ctypes.POINTER(ctypes.c_int32)
-        ]
+        self.tdclib.TDC_getLftStartInput.argtypes = [ctypes.POINTER(ctypes.c_int32)]
         self.tdclib.TDC_getLftStartInput.restype = ctypes.c_int32
         self.tdclib.TDC_setLftParams.argtypes = [ctypes.c_int32, ctypes.c_int32]
         self.tdclib.TDC_setLftParams.restype = ctypes.c_int32

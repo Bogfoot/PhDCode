@@ -1,7 +1,7 @@
 import time
 
 try:
-    import QuTAGLinux as qt
+    import QuTAG as qt
 except:
     print(f"Didn't find QuTAGWindows or something went wrong.'")
 
