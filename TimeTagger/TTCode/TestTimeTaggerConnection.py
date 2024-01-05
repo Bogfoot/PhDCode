@@ -3,7 +3,7 @@ import time
 try:
     import QuTAG as qt
 except:
-    print(f"Didn't find QuTAGWindows or something went wrong.'")
+    print(f"Didn't find QuTAG or something went wrong.")
 
 #%%  test connecting to time tagger
 channel_1 = 1
