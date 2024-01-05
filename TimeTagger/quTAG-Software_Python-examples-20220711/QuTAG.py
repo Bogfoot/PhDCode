@@ -38,7 +38,9 @@
 
 import ctypes
 import os
+import platform
 import sys
+import time
 
 try:
     import numpy as np
@@ -80,28 +82,49 @@ class QuTAG:
         Set some parameters
         """
         file_path = os.path.dirname(os.path.abspath(__file__))
-        dll_name = "libtdcbase.so"
-        # check Python bit version
-        if sys.maxsize > 2 ** 32:
-            # load DLL 64 Bit -------------------------------------------
-            full_path = file_path + os.path.sep + os.path.join("DLL_64bit")
-            # print("Python 64 Bit - loading 64 Bit DLL")
-        else:
-            # load DLL 32 Bit -------------------------------------------
-            full_path = file_path + os.path.sep + os.path.join("DLL_32bit")
-            # print("Python 32 Bit - loading 32 Bit DLL")
+        # load Lib -------------------------------------------
+        if platform.system() == "Windows":
+            file_path = os.path.dirname(os.path.abspath(__file__))
+            dll_name = "tdcbase.dll"
+            # check Python bit version
+            if sys.maxsize > 2 ** 32:
+                # load DLL 64 Bit -------------------------------------------
+                full_path = file_path + os.path.sep + os.path.join("DLL_64bit")
+                # print("Python 64 Bit - loading 64 Bit DLL")
+            else:
+                # load DLL 32 Bit -------------------------------------------
+                full_path = file_path + os.path.sep + os.path.join("DLL_32bit")
+                # print("Python 32 Bit - loading 32 Bit DLL")
 
-        # add DLL folder to environment PATH
-        os.environ["PATH"] += ";"
-        os.environ["PATH"] += full_path
+            # add DLL folder to environment PATH
+            os.environ["PATH"] += ";"
+            os.environ["PATH"] += full_path
 
-        # load DLL -------------------------------------------
-        self.qutools_dll = ctypes.cdll.LoadLibrary(dll_name)
+            # check Python bit version
+            if sys.maxsize > 2 ** 32:
+                # load DLL 64 Bit -------------------------------------------
+                full_path = file_path + os.path.sep + os.path.join("DLL_64bit")
+                # print("Python 64 Bit - loading 64 Bit DLL")
+            else:
+                # load DLL 32 Bit -------------------------------------------
+                full_path = file_path + os.path.sep + os.path.join("DLL_32bit")
+                # print("Python 32 Bit - loading 32 Bit DLL")
+
+            # load DLL -------------------------------------------
+            self.tdclib = ctypes.windll.LoadLibrary(dll_name)
+
+        if platform.system() == "Linux":
+            baseso = "libtdcbase.so"
+            full_path_to_baseso = file_path + os.path.sep + os.path.join(baseso)
+            self.tdclib = ctypes.cdll.LoadLibrary(full_path_to_baseso)
+            histogramso = "qutag_histogram.so"
+            full_path_to_so = file_path + os.path.sep + os.path.join(histogramso)
+            self.coincLib = ctypes.cdll.LoadLibrary(full_path_to_so)
 
         self.declareAPI()
         self.dev_nr = -1
 
-        # wrapper function Initialize to connect to quTAG
+        # wrapper function Initiallize to connect to quTAG
         self.Initialize()
 
         self._bufferSize = 1000000
@@ -126,8 +149,10 @@ class QuTAG:
             print("Found " + self.devtype_dict[self._deviceType] + " device.")
         else:
             print("No suitable device found - demo mode activated")
-
-        print("Initialized with QuTAG DLL v%f" % (self.getVersion()))
+        if platform.system() == "Windows":
+            print("Initialized with QuTAG DLL v%f" % (self.getVersion()))
+        if platform.system() == "Linux":
+            print("Initialized with QuTAG Linux library v%f" % (self.getVersion()))
 
     def declareAPI(self):
         """Declare the API of the DLL with its functions and dictionaries. Should not be executed from the user."""
@@ -199,190 +224,219 @@ class QuTAG:
         }
 
         # function definitions
-        self.qutools_dll.TDC_getVersion.argtypes = None
-        self.qutools_dll.TDC_getVersion.restype = ctypes.c_double
-        self.qutools_dll.TDC_perror.argtypes = [ctypes.c_int32]
-        self.qutools_dll.TDC_perror.restype = ctypes.POINTER(ctypes.c_char_p)
-        self.qutools_dll.TDC_getTimebase.argtypes = [ctypes.POINTER(ctypes.c_double)]
-        self.qutools_dll.TDC_getTimebase.restype = ctypes.c_int32
-        self.qutools_dll.TDC_init.argtypes = [ctypes.c_int32]
-        self.qutools_dll.TDC_init.restype = ctypes.c_int32
-        self.qutools_dll.TDC_deInit.argtypes = None
-        self.qutools_dll.TDC_deInit.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getDevType.argtypes = None
-        self.qutools_dll.TDC_getDevType.restype = ctypes.c_int32
-        self.qutools_dll.TDC_checkFeatureHbt.argtypes = None
-        self.qutools_dll.TDC_checkFeatureHbt.restype = ctypes.c_int32
-        self.qutools_dll.TDC_startCalibration.argtypes = None
-        self.qutools_dll.TDC_startCalibration.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getCalibrationState.argtypes = [
+        self.tdclib.TDC_getVersion.argtypes = None
+        self.tdclib.TDC_getVersion.restype = ctypes.c_double
+        self.tdclib.TDC_perror.argtypes = [ctypes.c_int32]
+        self.tdclib.TDC_perror.restype = ctypes.POINTER(ctypes.c_char_p)
+        self.tdclib.TDC_getTimebase.argtypes = [ctypes.POINTER(ctypes.c_double)]
+        self.tdclib.TDC_getTimebase.restype = ctypes.c_int32
+        self.tdclib.TDC_init.argtypes = [ctypes.c_int32]
+        self.tdclib.TDC_init.restype = ctypes.c_int32
+        self.tdclib.TDC_deInit.argtypes = None
+        self.tdclib.TDC_deInit.restype = ctypes.c_int32
+        self.tdclib.TDC_getDevType.argtypes = None
+        self.tdclib.TDC_getDevType.restype = ctypes.c_int32
+        self.tdclib.TDC_checkFeatureHbt.argtypes = None
+        self.tdclib.TDC_checkFeatureHbt.restype = ctypes.c_int32
+        # self.tdclib.TDC_checkFeatureLifeTime.argtypes = None
+        # self.tdclib.TDC_checkFeatureLifeTime.restype = ctypes.c_int32
+        self.tdclib.TDC_preselectSingleStop.argtypes = [ctypes.c_int32]
+        self.tdclib.TDC_preselectSingleStop.restype = ctypes.c_int32
+        self.tdclib.TDC_getSingleStopPreselection.argtypes = [
             ctypes.POINTER(ctypes.c_int32)
         ]
-        self.qutools_dll.TDC_getCalibrationState.restype = ctypes.c_int32
-        # self.qutools_dll.TDC_checkFeatureLifeTime.argtypes = None
-        # self.qutools_dll.TDC_checkFeatureLifeTime.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getFiveChannelMode.argtypes = None
-        self.qutools_dll.TDC_getFiveChannelMode.restype = ctypes.c_int32
-        self.qutools_dll.TDC_setFiveChannelMode.argtypes = [ctypes.c_int32]
-        self.qutools_dll.TDC_setFiveChannelMode.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getFiveChannelMode.argtypes = [
-            ctypes.POINTER(ctypes.c_int32)
-        ]
-        self.qutools_dll.TDC_getFiveChannelMode.restype = ctypes.c_int32
-        self.qutools_dll.TDC_preselectSingleStop.argtypes = [ctypes.c_int32]
-        self.qutools_dll.TDC_preselectSingleStop.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getSingleStopPreselection.argtypes = [
-            ctypes.POINTER(ctypes.c_int32)
-        ]
-        self.qutools_dll.TDC_getSingleStopPreselection.restype = ctypes.c_int32
-        self.qutools_dll.TDC_enableChannels.argtypes = [ctypes.c_int32]
-        self.qutools_dll.TDC_enableChannels.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getChannelsEnabled.argtypes = [
-            ctypes.POINTER(ctypes.c_int32)
-        ]
-        self.qutools_dll.TDC_getChannelsEnabled.restype = ctypes.c_int32
-        self.qutools_dll.TDC_enableMarkers.argtypes = [ctypes.c_int32]
-        self.qutools_dll.TDC_enableMarkers.restype = ctypes.c_int32
-        self.qutools_dll.TDC_configureSignalConditioning.argtypes = [
+        self.tdclib.TDC_getSingleStopPreselection.restype = ctypes.c_int32
+        self.tdclib.TDC_enableChannels.argtypes = [ctypes.c_int32]
+        self.tdclib.TDC_enableChannels.restype = ctypes.c_int32
+        self.tdclib.TDC_getChannelsEnabled.argtypes = [ctypes.POINTER(ctypes.c_int32)]
+        self.tdclib.TDC_getChannelsEnabled.restype = ctypes.c_int32
+        self.tdclib.TDC_enableMarkers.argtypes = [ctypes.c_int32]
+        self.tdclib.TDC_enableMarkers.restype = ctypes.c_int32
+        self.tdclib.TDC_configureSignalConditioning.argtypes = [
             ctypes.c_int32,
             ctypes.c_int32,
             ctypes.c_int32,
             ctypes.c_double,
         ]
-        self.qutools_dll.TDC_configureSignalConditioning.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getSignalConditioning.argtypes = [
+        self.tdclib.TDC_configureSignalConditioning.restype = ctypes.c_int32
+        self.tdclib.TDC_getSignalConditioning.argtypes = [
             ctypes.c_int32,
             ctypes.POINTER(ctypes.c_int32),
             ctypes.POINTER(ctypes.c_double),
         ]
-        self.qutools_dll.TDC_getSignalConditioning.restype = ctypes.c_int32
-        self.qutools_dll.TDC_configureSyncDivider.argtypes = [
+        self.tdclib.TDC_getSignalConditioning.restype = ctypes.c_int32
+        self.tdclib.TDC_configureSyncDivider.argtypes = [ctypes.c_int32, ctypes.c_int32]
+        self.tdclib.TDC_configureSyncDivider.restype = ctypes.c_int32
+        self.tdclib.TDC_getSyncDivider.argtypes = [
+            ctypes.POINTER(ctypes.c_int32),
+            ctypes.POINTER(ctypes.c_int32),
+        ]
+        self.tdclib.TDC_getSyncDivider.restype = ctypes.c_int32
+        self.tdclib.TDC_setCoincidenceWindow.argtypes = [ctypes.c_int32]
+        self.tdclib.TDC_setCoincidenceWindow.restype = ctypes.c_int32
+        self.tdclib.TDC_setExposureTime.argtypes = [ctypes.c_int32]
+        self.tdclib.TDC_setExposureTime.restype = ctypes.c_int32
+        self.tdclib.TDC_getDeviceParams.argtypes = [
+            ctypes.POINTER(ctypes.c_int32),
+            ctypes.POINTER(ctypes.c_int32),
+        ]
+        self.tdclib.TDC_getDeviceParams.restype = ctypes.c_int32
+        self.tdclib.TDC_setChannelDelays.argtypes = [ctypes.POINTER(ctypes.c_int32)]
+        self.tdclib.TDC_setChannelDelays.restype = ctypes.c_int32
+        self.tdclib.TDC_getChannelDelays.argtypes = [ctypes.POINTER(ctypes.c_int32)]
+        self.tdclib.TDC_getChannelDelays.restype = ctypes.c_int32
+        self.tdclib.TDC_setDeadTime.argtypes = [ctypes.c_int32, ctypes.c_int32]
+        self.tdclib.TDC_setDeadTime.restype = ctypes.c_int32
+        self.tdclib.TDC_getDeadTime.argtypes = [
+            ctypes.c_int32,
+            ctypes.POINTER(ctypes.c_int32),
+        ]
+        self.tdclib.TDC_getDeadTime.restype = ctypes.c_int32
+        self.tdclib.TDC_configureSelftest.argtypes = [
+            ctypes.c_int32,
+            ctypes.c_int32,
             ctypes.c_int32,
             ctypes.c_int32,
         ]
-        self.qutools_dll.TDC_configureSyncDivider.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getSyncDivider.argtypes = [
-            ctypes.POINTER(ctypes.c_int32),
-            ctypes.POINTER(ctypes.c_int32),
-        ]
-        self.qutools_dll.TDC_getSyncDivider.restype = ctypes.c_int32
-        self.qutools_dll.TDC_setCoincidenceWindow.argtypes = [ctypes.c_int32]
-        self.qutools_dll.TDC_setCoincidenceWindow.restype = ctypes.c_int32
-        self.qutools_dll.TDC_setExposureTime.argtypes = [ctypes.c_int32]
-        self.qutools_dll.TDC_setExposureTime.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getDeviceParams.argtypes = [
-            ctypes.POINTER(ctypes.c_int32),
-            ctypes.POINTER(ctypes.c_int32),
-        ]
-        self.qutools_dll.TDC_getDeviceParams.restype = ctypes.c_int32
-        self.qutools_dll.TDC_setChannelDelays.argtypes = [
+        self.tdclib.TDC_configureSelftest.restype = ctypes.c_int32
+        self.tdclib.TDC_getDataLost.argtypes = [ctypes.POINTER(ctypes.c_int32)]
+        self.tdclib.TDC_getDataLost.restype = ctypes.c_int32
+        self.tdclib.TDC_setTimestampBufferSize.argtypes = [ctypes.c_int32]
+        self.tdclib.TDC_setTimestampBufferSize.restype = ctypes.c_int32
+        self.tdclib.TDC_getTimestampBufferSize.argtypes = [
             ctypes.POINTER(ctypes.c_int32)
         ]
-        self.qutools_dll.TDC_setChannelDelays.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getChannelDelays.argtypes = [
-            ctypes.POINTER(ctypes.c_int32)
-        ]
-        self.qutools_dll.TDC_getChannelDelays.restype = ctypes.c_int32
-        self.qutools_dll.TDC_setDeadTime.argtypes = [ctypes.c_int32, ctypes.c_int32]
-        self.qutools_dll.TDC_setDeadTime.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getDeadTime.argtypes = [
-            ctypes.c_int32,
-            ctypes.POINTER(ctypes.c_int32),
-        ]
-        self.qutools_dll.TDC_getDeadTime.restype = ctypes.c_int32
-        self.qutools_dll.TDC_configureSelftest.argtypes = [
-            ctypes.c_int32,
-            ctypes.c_int32,
-            ctypes.c_int32,
-            ctypes.c_int32,
-        ]
-        self.qutools_dll.TDC_configureSelftest.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getDataLost.argtypes = [ctypes.POINTER(ctypes.c_int32)]
-        self.qutools_dll.TDC_getDataLost.restype = ctypes.c_int32
-        self.qutools_dll.TDC_setTimestampBufferSize.argtypes = [ctypes.c_int32]
-        self.qutools_dll.TDC_setTimestampBufferSize.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getTimestampBufferSize.argtypes = [
-            ctypes.POINTER(ctypes.c_int32)
-        ]
-        self.qutools_dll.TDC_getTimestampBufferSize.restype = ctypes.c_int32
-        self.qutools_dll.TDC_enableTdcInput.argtypes = [ctypes.c_int32]
-        self.qutools_dll.TDC_enableTdcInput.restype = ctypes.c_int32
-        self.qutools_dll.TDC_freezeBuffers.argtypes = [ctypes.c_int32]
-        self.qutools_dll.TDC_freezeBuffers.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getCoincCounters.argtypes = [
+        self.tdclib.TDC_getTimestampBufferSize.restype = ctypes.c_int32
+        self.tdclib.TDC_enableTdcInput.argtypes = [ctypes.c_int32]
+        self.tdclib.TDC_enableTdcInput.restype = ctypes.c_int32
+        self.tdclib.TDC_freezeBuffers.argtypes = [ctypes.c_int32]
+        self.tdclib.TDC_freezeBuffers.restype = ctypes.c_int32
+        self.tdclib.TDC_getCoincCounters.argtypes = [
             ctypes.POINTER(ctypes.c_int32),
             ctypes.POINTER(ctypes.c_int32),
         ]
-        self.qutools_dll.TDC_getCoincCounters.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getLastTimestamps.argtypes = [
+        self.tdclib.TDC_getCoincCounters.restype = ctypes.c_int32
+        self.tdclib.TDC_getLastTimestamps.argtypes = [
             ctypes.c_int32,
-            ctypes.POINTER(ctypes.c_int64),
+            ctypes.POINTER(ctypes.c_longlong),
             ctypes.POINTER(ctypes.c_int8),
             ctypes.POINTER(ctypes.c_int32),
         ]
-        self.qutools_dll.TDC_getLastTimestamps.restype = ctypes.c_int32
-        self.qutools_dll.TDC_writeTimestamps.argtypes = [
-            ctypes.c_char_p,
-            ctypes.c_int32,
-        ]
-        self.qutools_dll.TDC_writeTimestamps.restype = ctypes.c_int32
-        self.qutools_dll.TDC_inputTimestamps.argtypes = [
-            ctypes.POINTER(ctypes.c_int64),
+        self.tdclib.TDC_getLastTimestamps.restype = ctypes.c_int32
+        self.tdclib.TDC_writeTimestamps.argtypes = [ctypes.c_char_p, ctypes.c_int32]
+        self.tdclib.TDC_writeTimestamps.restype = ctypes.c_int32
+        self.tdclib.TDC_inputTimestamps.argtypes = [
+            ctypes.POINTER(ctypes.c_longlong),
             ctypes.POINTER(ctypes.c_int8),
             ctypes.c_int32,
         ]
-        self.qutools_dll.TDC_inputTimestamps.restype = ctypes.c_int32
-        self.qutools_dll.TDC_readTimestamps.argtypes = [ctypes.c_char_p, ctypes.c_int32]
-        self.qutools_dll.TDC_readTimestamps.restype = ctypes.c_int32
-        self.qutools_dll.TDC_generateTimestamps.argtypes = [
+        self.tdclib.TDC_inputTimestamps.restype = ctypes.c_int32
+        self.tdclib.TDC_readTimestamps.argtypes = [ctypes.c_char_p, ctypes.c_int32]
+        self.tdclib.TDC_readTimestamps.restype = ctypes.c_int32
+        self.tdclib.TDC_generateTimestamps.argtypes = [
             ctypes.c_int32,
             ctypes.POINTER(ctypes.c_double),
             ctypes.c_int32,
         ]
-        self.qutools_dll.TDC_generateTimestamps.restype = ctypes.c_int32
+        self.tdclib.TDC_generateTimestamps.restype = ctypes.c_int32
+
+        self.coincLib.determineCoincidencesStartBlock.argtypes = [
+            ctypes.POINTER(ctypes.c_longlong),
+            ctypes.POINTER(ctypes.c_int8),
+            ctypes.c_int32,
+            ctypes.c_int32,
+            ctypes.c_int32,
+            ctypes.c_int32,
+            ctypes.c_double,
+            ctypes.c_double,
+        ]
+        self.coincLib.determineCoincidencesStartBlock.restype = ctypes.c_int32
+
+        self.coincLib.determineCoincidenceBlock.argtypes = [
+            ctypes.POINTER(ctypes.c_longlong),
+            ctypes.POINTER(ctypes.c_int8),
+            ctypes.c_int32,
+            ctypes.c_int32,
+            ctypes.c_int32,
+            ctypes.c_int32,
+            ctypes.c_int32,
+            ctypes.c_double,
+            ctypes.c_double,
+        ]
+        self.coincLib.determineCoincidenceBlock.restype = ctypes.c_int32
+
+        self.coincLib.determineCoincidences.argtypes = [
+            ctypes.POINTER(ctypes.c_int64),
+            ctypes.POINTER(ctypes.c_int8),
+            ctypes.c_int64,
+            ctypes.c_int64,
+            ctypes.c_int64,
+            ctypes.c_double,
+            ctypes.c_double,
+            ctypes.c_double,
+        ]
+        self.coincLib.determineCoincidences.restype = ctypes.c_int64
+
+        # July 18th, 2022: I changed the following two lines to fit the
+        # changed arguments of the C function. Note that I changed the
+        # int arguments to Int64, and that I replaced the T1, T2 we had
+        # earlier with integer references T1out and T2out, such that we do not
+        # supply these values, but we receive them from the function - it
+        # looks at the time tags we have and then determines the minimum
+        # and maximum time delays we can encounter in our data
+        self.coincLib.determineCoincidenceHistogram.argtypes = [
+            ctypes.POINTER(ctypes.c_int64),
+            ctypes.POINTER(ctypes.c_int8),
+            ctypes.c_int64,
+            ctypes.c_int64,
+            ctypes.c_int64,
+            ctypes.c_double,
+            ctypes.c_double,
+            ctypes.c_double,
+            ctypes.POINTER(ctypes.c_int64),
+            ctypes.c_int64,
+        ]
+        self.coincLib.determineCoincidenceHistogram.restype = ctypes.c_int64
 
         # ------- tdcmultidev.h ------------------------------------------------------
-        self.qutools_dll.TDC_discover.argtypes = [ctypes.POINTER(ctypes.c_uint32)]
-        self.qutools_dll.TDC_discover.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getDeviceInfo.argtypes = [
+        self.tdclib.TDC_discover.argtypes = [ctypes.POINTER(ctypes.c_uint32)]
+        self.tdclib.TDC_discover.restype = ctypes.c_int32
+        self.tdclib.TDC_getDeviceInfo.argtypes = [
             ctypes.c_uint32,
             ctypes.POINTER(ctypes.c_int32),
             ctypes.POINTER(ctypes.c_int),
             ctypes.POINTER(ctypes.c_char_p),
             ctypes.POINTER(ctypes.c_int32),
         ]
-        self.qutools_dll.TDC_getDeviceInfo.restype = ctypes.c_int32
-        self.qutools_dll.TDC_connect.argtypes = [ctypes.c_uint32]
-        self.qutools_dll.TDC_connect.restype = ctypes.c_int32
-        self.qutools_dll.TDC_disconnect.argtypes = [ctypes.c_uint32]
-        self.qutools_dll.TDC_disconnect.restype = ctypes.c_int32
-        self.qutools_dll.TDC_addressDevice.argtypes = [ctypes.c_uint32]
-        self.qutools_dll.TDC_addressDevice.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getCurrentAddress.argtypes = [ctypes.c_uint32]
-        self.qutools_dll.TDC_getCurrentAddress.restype = ctypes.c_int32
+        self.tdclib.TDC_getDeviceInfo.restype = ctypes.c_int32
+        self.tdclib.TDC_connect.argtypes = [ctypes.c_uint32]
+        self.tdclib.TDC_connect.restype = ctypes.c_int32
+        self.tdclib.TDC_disconnect.argtypes = [ctypes.c_uint32]
+        self.tdclib.TDC_disconnect.restype = ctypes.c_int32
+        self.tdclib.TDC_addressDevice.argtypes = [ctypes.c_uint32]
+        self.tdclib.TDC_addressDevice.restype = ctypes.c_int32
+        self.tdclib.TDC_getCurrentAddress.argtypes = [ctypes.c_uint32]
+        self.tdclib.TDC_getCurrentAddress.restype = ctypes.c_int32
 
         # ------- tdcstartstop.h -----------------------------------------------------
-        self.qutools_dll.TDC_enableStartStop.argtypes = [ctypes.c_int32]
-        self.qutools_dll.TDC_enableStartStop.restype = ctypes.c_int32
-        self.qutools_dll.TDC_addHistogram.argtypes = [
+        self.tdclib.TDC_enableStartStop.argtypes = [ctypes.c_int32]
+        self.tdclib.TDC_enableStartStop.restype = ctypes.c_int32
+        self.tdclib.TDC_addHistogram.argtypes = [
             ctypes.c_int32,
             ctypes.c_int32,
             ctypes.c_int32,
         ]
-        self.qutools_dll.TDC_addHistogram.restype = ctypes.c_int32
-        self.qutools_dll.TDC_setHistogramParams.argtypes = [
-            ctypes.c_int32,
-            ctypes.c_int32,
-        ]
-        self.qutools_dll.TDC_setHistogramParams.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getHistogramParams.argtypes = [
+        self.tdclib.TDC_addHistogram.restype = ctypes.c_int32
+        self.tdclib.TDC_setHistogramParams.argtypes = [ctypes.c_int32, ctypes.c_int32]
+        self.tdclib.TDC_setHistogramParams.restype = ctypes.c_int32
+        self.tdclib.TDC_getHistogramParams.argtypes = [
             ctypes.POINTER(ctypes.c_int32),
             ctypes.c_int32,
         ]
-        self.qutools_dll.TDC_getHistogramParams.restype = ctypes.c_int32
-        self.qutools_dll.TDC_clearAllHistograms.argtypes = None
-        self.qutools_dll.TDC_clearAllHistograms.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getHistogram.argtypes = [
+        self.tdclib.TDC_getHistogramParams.restype = ctypes.c_int32
+        self.tdclib.TDC_clearAllHistograms.argtypes = None
+        self.tdclib.TDC_clearAllHistograms.restype = ctypes.c_int32
+        self.tdclib.TDC_getHistogram.argtypes = [
             ctypes.c_int32,
             ctypes.c_int32,
             ctypes.c_int32,
@@ -392,9 +446,9 @@ class QuTAG:
             ctypes.POINTER(ctypes.c_int32),
             ctypes.POINTER(ctypes.c_int32),
             ctypes.POINTER(ctypes.c_int32),
-            ctypes.POINTER(ctypes.c_int64),
+            ctypes.POINTER(ctypes.c_longlong),
         ]
-        self.qutools_dll.TDC_getHistogram.restype = ctypes.c_int32
+        self.tdclib.TDC_getHistogram.restype = ctypes.c_int32
 
         # ------- tdchbt.h -----------------------------------------------------------
         # type of a HBT model function
@@ -431,85 +485,81 @@ class QuTAG:
         self.FCTTYPE_ANTIB_JIT_OFS = 13
         # ----------------------------------------------------
         # function definitions
-        self.qutools_dll.TDC_enableHbt.argtypes = [ctypes.c_int32]
-        self.qutools_dll.TDC_enableHbt.restype = ctypes.c_int32
-        self.qutools_dll.TDC_setHbtParams.argtypes = [ctypes.c_int32, ctypes.c_int32]
-        self.qutools_dll.TDC_setHbtParams.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getHbtParams.argtypes = [
+        self.tdclib.TDC_enableHbt.argtypes = [ctypes.c_int32]
+        self.tdclib.TDC_enableHbt.restype = ctypes.c_int32
+        self.tdclib.TDC_setHbtParams.argtypes = [ctypes.c_int32, ctypes.c_int32]
+        self.tdclib.TDC_setHbtParams.restype = ctypes.c_int32
+        self.tdclib.TDC_getHbtParams.argtypes = [
             ctypes.POINTER(ctypes.c_int32),
             ctypes.POINTER(ctypes.c_int32),
         ]
-        self.qutools_dll.TDC_getHbtParams.restype = ctypes.c_int32
-        self.qutools_dll.TDC_setHbtDetectorParams.argtypes = [ctypes.c_double]
-        self.qutools_dll.TDC_setHbtDetectorParams.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getHbtDetectorParams.argtypes = [
+        self.tdclib.TDC_getHbtParams.restype = ctypes.c_int32
+        self.tdclib.TDC_setHbtDetectorParams.argtypes = [ctypes.c_double]
+        self.tdclib.TDC_setHbtDetectorParams.restype = ctypes.c_int32
+        self.tdclib.TDC_getHbtDetectorParams.argtypes = [
             ctypes.POINTER(ctypes.c_double)
         ]
-        self.qutools_dll.TDC_getHbtDetectorParams.restype = ctypes.c_int32
-        self.qutools_dll.TDC_setHbtInput.argtypes = [ctypes.c_int32, ctypes.c_int32]
-        self.qutools_dll.TDC_setHbtInput.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getHbtInput.argtypes = [
+        self.tdclib.TDC_getHbtDetectorParams.restype = ctypes.c_int32
+        self.tdclib.TDC_setHbtInput.argtypes = [ctypes.c_int32, ctypes.c_int32]
+        self.tdclib.TDC_setHbtInput.restype = ctypes.c_int32
+        self.tdclib.TDC_getHbtInput.argtypes = [
             ctypes.POINTER(ctypes.c_int32),
             ctypes.POINTER(ctypes.c_int32),
         ]
-        self.qutools_dll.TDC_getHbtInput.restype = ctypes.c_int32
-        self.qutools_dll.TDC_resetHbtCorrelations.argtypes = None
-        self.qutools_dll.TDC_resetHbtCorrelations.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getHbtEventCount.argtypes = [
-            ctypes.POINTER(ctypes.c_int64),
-            ctypes.POINTER(ctypes.c_int64),
+        self.tdclib.TDC_getHbtInput.restype = ctypes.c_int32
+        self.tdclib.TDC_resetHbtCorrelations.argtypes = None
+        self.tdclib.TDC_resetHbtCorrelations.restype = ctypes.c_int32
+        self.tdclib.TDC_getHbtEventCount.argtypes = [
+            ctypes.POINTER(ctypes.c_longlong),
+            ctypes.POINTER(ctypes.c_longlong),
             ctypes.POINTER(ctypes.c_double),
         ]
-        self.qutools_dll.TDC_getHbtEventCount.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getHbtIntegrationTime.argtypes = [
+        self.tdclib.TDC_getHbtEventCount.restype = ctypes.c_int32
+        self.tdclib.TDC_getHbtIntegrationTime.argtypes = [
             ctypes.POINTER(ctypes.c_double)
         ]
-        self.qutools_dll.TDC_getHbtIntegrationTime.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getHbtCorrelations.argtypes = [
+        self.tdclib.TDC_getHbtIntegrationTime.restype = ctypes.c_int32
+        self.tdclib.TDC_getHbtCorrelations.argtypes = [
             ctypes.c_int32,
             ctypes.POINTER(QuTAG.TDC_HbtFunction),
         ]
-        self.qutools_dll.TDC_getHbtCorrelations.restype = ctypes.c_int32
-        self.qutools_dll.TDC_calcHbtG2.argtypes = [
-            ctypes.POINTER(QuTAG.TDC_HbtFunction)
-        ]
-        self.qutools_dll.TDC_calcHbtG2.restype = ctypes.c_int32
-        self.qutools_dll.TDC_fitHbtG2.argtypes = [
+        self.tdclib.TDC_getHbtCorrelations.restype = ctypes.c_int32
+        self.tdclib.TDC_calcHbtG2.argtypes = [ctypes.POINTER(QuTAG.TDC_HbtFunction)]
+        self.tdclib.TDC_calcHbtG2.restype = ctypes.c_int32
+        self.tdclib.TDC_fitHbtG2.argtypes = [
             ctypes.POINTER(QuTAG.TDC_HbtFunction),
             ctypes.c_int32,
             ctypes.POINTER(ctypes.c_double),
             ctypes.POINTER(ctypes.c_double),
             ctypes.POINTER(ctypes.c_int32),
         ]
-        self.qutools_dll.TDC_fitHbtG2.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getHbtFitStartParams.argtypes = [
+        self.tdclib.TDC_fitHbtG2.restype = ctypes.c_int32
+        self.tdclib.TDC_getHbtFitStartParams.argtypes = [
             ctypes.c_int32,
             ctypes.POINTER(ctypes.c_double),
         ]
-        self.qutools_dll.TDC_getHbtFitStartParams.restype = ctypes.POINTER(
-            ctypes.c_double
-        )
-        self.qutools_dll.TDC_calcHbtModelFct.argtypes = [
+        self.tdclib.TDC_getHbtFitStartParams.restype = ctypes.POINTER(ctypes.c_double)
+        self.tdclib.TDC_calcHbtModelFct.argtypes = [
             ctypes.c_int32,
             ctypes.POINTER(ctypes.c_double),
             ctypes.POINTER(QuTAG.TDC_HbtFunction),
         ]
-        self.qutools_dll.TDC_calcHbtModelFct.restype = ctypes.c_int32
-        self.qutools_dll.TDC_generateHbtDemo.argtypes = [
+        self.tdclib.TDC_calcHbtModelFct.restype = ctypes.c_int32
+        self.tdclib.TDC_generateHbtDemo.argtypes = [
             ctypes.c_int32,
             ctypes.POINTER(ctypes.c_double),
             ctypes.c_double,
         ]
-        self.qutools_dll.TDC_generateHbtDemo.restype = ctypes.c_int32
-        self.qutools_dll.TDC_createHbtFunction.argtypes = None
-        self.qutools_dll.TDC_createHbtFunction.restype = ctypes.POINTER(
+        self.tdclib.TDC_generateHbtDemo.restype = ctypes.c_int32
+        self.tdclib.TDC_createHbtFunction.argtypes = None
+        self.tdclib.TDC_createHbtFunction.restype = ctypes.POINTER(
             QuTAG.TDC_HbtFunction
         )
-        self.qutools_dll.TDC_releaseHbtFunction.argtypes = [
+        self.tdclib.TDC_releaseHbtFunction.argtypes = [
             ctypes.POINTER(QuTAG.TDC_HbtFunction)
         ]
-        self.qutools_dll.TDC_releaseHbtFunction.restype = None
-        self.qutools_dll.TDC_analyseHbtFunction.argtypes = [
+        self.tdclib.TDC_releaseHbtFunction.restype = None
+        self.tdclib.TDC_analyseHbtFunction.argtypes = [
             ctypes.POINTER(QuTAG.TDC_HbtFunction),
             ctypes.POINTER(ctypes.c_int32),
             ctypes.POINTER(ctypes.c_int32),
@@ -518,7 +568,7 @@ class QuTAG:
             ctypes.POINTER(ctypes.c_double),
             ctypes.c_int32,
         ]
-        self.qutools_dll.TDC_analyseHbtFunction.restype = ctypes.c_int32
+        self.tdclib.TDC_analyseHbtFunction.restype = ctypes.c_int32
 
         # ------- tdclifetm.h --------------------------------------------------------
         self.LFT_PARAM_SIZE = 4
@@ -530,34 +580,32 @@ class QuTAG:
         self.LFTTYPE_KOHLRAUSCH = 3
 
         # function definitions
-        self.qutools_dll.TDC_enableLft.argtypes = [ctypes.c_int32]
-        self.qutools_dll.TDC_enableLft.restype = ctypes.c_int32
-        self.qutools_dll.TDC_setLftStartInput.argtypes = [ctypes.c_int32]
-        self.qutools_dll.TDC_setLftStartInput.restype = ctypes.c_int32
-        self.qutools_dll.TDC_addLftHistogram.argtypes = [ctypes.c_int32, ctypes.c_int32]
-        self.qutools_dll.TDC_addLftHistogram.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getLftStartInput.argtypes = [
-            ctypes.POINTER(ctypes.c_int32)
-        ]
-        self.qutools_dll.TDC_getLftStartInput.restype = ctypes.c_int32
-        self.qutools_dll.TDC_setLftParams.argtypes = [ctypes.c_int32, ctypes.c_int32]
-        self.qutools_dll.TDC_setLftParams.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getLftParams.argtypes = [
+        self.tdclib.TDC_enableLft.argtypes = [ctypes.c_int32]
+        self.tdclib.TDC_enableLft.restype = ctypes.c_int32
+        self.tdclib.TDC_setLftStartInput.argtypes = [ctypes.c_int32]
+        self.tdclib.TDC_setLftStartInput.restype = ctypes.c_int32
+        self.tdclib.TDC_addLftHistogram.argtypes = [ctypes.c_int32, ctypes.c_int32]
+        self.tdclib.TDC_addLftHistogram.restype = ctypes.c_int32
+        self.tdclib.TDC_getLftStartInput.argtypes = [ctypes.POINTER(ctypes.c_int32)]
+        self.tdclib.TDC_getLftStartInput.restype = ctypes.c_int32
+        self.tdclib.TDC_setLftParams.argtypes = [ctypes.c_int32, ctypes.c_int32]
+        self.tdclib.TDC_setLftParams.restype = ctypes.c_int32
+        self.tdclib.TDC_getLftParams.argtypes = [
             ctypes.POINTER(ctypes.c_int32),
             ctypes.POINTER(ctypes.c_int32),
         ]
-        self.qutools_dll.TDC_getLftParams.restype = ctypes.c_int32
-        self.qutools_dll.TDC_resetLftHistograms.argtypes = None
-        self.qutools_dll.TDC_resetLftHistograms.restype = ctypes.c_int32
-        self.qutools_dll.TDC_createLftFunction.argtypes = None
-        self.qutools_dll.TDC_createLftFunction.restype = ctypes.POINTER(
+        self.tdclib.TDC_getLftParams.restype = ctypes.c_int32
+        self.tdclib.TDC_resetLftHistograms.argtypes = None
+        self.tdclib.TDC_resetLftHistograms.restype = ctypes.c_int32
+        self.tdclib.TDC_createLftFunction.argtypes = None
+        self.tdclib.TDC_createLftFunction.restype = ctypes.POINTER(
             QuTAG.TDC_LftFunction
         )
-        self.qutools_dll.TDC_releaseLftFunction.argtypes = [
+        self.tdclib.TDC_releaseLftFunction.argtypes = [
             ctypes.POINTER(QuTAG.TDC_LftFunction)
         ]
-        self.qutools_dll.TDC_releaseLftFunction.restype = None
-        self.qutools_dll.TDC_analyseLftFunction.argtypes = [
+        self.tdclib.TDC_releaseLftFunction.restype = None
+        self.tdclib.TDC_analyseLftFunction.argtypes = [
             ctypes.POINTER(QuTAG.TDC_LftFunction),
             ctypes.POINTER(ctypes.c_int32),
             ctypes.POINTER(ctypes.c_int32),
@@ -565,81 +613,82 @@ class QuTAG:
             ctypes.POINTER(ctypes.c_double),
             ctypes.c_int32,
         ]
-        self.qutools_dll.TDC_analyseLftFunction.restype = None
-        self.qutools_dll.TDC_getLftHistogram.argtypes = [
+        self.tdclib.TDC_analyseLftFunction.restype = None
+        self.tdclib.TDC_getLftHistogram.argtypes = [
             ctypes.c_int32,
             ctypes.c_int32,
             ctypes.POINTER(QuTAG.TDC_LftFunction),
             ctypes.POINTER(ctypes.c_int32),
             ctypes.POINTER(ctypes.c_int32),
             ctypes.POINTER(ctypes.c_int32),
-            ctypes.POINTER(ctypes.c_int64),
+            ctypes.POINTER(ctypes.c_longlong),
         ]
-        self.qutools_dll.TDC_getLftHistogram.restype = ctypes.c_int32
-        self.qutools_dll.TDC_calcLftModelFct.argtypes = [
+        self.tdclib.TDC_getLftHistogram.restype = ctypes.c_int32
+        self.tdclib.TDC_calcLftModelFct.argtypes = [
             ctypes.c_int32,
             ctypes.POINTER(ctypes.c_double),
             ctypes.POINTER(QuTAG.TDC_LftFunction),
         ]
-        self.qutools_dll.TDC_calcLftModelFct.restype = ctypes.c_int32
-        self.qutools_dll.TDC_generateLftDemo.argtypes = [
+        self.tdclib.TDC_calcLftModelFct.restype = ctypes.c_int32
+        self.tdclib.TDC_generateLftDemo.argtypes = [
             ctypes.c_int32,
             ctypes.POINTER(ctypes.c_double),
             ctypes.c_double,
         ]
-        self.qutools_dll.TDC_generateLftDemo.restype = ctypes.c_int32
-        self.qutools_dll.TDC_fitLftHistogram.argtypes = [
+        self.tdclib.TDC_generateLftDemo.restype = ctypes.c_int32
+        self.tdclib.TDC_fitLftHistogram.argtypes = [
             ctypes.POINTER(ctypes.c_double),
             ctypes.c_int32,
             ctypes.POINTER(ctypes.c_double),
             ctypes.POINTER(ctypes.c_double),
             ctypes.POINTER(ctypes.c_int32),
         ]
-        self.qutools_dll.TDC_fitLftHistogram.restype = ctypes.c_int32
+        self.tdclib.TDC_fitLftHistogram.restype = ctypes.c_int32
 
-        # ------- tdchg2.h --------------------------------------------------------
-        self.qutools_dll.TDC_enableHg2.restype = ctypes.c_int32
-        self.qutools_dll.TDC_enableHg2.argtypes = [ctypes.c_int32]
-        self.qutools_dll.TDC_getHg2Input.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getHg2Input.argtypes = [
-            ctypes.POINTER(ctypes.c_int32),
-            ctypes.POINTER(ctypes.c_int32),
-            ctypes.POINTER(ctypes.c_int32),
-        ]
-        self.qutools_dll.TDC_getHg2Params.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getHg2Params.argtypes = [
-            ctypes.POINTER(ctypes.c_int32),
-            ctypes.POINTER(ctypes.c_int32),
-        ]
-        self.qutools_dll.TDC_getHg2Raw.restype = ctypes.c_int32
-        self.qutools_dll.TDC_getHg2Raw.argtypes = [
-            ctypes.POINTER(ctypes.c_int64),
-            ctypes.POINTER(ctypes.c_int64),
-            ctypes.POINTER(ctypes.c_int64),
-            ctypes.POINTER(ctypes.c_int64),
-            ctypes.POINTER(ctypes.c_int32),
-        ]
-        self.qutools_dll.TDC_resetHg2Correlations.restype = ctypes.c_int32
-        self.qutools_dll.TDC_resetHg2Correlations.argtypes = None
-        self.qutools_dll.TDC_setHg2Input.restype = ctypes.c_int32
-        self.qutools_dll.TDC_setHg2Input.argtypes = [
-            ctypes.c_int32,
-            ctypes.c_int32,
-            ctypes.c_int32,
-        ]
-        self.qutools_dll.TDC_setHg2Params.restype = ctypes.c_int32
-        self.qutools_dll.TDC_setHg2Params.argtypes = [ctypes.c_int32, ctypes.c_int32]
-        self.qutools_dll.TDC_calcHg2G2.restype = ctypes.c_int32
-        self.qutools_dll.TDC_calcHg2G2.argtypes = [
-            ctypes.POINTER(ctypes.c_double),
-            ctypes.POINTER(ctypes.c_int32),
-            ctypes.c_int32,
-        ]
-        self.qutools_dll.TDC_calcHg2Tcp.argtypes = [
-            ctypes.POINTER(ctypes.POINTER(ctypes.c_int64)),
-            ctypes.c_int32,
-        ]
-        self.qutools_dll.TDC_calcHg2Tcp.restype = ctypes.c_int32
+        if platform.system() == "Windows":
+            # ------- tdchg2.h --------------------------------------------------------
+            self.tdclib.TDC_enableHg2.restype = ctypes.c_int32
+            self.tdclib.TDC_enableHg2.argtypes = [ctypes.c_int32]
+            self.tdclib.TDC_getHg2Input.restype = ctypes.c_int32
+            self.tdclib.TDC_getHg2Input.argtypes = [
+                ctypes.POINTER(ctypes.c_int32),
+                ctypes.POINTER(ctypes.c_int32),
+                ctypes.POINTER(ctypes.c_int32),
+            ]
+            self.tdclib.TDC_getHg2Params.restype = ctypes.c_int32
+            self.tdclib.TDC_getHg2Params.argtypes = [
+                ctypes.POINTER(ctypes.c_int32),
+                ctypes.POINTER(ctypes.c_int32),
+            ]
+            self.tdclib.TDC_getHg2Raw.restype = ctypes.c_int32
+            self.tdclib.TDC_getHg2Raw.argtypes = [
+                ctypes.POINTER(ctypes.c_longlong),
+                ctypes.POINTER(ctypes.c_longlong),
+                ctypes.POINTER(ctypes.c_longlong),
+                ctypes.POINTER(ctypes.c_longlong),
+                ctypes.POINTER(ctypes.c_int32),
+            ]
+            self.tdclib.TDC_resetHg2Correlations.restype = ctypes.c_int32
+            self.tdclib.TDC_resetHg2Correlations.argtypes = None
+            self.tdclib.TDC_setHg2Input.restype = ctypes.c_int32
+            self.tdclib.TDC_setHg2Input.argtypes = [
+                ctypes.c_int32,
+                ctypes.c_int32,
+                ctypes.c_int32,
+            ]
+            self.tdclib.TDC_setHg2Params.restype = ctypes.c_int32
+            self.tdclib.TDC_setHg2Params.argtypes = [ctypes.c_int32, ctypes.c_int32]
+            self.tdclib.TDC_calcHg2G2.restype = ctypes.c_int32
+            self.tdclib.TDC_calcHg2G2.argtypes = [
+                ctypes.POINTER(ctypes.c_double),
+                ctypes.POINTER(ctypes.c_int32),
+                ctypes.c_int32,
+            ]
+            self.tdclib.TDC_calcHg2Tcp.argtypes = [
+                ctypes.POINTER(ctypes.POINTER(ctypes.c_longlong)),
+                ctypes.c_int32,
+            ]
+            self.tdclib.TDC_calcHg2Tcp.restype = ctypes.c_int32
 
     # Init --------------------------------------------------------------
     def Initialize(self):
@@ -649,7 +698,7 @@ class QuTAG:
         @return: Returns error code via dictionary
 
         """
-        ans = self.qutools_dll.TDC_init(self.dev_nr)
+        ans = self.tdclib.TDC_init(self.dev_nr)
 
         if ans != 0:
             print("Error in TDC_init: " + self.err_dict[ans])
@@ -660,64 +709,38 @@ class QuTAG:
         Important to clear the connection to reconnect to the device \n
         Return error code via dictionary
         """
-        ans = self.qutools_dll.TDC_deInit()
+        ans = self.tdclib.TDC_deInit()
 
         if ans != 0:  # from the documentation: "never fails"
             print("Error in TDC_deInit: " + self.err_dict[ans])
         return ans
 
-    def startCalibration(self):
-        ans = self.qutools_dll.TDC_startCalibration()
-
-        if ans != 0:
-            print("Error in TDC_startCalibration: " + self.err_dict[ans])
-        return ans
-
-    def getCalibrationState(self):
-        active = ctypes.c_int32()
-        ans = self.qutools_dll.TDC_getCalibrationState(ctypes.byref(active))
-
-        if ans != 0:
-            print("Error in TDC_getCalibrationState: " + self.err_dict[ans])
-        return active.value
-
     # Device Info -------------------------------------------------------------
     def getVersion(self):
-        return self.qutools_dll.TDC_getVersion()
+        return self.tdclib.TDC_getVersion()
 
     def getTimebase(self):
         timebase = ctypes.c_double()
-        ans = self.qutools_dll.TDC_getTimebase(ctypes.byref(timebase))
+        ans = self.tdclib.TDC_getTimebase(ctypes.byref(timebase))
         if ans != 0:
             print("Error in TDC_getTimebase: " + self.err_dict[ans])
         return timebase.value
 
     def getDeviceType(self):
-        ans = self.qutools_dll.TDC_getDevType()
+        ans = self.tdclib.TDC_getDevType()
         return ans
 
     def checkFeatureHBT(self):
-        ans = self.qutools_dll.TDC_checkFeatureHbt()
+        ans = self.tdclib.TDC_checkFeatureHbt()
         return ans == 1
 
     def checkFeatureLifetime(self):
-        ans = self.qutools_dll.TDC_checkFeatureLifeTime()
+        ans = self.tdclib.TDC_checkFeatureLifeTime()
         return ans == 1
-
-    def checkFeatureFiveChan(self):
-        ans = self.qutools_dll.TDC_checkFeatureFiveChan()
-        return ans == 1
-
-    def getFiveChannelMode(self):
-        enable = ctypes.c_int32()
-        ans = self.qutools_dll.TDC_getFiveChannelMode(ctypes.byref(enable))
-        if ans != 0:
-            print("Error in TDC_getFiveChannelMode: " + self.err_dict[ans])
-        return enable.value == 1
 
     def getSingleStopPreselection(self):
         enable = ctypes.c_int32()
-        ans = self.qutools_dll.TDC_getSingleStopPreselection(ctypes.byref(enable))
+        ans = self.tdclib.TDC_getSingleStopPreselection(ctypes.byref(enable))
         if ans != 0:
             print("Error in TDC_getSingleStopPreselection: " + self.err_dict[ans])
         return enable.value == 1
@@ -735,40 +758,40 @@ class QuTAG:
             enable = 1
         else:
             enable = 0
-        ans = self.qutools_dll.TDC_preselectSingleStop(enable)
+        ans = self.tdclib.TDC_preselectSingleStop(enable)
         if ans != 0:
             print("Error in TDC_preselectSingleStop: " + self.err_dict[ans])
         return self.err_dict[ans]
 
     # multiple devices ---------------------------------
     def addressDevice(self, deviceNumber):
-        ans = self.qutools_dll.TDC_addressDevice(deviceNumber)
+        ans = self.tdclib.TDC_addressDevice(deviceNumber)
         if ans != 0:
             print("Error in TDC_addressDevice: " + self.err_dict[ans])
         return ans
 
     def connect(self, deviceNumber):
-        ans = self.qutools_dll.TDC_connect(deviceNumber)
+        ans = self.tdclib.TDC_connect(deviceNumber)
         if ans != 0:
             print("Error in TDC_connect: " + self.err_dict[ans])
         return ans
 
     def disconnect(self, deviceNumber):
-        ans = self.qutools_dll.TDC_disconnect(deviceNumber)
+        ans = self.tdclib.TDC_disconnect(deviceNumber)
         if ans != 0:
             print("Error in TDC_disconnect: " + self.err_dict[ans])
         return ans
 
     def discover(self):
         devCount = ctypes.c_uint32()
-        ans = self.qutools_dll.TDC_discover(ctypes.byref(devCount))
+        ans = self.tdclib.TDC_discover(ctypes.byref(devCount))
         if ans != 0:
             print("Error in TDC_discover: " + self.err_dict[ans])
         return devCount.value
 
     def getCurrentAddress(self):
         devNo = ctypes.c_unit32()
-        ans = self.qutools_dll.TDC_getCurrentAddress(ctypes.byref(devNo))
+        ans = self.tdclib.TDC_getCurrentAddress(ctypes.byref(devNo))
         if ans != 0:
             print("Error in TDC_getCurrentAddress: " + self.err_dict[ans])
         return devNo.value
@@ -777,9 +800,9 @@ class QuTAG:
         devicetype = ctypes.c_int32()
         deviceid = ctypes.c_int32()
         serialnumber = ctypes.c_char_p()
-        connected = ctypes.s_int32()
+        connected = ctypes.c_int32()
 
-        ans = self.qutools_dll.TDC_getDeviceInfo(
+        ans = self.tdclib.TDC_getDeviceInfo(
             deviceNumber,
             ctypes.byref(devicetype),
             ctypes.byref(deviceid),
@@ -797,7 +820,7 @@ class QuTAG:
         edg = ctypes.c_int32()
         threshold = ctypes.c_double()
 
-        ans = self.qutools_dll.TDC_getSignalConditioning(
+        ans = self.tdclib.TDC_getSignalConditioning(
             channel, ctypes.byref(edg), ctypes.byref(threshold)
         )
 
@@ -812,7 +835,7 @@ class QuTAG:
         else:
             edge_value = 0  # False: Falling
 
-        ans = self.qutools_dll.TDC_configureSignalConditioning(
+        ans = self.tdclib.TDC_configureSignalConditioning(
             channel, conditioning, edge_value, threshold
         )
         if ans != 0:
@@ -822,7 +845,7 @@ class QuTAG:
     def getDivider(self):
         divider = ctypes.c_int32()
         reconstruct = ctypes.c_bool()
-        ans = self.qutools_dll.TDC_getSyncDivider(
+        ans = self.tdclib.TDC_getSyncDivider(
             ctypes.byref(divider), ctypes.byref(reconstruct)
         )
 
@@ -834,14 +857,14 @@ class QuTAG:
     def setDivider(self, divider, reconstruct):
         # allowed values:
         # - quTAG: 1, 2, 4, 8
-        ans = self.qutools_dll.TDC_configureSyncDivider(divider, reconstruct)
+        ans = self.tdclib.TDC_configureSyncDivider(divider, reconstruct)
         if ans != 0:
             print("Error in TDC_configureSyncDivider: " + self.err_dict[ans])
         return ans
 
     def getChannelDelays(self):
         delays = np.zeros(int(8), dtype=np.int32)
-        ans = self.qutools_dll.TDC_getChannelDelays(
+        ans = self.tdclib.TDC_getChannelDelays(
             delays.ctypes.data_as(ctypes.POINTER(ctypes.c_int32))
         )
         if ans != 0:
@@ -849,7 +872,7 @@ class QuTAG:
         return delays
 
     def setChannelDelays(self, delays):
-        ans = self.qutools_dll.TDC_setChannelDelays(
+        ans = self.tdclib.TDC_setChannelDelays(
             delays.ctypes.data_as(ctypes.POINTER(ctypes.c_int32))
         )
         if ans != 0:
@@ -859,25 +882,15 @@ class QuTAG:
     def getDeadTime(self, chn):
         # chn = ctypes.c_int32()
         deadTime = ctypes.c_int32()
-        ans = self.qutools_dll.TDC_getDeadTime(chn, ctypes.byref(deadTime))
+        ans = self.tdclib.TDC_getDeadTime(chn, ctypes.byref(deadTime))
         if ans != 0:
             print("Error in TDC_getDeadTime: " + self.err_dict[ans])
         return deadTime.value
 
     def setDeadTime(self, chn, deadTime):
-        ans = self.qutools_dll.TDC_setDeadTime(chn, deadTime)
+        ans = self.tdclib.TDC_setDeadTime(chn, deadTime)
         if ans != 0:
             print("Error in TDC_setDeadTime: " + self.err_dict[ans])
-        return ans
-
-    def setFiveChannelMode(self, enable):
-        if enable:
-            ena = 1
-        else:
-            ena = 0
-        ans = self.qutools_dll.TDC_setFiveChannelMode(ena)
-        if ans != 0:
-            print("Error in TDC_setFiveChannelMode: " + self.err_dict[ans])
         return ans
 
     def enableTDCInput(self, enable):
@@ -886,7 +899,7 @@ class QuTAG:
         else:
             value = 0  # disable input
 
-        ans = self.qutools_dll.TDC_enableTdcInput(value)
+        ans = self.tdclib.TDC_enableTdcInput(value)
         if ans != 0:
             print("Error in TDC_enableTdcInput: " + self.err_dict[ans])
 
@@ -904,7 +917,7 @@ class QuTAG:
             bitstring = "0"
 
         channelMask = int(bitstring, 2)
-        ans = self.qutools_dll.TDC_enableChannels(channelMask)
+        ans = self.tdclib.TDC_enableChannels(channelMask)
         if ans != 0:
             print("Error in TDC_enableChannels: " + self.err_dict[ans])
 
@@ -912,13 +925,14 @@ class QuTAG:
 
     def getChannelsEnabled(self):
         channelMask = ctypes.c_int32()
-        ans = self.qutools_dll.TDC_getChannelsEnabled(ctypes.byref(channelMask))
+        ans = self.tdclib.TDC_getChannelsEnabled(ctypes.byref(channelMask))
 
         channels = [0 for i in range(self.TDC_QUTAG_CHANNELS)]
         mask = channelMask.value
         i = 1
         while mask > 0:
-            channels[self.TDC_QUTAG_CHANNELS - i] = mask.value % 2
+            # channels[self.TDC_QUTAG_CHANNELS-i] = mask.value % 2
+            channels[self.TDC_QUTAG_CHANNELS - i] = mask % 2
             mask //= 2
             i += 1
             if i > self.TDC_QUTAG_CHANNELS:
@@ -941,7 +955,7 @@ class QuTAG:
             bitstring = "0"
 
         markerMask = int(bitstring, 2)
-        ans = self.qutools_dll.TDC_enableMarkers(markerMask)
+        ans = self.tdclib.TDC_enableMarkers(markerMask)
         if ans != 0:
             print("Error in TDC_enableMarkers: " + self.err_dict[ans])
 
@@ -949,13 +963,13 @@ class QuTAG:
 
     # Define Measurements -------------------------------------------------------
     def setCoincidenceWindow(self, coincWin):
-        ans = self.qutools_dll.TDC_setCoincidenceWindow(coincWin)
+        ans = self.tdclib.TDC_setCoincidenceWindow(coincWin)
         if ans != 0:
             print("Error in TDC_setCoincidenceWindows: " + self.err_dict[ans])
         return 0
 
     def setExposureTime(self, expTime):
-        ans = self.qutools_dll.TDC_setExposureTime(expTime)
+        ans = self.tdclib.TDC_setExposureTime(expTime)
         if ans != 0:
             print("Error in TDC_setExposureTime: " + self.err_dict[ans])
         return ans
@@ -965,7 +979,7 @@ class QuTAG:
         coinc = ctypes.c_int32()
         exptime = ctypes.c_int32()
 
-        ans = self.qutools_dll.TDC_getDeviceParams(
+        ans = self.tdclib.TDC_getDeviceParams(
             ctypes.byref(coinc), ctypes.byref(exptime)
         )
         if ans != 0:
@@ -977,7 +991,7 @@ class QuTAG:
         if channels:
             bitstring = ""
             for k in range(max(channels) + 1):
-                if k in channels:
+                if k in channelsgetDeviceInfo:
                     bitstring = "1" + bitstring
                 else:
                     bitstring = "0" + bitstring
@@ -985,7 +999,7 @@ class QuTAG:
             bitstring = "0"
 
         channelMask = int(bitstring, 2)
-        ans = self.qutools_dll.TDC_configureSelftest(
+        ans = self.tdclib.TDC_configureSelftest(
             channelMask, period, burstSize, burstDist
         )
         if ans != 0:
@@ -994,7 +1008,8 @@ class QuTAG:
         return ans
 
     def generateTimestamps(self, simtype, par, count):
-        ans = self.qutools_dll.TDC_generateTimestamps(simtype, ctypes.byref(par), count)
+        # ans = self.tdclib.TDC_generateTimestamps(simtype,ctypes.byref(par),count)
+        ans = self.tdclib.TDC_generateTimestamps(simtype, par, count)
         if ans != 0:
             print("Error in TDC_generateTimestamps: " + self.err_dict[ans])
         return ans
@@ -1002,21 +1017,21 @@ class QuTAG:
     # Timestamping ---------------------------------------------------------
     def getBufferSize(self):
         sz = ctypes.c_int32()
-        ans = self.qutools_dll.TDC_getTimestampBufferSize(ctypes.byref(sz))
+        ans = self.tdclib.TDC_getTimestampBufferSize(ctypes.byref(sz))
         if ans != 0:
             print("Error in TDC_getTimestampBufferSize: " + self.err_dict[ans])
         return sz.value
 
     def setBufferSize(self, size):
         self._bufferSize = size
-        ans = self.qutools_dll.TDC_setTimestampBufferSize(size)
+        ans = self.tdclib.TDC_setTimestampBufferSize(size)
         if ans != 0:
             print("Error in TDC_setTimestampBufferSize: " + self.err_dict[ans])
         return ans
 
     def getDataLost(self):
         lost = ctypes.c_int32()
-        ans = self.qutools_dll.TDC_getDataLost(ctypes.byref(lost))
+        ans = self.tdclib.TDC_getDataLost(ctypes.byref(lost))
         if ans != 0:
             print("Error in TDC_getDataLost: " + self.err_dict[ans])
         return lost.value
@@ -1026,7 +1041,7 @@ class QuTAG:
             freeze_value = 1
         else:
             freeze_value = 0
-        ans = self.qutools_dll.TDC_freezeBuffers(freeze_value)
+        ans = self.tdclib.TDC_freezeBuffers(freeze_value)
         if ans != 0:
             print("Error in TDC_freezeBuffers: " + self.err_dict[ans])
 
@@ -1037,9 +1052,9 @@ class QuTAG:
         channels = np.zeros(int(self._bufferSize), dtype=np.int8)
         valid = ctypes.c_int32()
 
-        ans = self.qutools_dll.TDC_getLastTimestamps(
+        ans = self.tdclib.TDC_getLastTimestamps(
             reset,
-            timestamps.ctypes.data_as(ctypes.POINTER(ctypes.c_int64)),
+            timestamps.ctypes.data_as(ctypes.POINTER(ctypes.c_longlong)),
             channels.ctypes.data_as(ctypes.POINTER(ctypes.c_int8)),
             ctypes.byref(valid),
         )
@@ -1051,13 +1066,13 @@ class QuTAG:
     # File IO -------------------------------------------
     def writeTimestamps(self, filename, fileformat):
         filename = filename.encode("utf-8")
-        ans = self.qutools_dll.TDC_writeTimestamps(filename, fileformat)
+        ans = self.tdclib.TDC_writeTimestamps(filename, fileformat)
         if ans != 0:
             print("Error in TDC_writeTimestamps: " + self.err_dict[ans])
         return ans
 
     def inputTimestamps(self, timestamps, channels, count):
-        ans = self.qutools_dll.TDC_inputTimestamps(
+        ans = self.tdclib.TDC_inputTimestamps(
             ctypes.byref(timestamps), ctypes.byref(channels), count
         )
         if ans != 0:
@@ -1066,16 +1081,86 @@ class QuTAG:
 
     def readTimestamps(self, filename, fileformat):
         filename = filename.encode("utf-8")
-        ans = self.qutools_dll.TDC_readTimestamps(filename, fileformat)
+        ans = self.tdclib.TDC_readTimestamps(filename, fileformat)
         if ans != 0:
             print("Error in TDC_readTimestamps: " + self.err_dict[ans])
         return ans
+
+    # get a histogram of coincidences calculated using our C program using the
+    # time tags + channels + the number of valid time tags as we get them when
+    # we get the set of last coincidences. histlen is the number of entries in
+    # the histogram the function returns a numpy array hist containing the
+    # histogram for time delays in the range [T1,T2] between channels ch1 and
+    # ch2. We only look at delays where events in ch2 happen after or at the
+    # same time as in ch1. "n" is the block size used for generating the
+    # histogram block by block from the timetags supplied
+    def getCoincidenceHistogram(self, tags, chs, valid, ch1, ch2, dt, T1, T2, histlen):
+        hist = np.zeros(int(histlen), dtype=np.int64)
+        DT = (T2 - T1) / histlen
+        delays = np.arange(histlen) * DT
+        hist = np.zeros(int(histlen), dtype=np.int64)
+        self.coincLib.determineCoincidenceHistogram(
+            tags.ctypes.data_as(ctypes.POINTER(ctypes.c_longlong)),
+            chs.ctypes.data_as(ctypes.POINTER(ctypes.c_int8)),
+            ctypes.c_longlong(valid),
+            ctypes.c_longlong(ch1),
+            ctypes.c_longlong(ch2),
+            ctypes.c_double(dt),
+            ctypes.c_double(T1),
+            ctypes.c_double(T2),
+            hist.ctypes.data_as(ctypes.POINTER(ctypes.c_longlong)),
+            ctypes.c_longlong(histlen),
+        )
+        return (delays, hist)
+
+    def getSimpleHistogram(self, tags, channels, valid, ch1, ch2, maxT, dt, bins):
+        DT = maxT / bins
+        delays = np.arange(bins, dtype=np.double) * DT
+        coinc = np.zeros(bins, dtype=np.longlong)
+        for i in np.arange(delays.size):
+            if i % (delays.size / 10) == 0:
+                print("histogram progress (%): ", ((100.0 * i) / (1.0 * delays.size)))
+            coinc[i] = self.coincLib.determineCoincidences(
+                tags.ctypes.data_as(ctypes.POINTER(ctypes.c_int64)),
+                channels.ctypes.data_as(ctypes.POINTER(ctypes.c_int8)),
+                valid,
+                ch1,
+                ch2,
+                dt,
+                delays[i],
+                maxT,
+            )
+        return (delays, coinc)
+
+    def collectSimpleHistogram(self, ch1, ch2, DT1, DT2, maxT, bins, dt, intT):
+        self.setDeadTime(ch1, DT1)
+        self.setDeadTime(ch2, DT2)
+        delays = np.arange(bins, dtype=np.double) * dt
+        coinc = np.zeros(bins, dtype=np.longlong)
+        valids = np.zeros(bins, dtype=np.longlong)
+        for i in np.arange(delays.size):
+            print("delay (s): ", delays[i])
+            (tags, chs, valids[i]) = self.getLastTimestamps(True)
+            time.sleep(intT)
+            (tags, chs, valids[i]) = self.getLastTimestamps(True)
+            coinc[i] = self.coincLib.determineCoincidences(
+                tags.ctypes.data_as(ctypes.POINTER(ctypes.c_int64)),
+                chs.ctypes.data_as(ctypes.POINTER(ctypes.c_int8)),
+                valids[i],
+                ch1,
+                ch2,
+                dt,
+                delays[i],
+                maxT,
+            )
+            print("coinc[", i, "]: ", coinc[i])
+        return (delays, coinc, valids)
 
     # Counting --------------------------------------------
     def getCoincCounters(self):
         data = np.zeros(int(31), dtype=np.int32)
         update = ctypes.c_int32()
-        ans = self.qutools_dll.TDC_getCoincCounters(
+        ans = self.tdclib.TDC_getCoincCounters(
             data.ctypes.data_as(ctypes.POINTER(ctypes.c_int32)), ctypes.byref(update)
         )
         if ans != 0:  # "never fails"
@@ -1088,7 +1173,7 @@ class QuTAG:
             ena_value = 1
         else:
             ena_value = 0
-        ans = self.qutools_dll.TDC_enableStartStop(ena_value)
+        ans = self.tdclib.TDC_enableStartStop(ena_value)
         if ans != 0:
             print("Error in TDC_enableStartStop: " + self.err_dict[ans])
         return ans
@@ -1099,14 +1184,14 @@ class QuTAG:
             ena_value = 1
         else:
             ena_value = 0
-        ans = self.qutools_dll.TDC_addHistogram(startChannel, stopChannel, ena_value)
+        ans = self.tdclib.TDC_addHistogram(startChannel, stopChannel, ena_value)
         if ans != 0:
             print("Error in TDC_addHistogram: " + self.err_dict[ans])
         return ans
 
     def setHistogramParams(self, binWidth, binCount):
         self._StartStopBinCount = binCount
-        ans = self.qutools_dll.TDC_setHistogramParams(binWidth, binCount)
+        ans = self.tdclib.TDC_setHistogramParams(binWidth, binCount)
         if ans != 0:
             print("Error in TDC_setHistogramParams: " + self.err_dict[ans])
         return ans
@@ -1114,7 +1199,7 @@ class QuTAG:
     def getHistogramParams(self):
         binWidth = ctypes.c_int32()
         binCount = ctypes.c_int32()
-        ans = self.qutools_dll.TDC_getHistogramParams(
+        ans = self.tdclib.TDC_getHistogramParams(
             ctypes.byref(binWidth), ctypes.byref(binCount)
         )
         if ans != 0:
@@ -1122,7 +1207,7 @@ class QuTAG:
         return (binWidth.value, binCount.value)
 
     def clearAllHistograms(self):
-        ans = self.qutools_dll.TDC_clearAllHistograms()
+        ans = self.tdclib.TDC_clearAllHistograms()
         if ans != 0:
             print("Error in TDC_clearAllHistograms: " + self.err_dict[ans])
         return ans
@@ -1138,8 +1223,8 @@ class QuTAG:
         tooLarge = ctypes.c_int32()
         starts = ctypes.c_int32()
         stops = ctypes.c_int32()
-        expTime = ctypes.c_int64()
-        ans = self.qutools_dll.TDC_getHistogram(
+        expTime = ctypes.c_longlong()
+        ans = self.tdclib.TDC_getHistogram(
             chanA,
             chanB,
             reset_value,
@@ -1170,14 +1255,14 @@ class QuTAG:
             ena = 1
         else:
             ena = 0
-        ans = self.qutools_dll.TDC_enableLft(ena)
+        ans = self.tdclib.TDC_enableLft(ena)
         if ans != 0:
             print("Error in TDC_enableLft: " + self.err_dict[ans])
         return ans
 
     def setLFTParams(self, binWidth, binCount):
         self._LFTBufferSize = binCount
-        ans = self.qutools_dll.TDC_setLftParams(binWidth, binCount)
+        ans = self.tdclib.TDC_setLftParams(binWidth, binCount)
         if ans != 0:
             print("Error in TDC_setLftParams: " + self.err_dict[ans])
         return ans
@@ -1185,7 +1270,7 @@ class QuTAG:
     def getLFTParams(self):
         binWidth = ctypes.c_int32()
         binCount = ctypes.c_int32()
-        ans = self.qutools_dll.TDC_getLftParams(
+        ans = self.tdclib.TDC_getLftParams(
             ctypes.byref(binWidth), ctypes.byref(binCount)
         )
         if ans != 0:
@@ -1193,30 +1278,30 @@ class QuTAG:
         return binWidth.value, binCount.value
 
     def setLFTStartInput(self, startChannel):
-        ans = self.qutools_dll.TDC_setLftStartInput(startChannel)
+        ans = self.tdclib.TDC_setLftStartInput(startChannel)
         if ans != 0:
             print("Error in TDC_setLftStartInput: " + self.err_dict[ans])
         return ans
 
     def getLFTStartInput(self):
         startChannel = ctypes.c_int32()
-        ans = self.qutools_dll.TDC_getLFTStartInput(ctypes.byref(startChannel))
+        ans = self.tdclib.TDC_getLFTStartInput(ctypes.byref(startChannel))
         if ans != 0:
             print("Error in TDC_getLFTStartInput: " + self.err_dict[ans])
         return startChannel.value
 
     def resetLFTHistograms(self):
-        ans = self.qutools_dll.TDC_resetLftHistograms()
+        ans = self.tdclib.TDC_resetLftHistograms()
         if ans != 0:
             print("Error in TDC_resetLftHistrograms: " + self.err_dict[ans])
         return ans
 
     def createLFTFunction(self):
-        LFTfunction = self.qutools_dll.TDC_createLftFunction()
+        LFTfunction = self.tdclib.TDC_createLftFunction()
         return LFTfunction
 
     def releaseLFTFunction(self, LFTfunction):
-        self.qutools_dll.TDC_releaseLftFunction(LFTfunction)
+        self.tdclib.TDC_releaseLftFunction(LFTfunction)
         return 0
 
     def addLFTHistogram(self, stopchannel, enable):
@@ -1225,7 +1310,7 @@ class QuTAG:
         else:
             ena = 0
 
-        ans = self.qutools_dll.TDC_addLftHistogram(stopchannel, ena)
+        ans = self.tdclib.TDC_addLftHistogram(stopchannel, ena)
         if ans != 0:
             print("Error in TDC_addLftHistogram: " + self.err_dict[ans])
         return ans
@@ -1236,7 +1321,7 @@ class QuTAG:
         binWidth = ctypes.c_int32()
         values = np.zeros(self._LFTBufferSize, dtype=np.double)
 
-        self.qutools_dll.TDC_analyseLftFunction(
+        self.tdclib.TDC_analyseLftFunction(
             lft,
             ctypes.byref(capacity),
             ctypes.byref(size),
@@ -1251,13 +1336,13 @@ class QuTAG:
         tooBig = ctypes.c_int32()
         startevt = ctypes.c_int32()
         stopevt = ctypes.c_int32()
-        expTime = ctypes.c_int64()
+        expTime = ctypes.c_longlong()
         if reset:
             resetvalue = 1
         else:
             resetvalue = 0
 
-        ans = self.qutools_dll.TDC_getLftHistogram(
+        ans = self.tdclib.TDC_getLftHistogram(
             channel,
             resetvalue,
             lft,
@@ -1310,7 +1395,7 @@ class QuTAG:
         fitParams = np.zeros(4, dtype=np.double)
         iterations = ctypes.c_int32()
 
-        ans = self.qutools_dll.TDC_fitLftHistogram(
+        ans = self.tdclib.TDC_fitLftHistogram(
             lft,
             lfttype,
             c_params.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),
@@ -1327,13 +1412,13 @@ class QuTAG:
             ena_value = 1
         else:
             ena_value = 0
-        ans = self.qutools_dll.TDC_enableHbt(ena_value)
+        ans = self.tdclib.TDC_enableHbt(ena_value)
         if ans != 0:
             print("Error in TDC_enableHbt: " + self.err_dict[ans])
         return ans
 
     def setHBTParams(self, binWidth, binCount):
-        ans = self.qutools_dll.TDC_setHbtParams(binWidth, binCount)
+        ans = self.tdclib.TDC_setHbtParams(binWidth, binCount)
         self._HBTBufferSize = binCount * 2 - 1
         if ans != 0:
             print("Error in TDC_setHbtParams: " + self.err_dict[ans])
@@ -1342,7 +1427,7 @@ class QuTAG:
     def getHBTParams(self):
         binWidth = ctypes.c_int32()
         binCount = ctypes.c_int32()
-        ans = self.qutools_dll.TDC_setHbtParams(
+        ans = self.tdclib.TDC_setHbtParams(
             ctypes.byref(binWidth), ctypes.byref(binCount)
         )
         if ans != 0:
@@ -1350,20 +1435,20 @@ class QuTAG:
         return (binWidth.value, binCount.value)
 
     def setHBTDetectorParams(self, jitter):
-        ans = self.qutools_dll.TDC_setHbtDetectorParams(jitter)
+        ans = self.tdclib.TDC_setHbtDetectorParams(jitter)
         if ans != 0:
             print("Error in TDC_setHbtDetectorParams: " + self.err_dict[ans])
         return ans
 
     def getHBTDetectorParams(self):
         jitter = ctypes.c_double()
-        ans = self.qutools_dll.TDC_getHbtDetectorParams(ctypes.byref(jitter))
+        ans = self.tdclib.TDC_getHbtDetectorParams(ctypes.byref(jitter))
         if ans != 0:
             print("Error in TDC_getHbtdetectorParams: " + self.err_dict[ans])
         return jitter.value
 
     def setHBTInput(self, channel1, channel2):
-        ans = self.qutools_dll.TDC_setHbtInput(channel1, channel2)
+        ans = self.tdclib.TDC_setHbtInput(channel1, channel2)
         if ans != 0:
             print("Error in TDC_setHbtInput: " + self.err_dict[ans])
         return ans
@@ -1371,7 +1456,7 @@ class QuTAG:
     def getHBTInput(self):
         channel1 = ctypes.c_int32()
         channel2 = ctypes.c_int32()
-        ans = self.qutools_dll.TDC_getHbtInput(
+        ans = self.tdclib.TDC_getHbtInput(
             ctypes.byref(channel1), ctypes.byref(channel2)
         )
         if ans != 0:
@@ -1379,16 +1464,16 @@ class QuTAG:
         return (channel1.value, channel2.value)
 
     def resetHBTCorrelations(self):
-        ans = self.qutools_dll.TDC_resetHbtCorrelations()
+        ans = self.tdclib.TDC_resetHbtCorrelations()
         if ans != 0:
             print("Error in TDC_resetHbtCorrelations: " + self.err_dict[ans])
         return ans
 
     def getHBTEventCount(self):
-        totalCount = ctypes.c_int64()
-        lastCount = ctypes.c_int64()
+        totalCount = ctypes.c_longlong()
+        lastCount = ctypes.c_longlong()
         lastRate = ctypes.c_double()
-        ans = self.qutools_dll.TDC_getHbtEventCount(
+        ans = self.tdclib.TDC_getHbtEventCount(
             ctypes.byref(totalCount), ctypes.byref(lastCount), ctypes.byref(lastRate)
         )
         if ans != 0:
@@ -1397,19 +1482,19 @@ class QuTAG:
 
     def getHBTIntegrationTime(self):
         intTime = ctypes.c_double()
-        ans = self.qutools_dll.TDC_getHbtIntegrationTime(ctypes.byref(intTime))
+        ans = self.tdclib.TDC_getHbtIntegrationTime(ctypes.byref(intTime))
         if ans != 0:
             print("Error in TDC_getHbtIntegrationTime: " + self.err_dict[ans])
         return intTime.value
 
     def getHBTCorrelations(self, forward, hbtfunction):
-        ans = self.qutools_dll.TDC_getHbtCorrelations(forward, hbtfunction)
+        ans = self.tdclib.TDC_getHbtCorrelations(forward, hbtfunction)
         if ans != 0:
             print("Error in TDC_getHbtCorrelations: " + self.err_dict[ans])
         return ans
 
     def calcHBTG2(self, hbtfunction):
-        ans = self.qutools_dll.TDC_calcHbtG2(hbtfunction)
+        ans = self.tdclib.TDC_calcHbtG2(hbtfunction)
         if ans != 0:
             print("Error in TDC_calcHbtG2: " + self.err_dict[ans])
         return ans
@@ -1424,7 +1509,7 @@ class QuTAG:
         fitParams = np.zeros(self.HBT_PARAM_SIZE, dtype=np.double)
         iterations = ctypes.c_int32()
 
-        ans = self.qutools_dll.TDC_fitHbtG2(
+        ans = self.tdclib.TDC_fitHbtG2(
             hbtfunction,
             fitType,
             c_params.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),
@@ -1437,7 +1522,7 @@ class QuTAG:
 
     def getHBTFitStartParams(self, fctType):
         fitParams = np.zeros(self.HBT_PARAM_SIZE, dtype=np.double)
-        ans = self.qutools_dll.TDC_getHbtFitStartParams(
+        ans = self.tdclib.TDC_getHbtFitStartParams(
             fctType, fitParams.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
         )
         if ans != 0:
@@ -1451,7 +1536,7 @@ class QuTAG:
                 c_params[i] = params[i]
             else:
                 break
-        ans = self.qutools_dll.TDC_calcHbtModelFct(
+        ans = self.tdclib.TDC_calcHbtModelFct(
             fctType,
             c_params.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),
             hbtfunction,
@@ -1467,7 +1552,7 @@ class QuTAG:
                 c_params[i] = params[i]
             else:
                 break
-        ans = self.qutools_dll.TDC_generateHbtDemo(
+        ans = self.tdclib.TDC_generateHbtDemo(
             fctType, c_params.ctypes.data_as(ctypes.POINTER(ctypes.c_double)), noiseLv
         )
         if ans != 0:
@@ -1475,10 +1560,10 @@ class QuTAG:
         return ans
 
     def createHBTFunction(self):
-        return self.qutools_dll.TDC_createHbtFunction()
+        return self.tdclib.TDC_createHbtFunction()
 
     def releaseHBTFunction(self, hbtfunction):
-        self.qutools_dll.TDC_releaseHbtFunction(hbtfunction)
+        self.tdclib.TDC_releaseHbtFunction(hbtfunction)
         return 0
 
     def analyzeHBTFunction(self, hbtfunction):
@@ -1487,7 +1572,7 @@ class QuTAG:
         binWidth = ctypes.c_int32()
         iOffset = ctypes.c_int32()
         values = np.zeros(self._HBTBufferSize, dtype=np.double)
-        self.qutools_dll.TDC_analyseHbtFunction(
+        self.tdclib.TDC_analyseHbtFunction(
             hbtfunction,
             ctypes.byref(capacity),
             ctypes.byref(size),
@@ -1505,13 +1590,13 @@ class QuTAG:
             ena = 1
         else:
             ena = 0
-        ans = self.qutools_dll.TDC_enableHg2(ena)
+        ans = self.tdclib.TDC_enableHg2(ena)
         if ans != 0:
             print("Error in TDC_enableLft: " + self.err_dict[ans])
         return self.err_dict[ans]
 
     def setHg2Params(self, binWidth, binCount):
-        ans = self.qutools_dll.TDC_setHg2Params(binWidth, binCount)
+        ans = self.tdclib.TDC_setHg2Params(binWidth, binCount)
         if ans != 0:
             print("Error in TDC_setHg2Params: " + self.err_dict[ans])
         return self.err_dict[ans]
@@ -1519,7 +1604,7 @@ class QuTAG:
     def getHg2Params(self):
         binWidth = ctypes.c_int32()
         binCount = ctypes.c_int32()
-        ans = self.qutools_dll.TDC_getHg2Params(
+        ans = self.tdclib.TDC_getHg2Params(
             ctypes.byref(binWidth), ctypes.byref(binCount)
         )
         if ans != 0:
@@ -1527,7 +1612,7 @@ class QuTAG:
         return (binWidth.value, binCount.value)
 
     def setHg2Input(self, idler, channel1, channel2):
-        ans = self.qutools_dll.TDC_setHg2Input(idler, channel1, channel2)
+        ans = self.tdclib.TDC_setHg2Input(idler, channel1, channel2)
         if ans != 0:
             print("Error in TDC_setHg2Input: " + self.err_dict[ans])
         return self.err_dict[ans]
@@ -1536,7 +1621,7 @@ class QuTAG:
         idler = ctypes.c_int32()
         channel1 = ctypes.c_int32()
         channel2 = ctypes.c_int32()
-        ans = self.qutools_dll.TDC_getHg2Input(
+        ans = self.tdclib.TDC_getHg2Input(
             ctypes.byref(idler), ctypes.byref(channel1), ctypes.byref(channel2)
         )
         if ans != 0:
@@ -1544,7 +1629,7 @@ class QuTAG:
         return (idler.value, channel1.value, channel2.value)
 
     def resetHg2Correlations(self):
-        ans = self.qutools_dll.TDC_resetHg2Correlations()
+        ans = self.tdclib.TDC_resetHg2Correlations()
         if ans != 0:
             print("Error in TDC_resetHg2Correlations: " + self.err_dict[ans])
         return self.err_dict[ans]
@@ -1558,7 +1643,7 @@ class QuTAG:
         buffer = np.zeros(binCount, dtype=np.double)
         bufSize = ctypes.c_int32(binCount)
 
-        ans = self.qutools_dll.TDC_calcHg2G2(
+        ans = self.tdclib.TDC_calcHg2G2(
             buffer.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),
             ctypes.byref(bufSize),
             resetvalue,
@@ -1566,6 +1651,65 @@ class QuTAG:
         if ans != 0:
             print("Error in TDC_calcHg2G2: " + self.err_dict[ans])
         return buffer
+
+    def diffMatrix(self, a):
+        x = np.reshape(a, (len(a), 1))
+        return x - x.transpose()
+
+    def getCoincidences(self, ch1, ch2, n, dt, T):
+        """
+        get the latest time tags, if there are more than n time tags, only take into account n
+        NOTE: n should not be too large, otherwise the memory usage will become horrendous
+
+        ch1 and ch2 are integers specifying the cannels to monitor for coincidences
+        dt is the coincidence window (in seconds)
+        T is the time delay between the channels (in seconds)
+        """
+        t0 = time.time()
+        (tags, chs, valid) = self.getLastTimestamps(True)
+        t1 = time.time()
+        print("t1 (ms): ", (t1 - t0) * 1e3)
+        baseunit = 1e-12
+        baseF = 1 / baseunit
+        Tint = np.int(baseF * T)
+        dtInt = np.int(baseF * dt)
+        if ch1 < 0 or ch2 < 0 or ch1 > 4 or ch2 > 4:
+            print("please supply proper channel numbers - exiting")
+            return -1  # error code
+        chDiff = ch2 - ch1
+        tagsNZ = tags[
+            chs != 104
+        ]  # the time tagger regulary (every 1ms) records time stamps in channel 104 - might be for testing purposes.
+        # We get rid of those
+        t2 = time.time()
+        print("t2 (ms): ", (t2 - t1) * 1e3)
+        chsNZ = chs[chs != 104]  # also of the corresponding channels
+        t3 = time.time()
+        print("t3(ms): ", (t3 - t2) * 1e3)
+        if n > 100000:
+            print("the 'n' you chose is too large for my taste - aborting")
+            return -1  # error code
+        elif n < 1:
+            print("the parameter 'n' should be at least 1 - aborting")
+            return -1  # error code
+        mytags = tagsNZ[:n]
+        t4 = time.time()
+        print("t4 (ms): ", (t4 - t3) * 1e3)
+        mychs = chsNZ[:n]
+        t5 = time.time()
+        print("t5 (ms): ", (t5 - t4) * 1e3)
+        diffs = self.diffMatrix(mytags)
+        t6 = time.time()
+        print("t6 (ms): ", (t6 - t5) * 1e3)
+        diffchs = self.diffMatrix(mychs)
+        t7 = time.time()
+        print("t7 (ms): ", (t7 - t6) * 1e3)
+        cs = np.sum(np.abs(diffs[diffchs == chDiff] - Tint) < dtInt)
+        t8 = time.time()
+        print("t8 (ms): ", (t8 - t7) * 1e3)
+        return (
+            cs  # indicate success by returning (a nonnegative number of coincidences)
+        )
 
     def calcHg2Tcp1D(self, reset):
         if reset:
@@ -1577,8 +1721,8 @@ class QuTAG:
         buffer = np.zeros(binCount2, dtype=np.int64)
         bufSize = ctypes.c_int32(binCount2)
 
-        ans = self.qutools_dll.TDC_calcHg2Tcp1D(
-            buffer.ctypes.data_as(ctypes.POINTER(ctypes.c_int64)),
+        ans = self.tdclib.TDC_calcHg2Tcp1D(
+            buffer.ctypes.data_as(ctypes.POINTER(ctypes.c_longlong)),
             ctypes.byref(bufSize),
             resetvalue,
         )
@@ -1587,18 +1731,18 @@ class QuTAG:
         return buffer
 
     def getHg2Raw(self):
-        evtIdler = ctypes.c_int64()
-        evtCoinc = ctypes.c_int64()
+        evtIdler = ctypes.c_longlong()
+        evtCoinc = ctypes.c_longlong()
         binCount = self.getHg2Params()[1]
         bufSsi = np.zeros(binCount, dtype=np.int64)
         bufS2i = np.zeros(binCount, dtype=np.int64)
         bufSize = ctypes.c_int32(binCount)
 
-        ans = self.qutools_dll.TDC_getHg2Raw(
+        ans = self.tdclib.TDC_getHg2Raw(
             ctypes.byref(evtIdler),
             ctypes.byref(evtCoinc),
-            bufSsi.ctypes.data_as(ctypes.POINTER(ctypes.c_int64)),
-            bufS2i.ctypes.data_as(ctypes.POINTER(ctypes.c_int64)),
+            bufSsi.ctypes.data_as(ctypes.POINTER(ctypes.c_longlong)),
+            bufS2i.ctypes.data_as(ctypes.POINTER(ctypes.c_longlong)),
             ctypes.byref(bufSize),
         )
         if ans != 0:

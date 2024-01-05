@@ -7,7 +7,7 @@
 #
 # This is demo code. Use at your own risk. No warranties.
 #
-# It may be used and modified with no restriction; raw copies as well as 
+# It may be used and modified with no restriction; raw copies as well as
 # modified versions may be distributed without limitation.
 
 # This code shows different device settings and their usage. For additional information see the documentation of TDCBase.
@@ -16,11 +16,10 @@
 # for sleep
 import time
 
-
 try:
-        import QuTAG
+    import QuTAG
 except:
-        print("Time Tagger wrapper QuTAG.py is not in the search path / same folder.")
+    print("Time Tagger wrapper QuTAG.py is not in the search path / same folder.")
 
 import numpy as np
 
@@ -31,7 +30,6 @@ qutag = QuTAG.QuTAG()
 print("preselectSingleStop", qutag.preselectSingleStop(True))
 
 
-
 # Get the timebase (the resolution) from the quTAG. It is used as time unit by many other functions.
 timebase = qutag.getTimebase()
 print("Device timebase:", timebase, "s")
@@ -39,21 +37,23 @@ print("Device timebase:", timebase, "s")
 
 # Read back device parameters: coincidence window in bins (bin width is timebase) and exposuretime in ms
 na, coincWin, expTime = qutag.getDeviceParams()
-print("Coincidence window",coincWin, "bins, exposure time",expTime, "ms")
+print("Coincidence window", coincWin, "bins, exposure time", expTime, "ms")
 
 
 # Define the coincidence window	in bins of the timebase
-qutag.setCoincidenceWindow(20000) # with the timebase 1e-12s -> coincidence window is set to 20ns
+qutag.setCoincidenceWindow(
+    20000
+)  # with the timebase 1e-12s -> coincidence window is set to 20ns
 
 
 # Set the exposure or integration time in milliseconds, range = 0..65535
-qutag.setExposureTime(500) # 500ms Counting
+qutag.setExposureTime(500)  # 500ms Counting
 
 
 # Enable channels, disable the rest
 # Selects the channels that contribute to the timestamp output stream.
 # 0 enables the start input that doesn't trigger timestamps but may affect timestamps from other channels.
-qutag.enableChannels((0,1,2,3,4)) # Enables channel 0,2,3
+qutag.enableChannels((0, 1, 2, 3, 4))  # Enables channel 0,2,3
 
 
 # Let's configure a channel with threshold voltage and rising or faling edge.
@@ -65,15 +65,14 @@ qutag.enableChannels((0,1,2,3,4)) # Enables channel 0,2,3
 # Rising/falling edge: True/False (rising is default)
 # Voltage threshold from -2...3V when signal conditioning is SIGNALCOND_MISC: 1.2V
 # For additional information see the documentation of TDCBase.
-qutag.setSignalConditioning(2,qutag.SCOND_MISC,False,1.2)
+qutag.setSignalConditioning(2, qutag.SCOND_MISC, False, 1.2)
 print("Signal Cond.", qutag.getSignalConditioning(2))
 
 # Enable Markers.
 # The markers 0-3 are low resolution timestamps triggered over the GPIO port. Marker 4 is a 1ms timer tick.
 # If enabled, the markers are included in timestamp protocol files with channel numbers 100-104.
-# By default, all markers are activated. The function allows to enable or disable the single marker channels. 
-qutag.enableMarkers((1,2))
-
+# By default, all markers are activated. The function allows to enable or disable the single marker channels.
+qutag.enableMarkers((1, 2))
 
 
 # Get the dead time for input channel 1
@@ -84,7 +83,7 @@ print("Dead time channel 1:", rc, "ps")
 
 # Set dead time for a specified input channel
 # Channel 1, dead time 200 ps
-rc = qutag.setDeadTime(1,200)
+rc = qutag.setDeadTime(1, 200)
 
 
 # Set Channel Delay Times.
@@ -105,24 +104,23 @@ print("Channel delay", rc)
 # Timestamps of events detected by the device can get lost if their rate is too high for the USB interface or if the PC is unable to receive the data in time.
 # The TDC recognizes this situation and signals it to the PC (with high priority).
 # The function checks if a data loss situation is currently detected or if it has been latched since the last call.
-# If you are only interested in the current situation, call the function twice; the first call will delete the latch. 
+# If you are only interested in the current situation, call the function twice; the first call will delete the latch.
 rc = qutag.getDataLost()
 print("Data loss", rc)
-
 
 
 rc = qutag.startCalibration()
 
 # wait a little to get the device started calibrating
-time.sleep(.5)
+time.sleep(0.5)
 
 calibState = qutag.getCalibrationState()
 print("getCalibrationState", calibState)
 
 while calibState:
-	time.sleep(0.1)
-	calibState = qutag.getCalibrationState()
-	#print("getCalibrationState: ", calibState)
+    time.sleep(0.1)
+    calibState = qutag.getCalibrationState()
+    # print("getCalibrationState: ", calibState)
 print("CalibrationState done:", calibState)
 
 

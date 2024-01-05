@@ -692,7 +692,7 @@ class QuTAG:
 
     # Init --------------------------------------------------------------
     def Initialize(self):
-        """Initializing the quTAG by DLL cunction TDC_init with device number -1 \n
+        """Initializing the quTAG by DLL function TDC_init with device number -1 \n
 
         @rtype: string
         @return: Returns error code via dictionary

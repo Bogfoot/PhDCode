@@ -19,7 +19,8 @@ print("Device timebase:", timebase, "s")
 
 
 # Set the exposure or integration time in milliseconds, range = 0..65535
-tt.setExposureTime(1 * 1000)  # ms Counting
+exposure_time_seconds = 0.5
+tt.setExposureTime(int( 1000 * exposure_time_seconds ))  # ms Counting
 
 tt.enableChannels((1, 2))  # Enables channel 0,2,3
 
@@ -28,7 +29,7 @@ time.sleep(1)
 data, updates = tt.getCoincCounters()
 
 # wait a little to get the device started calibrating
-time.sleep(2)
+time.sleep(1)
 
 data, updates = tt.getCoincCounters()
 print("Updates since last call: ", updates, "| Data: ", data)
