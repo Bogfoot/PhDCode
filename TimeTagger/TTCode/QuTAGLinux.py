@@ -113,7 +113,7 @@ class QuTAG:
         ):  # if you want to switch to linux you also need to change self.tdclib into self.tdclib throughout this code... or just use the other code
             self.tdclib = ctypes.cdll.LoadLibrary("libtdcbase.so")
             self.coincLib = ctypes.cdll.LoadLibrary(
-                "/home/bogfootlj/Documents/PhDCode/TimeTagger/TTCode/TimeTaggerCode/qutag_histogram.so"
+                "/home/bogfootlj/Documents/PhDCode/TimeTagger/TTCode/qutag_histogram.so"
             )
 
         self.declareAPI()
