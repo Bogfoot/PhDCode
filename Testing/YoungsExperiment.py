@@ -44,7 +44,6 @@ def youngs_experiment(
         field = np.cos(k * (screen_points - slit_position))
         print(field)
     
-
         # Add the contribution to the total intensity
         intensity += field ** 2
 
