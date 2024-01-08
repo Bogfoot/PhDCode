@@ -43,6 +43,7 @@ def youngs_experiment(
         # Calculate the electric field contribution from each slit
         field = np.cos(k * (screen_points - slit_position))
         print(field)
+    
 
         # Add the contribution to the total intensity
         intensity += field ** 2
