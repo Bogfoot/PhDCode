@@ -89,6 +89,7 @@ class QuTAG:
         os.environ["PATH"] += full_path
 
         # load DLL
+        # ADRIAN: Changed this to load generic libraries, not just windows. This should work on both now.
         self.qutools_dll = ctypes.cdll.LoadLibrary(dll_name)
 
         self.__declareAPI()

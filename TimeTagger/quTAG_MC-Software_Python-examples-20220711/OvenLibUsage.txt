@@ -1,0 +1,9 @@
+from OvenLibV2 import OvenController as OL
+
+oven = serial.Serial()
+usb_port = "COM7"
+
+oven = OL(oven, port=usb_port)
+
+oven.enable_oven()
+oven.set_temperature(round(temperature[0], 2))
