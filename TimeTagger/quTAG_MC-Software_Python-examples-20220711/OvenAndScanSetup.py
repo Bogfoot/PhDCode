@@ -4,6 +4,9 @@ import datetime
 import time
 
 import numpy as np
+import QuTAG_MC as qt
+import serial
+from OvenLibV2 import OvenController as OL
 
 # oven:
 
@@ -61,7 +64,6 @@ else:
 # print(f"Sleeping for {sleeptime} hours!")
 # time.sleep(sleeptime*seconds)
 
-import QuTAG_MC as qt
 
 current_time = time.strftime("%H:%M:%S", time.localtime())
 print("Waking up! Please make me coffee!")
@@ -72,7 +74,12 @@ tt = qt.QuTAG()
 timebase = tt.getTimebase()
 print("Device timebase:", timebase, "s")
 tt.setExposureTime(exposure_time_timetagger * 1000)  # ms Counting
-tt.enableChannels((0, 1, 2, 3, 4))
+
+channel_1 = 1
+channel_2 = 2
+coincidances_12 = 9
+
+tt.enableChannels((channel_1, channel_2))
 time.sleep(sleepy_sleepy_timetagger)
 # data, updates = tt.getCoincCounters()
 
@@ -104,9 +111,8 @@ f.write("# Temperature    Clicks_1    Clicks_2    Correlations \n")
 f.write("# [C]    [/]    [/]    [/] \n")
 f.close()
 
-import serial
+
 ########################## oven
-from OvenLibV2 import OvenController as OL
 
 oven = serial.Serial()
 usb_port = "COM7"
@@ -117,9 +123,6 @@ oven.enable_oven()
 oven.set_temperature(round(temperature[0], 2))
 
 # timetagger:
-channel_1 = 1
-channel_2 = 2
-coincidances_12 = 9
 
 ########################## temperature scan
 coincidances = []

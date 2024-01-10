@@ -8,17 +8,17 @@ class OvenController:
         oven,
         port="COM7",
         baudrate=19200,
-        parity=serial.PARITY_NONE,
-        stopbits=serial.STOPBITS_ONE,
-        bytesize=serial.EIGHTBITS,
+        # parity=serial.PARITY_NONE,
+        # stopbits=serial.STOPBITS_ONE,
+        # bytesize=serial.EIGHTBITS,
         timeout=1,
     ):
         self.oven = oven
         self.oven.port = port
         self.oven.baudrate = baudrate
-        self.oven.parity = parity
-        self.oven.stopbits = stopbits
-        self.oven.bytesize = bytesize
+        # self.oven.parity = parity
+        # self.oven.stopbits = stopbits
+        # self.oven.bytesize = bytesize
         self.oven.timeout = timeout
 
         self.enable_oven()
