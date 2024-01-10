@@ -386,10 +386,10 @@ sleepy_sleepy_timetagger = exposure_time_timetagger + 15  # s
 
 n = (
     int((temperature_end - temperature_start) / temperature_step) + 1
-)  # +1 because of the inital temperature
+)  # +1 because of the initial temperature
 temperature = np.linspace(temperature_start, temperature_end, n)
 
-# do you want to see the current status of the measurment?
+# do you want to see the current status of the measurement?
 plot_current_iteration = False  # not working for some reason
 
 print("Temperature scan will be performed.")
