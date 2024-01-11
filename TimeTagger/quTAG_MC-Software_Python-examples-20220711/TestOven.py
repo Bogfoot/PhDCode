@@ -1,7 +1,6 @@
 #%%  test connect to oven
 import OvenLibV2 as OO
 import serial
-print(serial)
 usb_port = "/dev/ttyUSB0"
 oven = serial.Serial(port=usb_port)
 
