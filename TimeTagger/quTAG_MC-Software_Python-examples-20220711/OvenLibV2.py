@@ -12,11 +12,7 @@ class OvenController:
         baudrate=19200,
         timeout=1,
     ):
-        self.oven = oven
-        self.oven.port = port
-        self.oven.baudrate = baudrate
-        self.oven.timeout = timeout
-
+        self.oven = oven.serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
         self.enable_oven()
 
     def enable_oven(self):

@@ -1,9 +1,9 @@
 #%%  test connect to oven
 import OvenLibV2 as OO
-import pyserial
-
+import serial
+print(serial)
 usb_port = "/dev/ttyUSB0"
-oven = pyserial.Serial(usb_port)
+oven = serial.Serial(port=usb_port)
 
 
 oven = OO.OvenController(oven, port=usb_port)
