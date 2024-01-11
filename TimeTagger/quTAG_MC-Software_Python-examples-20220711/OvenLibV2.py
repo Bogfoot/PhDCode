@@ -1,24 +1,20 @@
 import matplotlib.pyplot as plt
 import serial
 
+SOH = "\x01"
+
 
 class OvenController:
     def __init__(
         self,
         oven,
-        port="COM7",
+        port="/dev/ttyUSB0",
         baudrate=19200,
-        # parity=serial.PARITY_NONE,
-        # stopbits=serial.STOPBITS_ONE,
-        # bytesize=serial.EIGHTBITS,
         timeout=1,
     ):
         self.oven = oven
         self.oven.port = port
         self.oven.baudrate = baudrate
-        # self.oven.parity = parity
-        # self.oven.stopbits = stopbits
-        # self.oven.bytesize = bytesize
         self.oven.timeout = timeout
 
         self.enable_oven()
@@ -65,6 +61,13 @@ class OvenController:
         check_sum = hex(sum(list((start + command + data_length + data).encode())))[3:]
         command_packet = start + command + data_length + data + check_sum
         return command_packet
+
+    def close(self):
+        if self.oven.is_open:
+            self.oven.close()
+            print("Oven is now closed.")
+        else:
+            print("Oven was closed.")
 
     def set_temperature(self, T):
         self.oven.open()
