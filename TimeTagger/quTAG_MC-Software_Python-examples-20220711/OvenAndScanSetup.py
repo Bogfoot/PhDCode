@@ -116,6 +116,7 @@ f.close()
 
 oven = serial.Serial()
 usb_port = "COM7"
+# usb_port = "/dev/tty#" # This is for use on linux, you can also use /dev/bus/usb/... maybe depending on your setup
 
 oven = OL(oven, port=usb_port)
 
