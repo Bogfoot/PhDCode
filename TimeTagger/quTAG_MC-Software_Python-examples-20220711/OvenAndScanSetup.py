@@ -6,7 +6,8 @@ import time
 import numpy as np
 import QuTAG_MC as qt
 import serial
-from OvenLibV2 import OvenController as OL
+# from OvenLibV2 import OvenController as OL
+from OC import OC
 
 # oven:
 
@@ -114,14 +115,20 @@ f.close()
 
 ########################## oven
 
-oven = serial.Serial()
-usb_port = "COM7"
-# usb_port = "/dev/tty#" # This is for use on linux, you can also use /dev/bus/usb/... maybe depending on your setup
+# usb_port = "COM7"
+usb_port = "/dev/ttyUSB0"  # This is for use on linux, you can also use /dev/bus/usb/... maybe depending on your setup
+# oven = serial.Serial()
 
-oven = OL(oven, port=usb_port)
+# oven = OL(oven, port=usb_port)    # My Code
+oven = OC(usb_port)  # OC3 Code from them
 
-oven.enable_oven()
+oven.enable()
 oven.set_temperature(round(temperature[0], 2))
+print("Sleep for 10 seconds to see a different temperature")
+time.sleep(10)
+print(oven.temperature[0])
+oven.OC_close()
+
 
 # timetagger:
 

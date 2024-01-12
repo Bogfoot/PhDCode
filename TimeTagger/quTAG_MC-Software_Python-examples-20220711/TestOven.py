@@ -1,12 +1,24 @@
 #%%  test connect to oven
-import OvenLibV2 as OO
-import serial
-usb_port = "/dev/ttyUSB0"
-oven = serial.Serial(port=usb_port)
+import OC
+
+# usb_port = "/dev/ttyUSB0"
+# oven = serial.Serial(port=usb_port)
+#
+#
+# oven = OO.OvenController(oven, port=usb_port)
+# oven.enable_oven()
+#
+# print("current T = ", oven.check_temperature(), " C")
+# oven.close()
+#
+# usb_port = "COM7"
+usb_port = "/dev/ttyUSB0"  # This is for use on linux, you can also use /dev/bus/usb/... maybe depending on your setup
 
 
-oven = OO.OvenController(oven, port=usb_port)
-oven.enable_oven()
+oven = OC.OC(usb_port)  # OC3 Code from them
 
-print("current T = ", oven.check_temperature(), " C")
-oven.close()
+oven.enable()
+oven.set_temperature(round(temperature[0], 2))
+print("Sleep for 10 seconds to see a different temperature")
+time.sleep(10)
+print(oven.temperature[0])

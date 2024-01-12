@@ -15,7 +15,5 @@ the setpoint temperature, and for the presence of any faults reported by the uni
 
 Requirements:
 
-Python
-, version 3.10 or greater.
-PySerial module (https://pyserial.readthedocs.io/en/latest
-/pyserial.html#installation)
+Python, version 3.10 or greater.
+PySerial module (https://pyserial.readthedocs.io/en/latest/pyserial.html#installation)
