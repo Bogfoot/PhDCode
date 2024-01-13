@@ -1,4 +1,6 @@
 #%%  test connect to oven
+import time
+
 import OC
 
 # usb_port = "/dev/ttyUSB0"
@@ -18,7 +20,7 @@ usb_port = "/dev/ttyUSB0"  # This is for use on linux, you can also use /dev/bus
 oven = OC.OC(usb_port)  # OC3 Code from them
 
 oven.enable()
-oven.set_temperature(round(temperature[0], 2))
+oven.set_temperature(round(40))
 print("Sleep for 10 seconds to see a different temperature")
 time.sleep(10)
 print(oven.temperature[0])
