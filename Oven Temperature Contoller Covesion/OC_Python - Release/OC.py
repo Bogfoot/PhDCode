@@ -19,7 +19,7 @@ class OC:
                                                      'write_timeout'])
         self.OC_description = []
         self.OC_selected = ""
-        self.OC = serial.Serial() # Connection to the OC
+        self.OC = serial.Serial(port) # Connection to the OC
         self.port_params.baud = 19200
         self.port_params.data_bits = serial.EIGHTBITS
         self.port_params.stop_bits = serial.STOPBITS_ONE
@@ -407,10 +407,3 @@ class OC:
             self.fault_queue.append("Temp fault present at " + self.message_time.strftime("%b %d %Y %H:%M:%S"))
         if fault & 0b00001:
             self.fault_queue.append("Inhibited fault present at " + self.message_time.strftime("%b %d %Y %H:%M:%S"))
-                
-                
-        
-  
-
-
-
