@@ -29,9 +29,7 @@ from matplotlib import pyplot as plt
 com_port = "/dev/ttyUSB0"
 
 # Make a new OC object
-print("\tStarting")
 oc = OC.OC(com_port)
-print("\tPassed Com Port")
 
 
 # --------  Example 1: Temperature stability testing -----------
@@ -46,18 +44,13 @@ print("\tPassed Com Port")
 # controller and heater and places the returned values
 
 # Define stability criteria
-target_temperature = 40  # units: C
+target_temperature = 45  # units: C
 stability_range = 0.1  # units: C
 stability_time = 20  # units: s
-print("passed define stability")
 # Set the temperature setpoint
-print("coming to set temp")
 success = oc.set_temperature(target_temperature)
-print("set temp")
 # Enable the output
-print("coming to enable")
 oc.enable()
-print("enabled")
 
 # Monitor temperature and test for stability
 in_range = False
@@ -65,15 +58,15 @@ time_in_range = timedelta()
 stable = False
 
 
-print("while not stable")
 while not stable:
-
     # Get the status of the controller. This will return both the
     # setpoint that the controller is aiming for, and the current
     # temperature of the oven.
+    print("At Get status")
     oc.get_status()
 
     # Fault check
+    print("Passed Get status")
     if not (oc.fault_code[0] == 0):
         # If a fault is seen, it is logged in the fault_queue with the fault type
         # and the time is occured
@@ -169,7 +162,6 @@ oc.enable()
 
 # Monitor the ramp
 while oc.temperature[0] < oc.requested_temperature:
-
     # Check for bytes received from the OC. These are parsed to look for complete messages
     # and then, if a message is available, the message_available property is set to true
     oc.read_available_bytes()
