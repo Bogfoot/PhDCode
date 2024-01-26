@@ -73,20 +73,20 @@ class QuTAG:
         Set some parameters
         """
         file_path = os.path.dirname(os.path.abspath(__file__))
-        dll_name = "/home/bogfootlj/Documents/PhDCode/TimeTagger/quTAG_MC-Software_Python-examples-20220711/libtdcbase.so"
-        # check Python bit version
-        if sys.maxsize > 2 ** 32:
-            # DLL 64 Bit
-            full_path = file_path + os.path.sep + os.path.join("DLL_64bit")
-            # print("Python 64 Bit - loading 64 Bit DLL")
-        else:
-            # DLL 32 Bit
-            full_path = file_path + os.path.sep + os.path.join("DLL_32bit")
-            # print("Python 32 Bit - loading 32 Bit DLL")
-
-        # add DLL folder to environment PATH
-        os.environ["PATH"] += ";"
-        os.environ["PATH"] += full_path
+        dll_name = "/home/bogfootlj/Documents/PhDCode/TimeTagger/quTAG_MC-Software_Python-examples-20220711/libtdcbase1.so"
+        # # check Python bit version
+        # if sys.maxsize > 2 ** 32:
+        #     # DLL 64 Bit
+        #     full_path = file_path + os.path.sep + os.path.join("DLL_64bit")
+        #     # print("Python 64 Bit - loading 64 Bit DLL")
+        # else:
+        #     # DLL 32 Bit
+        #     full_path = file_path + os.path.sep + os.path.join("DLL_32bit")
+        #     # print("Python 32 Bit - loading 32 Bit DLL")
+        #
+        # # add DLL folder to environment PATH
+        # os.environ["PATH"] += ";"
+        # os.environ["PATH"] += full_path
 
         # load DLL
         # ADRIAN: Changed this to load generic libraries, not just windows. This should work on both now.

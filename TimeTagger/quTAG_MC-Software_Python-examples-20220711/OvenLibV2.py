@@ -1,3 +1,5 @@
+import time
+
 import matplotlib.pyplot as plt
 import serial
 
@@ -7,20 +9,20 @@ SOH = "\x01"
 class OvenController:
     def __init__(
         self,
-        oven,
+        # oven,
         port="/dev/ttyUSB0",
         baudrate=19200,
         timeout=1,
     ):
-        self.oven = oven.serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
-        self.enable_oven()
-
-    def enable_oven(self):
-        self.oven.open()
-        # define the right message string to enable heating the oven
+        self.oven = serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
+        time.sleep(0.01)
         send_message = "\x01j00CB"
         self.oven.write(send_message.encode())
         self.oven.close()
+
+    def enable_oven(self):
+        # define the right message string to enable heating the oven
+        self.oven.open()
         return
 
     def string_bit_converter(self, input_list):
@@ -36,7 +38,7 @@ class OvenController:
 
     def check_temperature(self):
         self.oven.open()
-        self.oven.flushOutput()
+        self.oven.flush()
         send_message = "\x01j00CB"
         self.oven.write(send_message.encode())
         oven_output = self.oven.readline()
@@ -66,7 +68,7 @@ class OvenController:
             print("Oven was closed.")
 
     def set_temperature(self, T):
-        self.oven.open()
+        # self.oven.open()
         send_message = self.command_packet_constructor(T)
         self.oven.write(send_message.encode())
         self.oven.close()
