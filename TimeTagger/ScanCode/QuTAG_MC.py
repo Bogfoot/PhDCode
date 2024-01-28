@@ -73,7 +73,7 @@ class QuTAG:
         Set some parameters
         """
         file_path = os.path.dirname(os.path.abspath(__file__))
-        dll_name = file_path + os.path.sep + "libtdcbase1.so"
+        dll_name = file_path + os.path.sep + "libtdcbase.so"
         # dll_name = (
         #     "/home/bogfootlj/Documents/PhDCode/TimeTagger/ScanCode/libtdcbase1.so"
         # )
