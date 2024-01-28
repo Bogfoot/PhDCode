@@ -73,7 +73,11 @@ class QuTAG:
         Set some parameters
         """
         file_path = os.path.dirname(os.path.abspath(__file__))
-        dll_name = "/home/bogfootlj/Documents/PhDCode/TimeTagger/quTAG_MC-Software_Python-examples-20220711/libtdcbase1.so"
+        dll_name = file_path + os.path.sep + "libtdcbase1.so"
+        # dll_name = (
+        #     "/home/bogfootlj/Documents/PhDCode/TimeTagger/ScanCode/libtdcbase1.so"
+        # )
+
         # # check Python bit version
         # if sys.maxsize > 2 ** 32:
         #     # DLL 64 Bit

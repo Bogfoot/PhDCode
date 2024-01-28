@@ -103,5 +103,3 @@ for i in range(1000):
 
 # Disconnects a connected device and stops the internal event loop.
 qutag.deInitialize()
-
-
