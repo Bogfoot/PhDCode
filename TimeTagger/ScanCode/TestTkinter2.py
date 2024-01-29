@@ -1,5 +1,6 @@
 import random
 import tkinter as tk
+from tkinter import *
 from tkinter import ttk
 
 import matplotlib.pyplot as plt
@@ -18,6 +19,11 @@ class LivePlotApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Live Plot App")
+        self.frame = ttk.Frame(self.root)
+        self.grid = ttk.Frame(
+            self.frame, borderwidth=5, relief="ridge", width=800, height=800
+        )
+
         self.tt = QuTAG_MC.QuTAG()
 
         # Variables to store selected channel numbers
@@ -31,26 +37,30 @@ class LivePlotApp:
         self.fig, self.ax = plt.subplots()
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.root)
         self.canvas_widget = self.canvas.get_tk_widget()
-        self.canvas_widget.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        self.canvas_widget.grid(column=5, row=0)
         self.animation()
 
     def create_widgets(self):
         # Dropdown menus for channel selection
-        ttk.Label(self.root, text="Channel 1:").pack(side=tk.LEFT, padx=10)
+        ttk.Label(self.root, text="Channel 1:").grid(
+            column=0, row=0, padx=5, sticky="NW"
+        )
         channel_1_dropdown = ttk.Combobox(
             self.root,
             textvariable=self.channel_1_var,
             values=[str(i) for i in range(1, 9)],
         )
-        channel_1_dropdown.pack(side=tk.LEFT)
+        channel_1_dropdown.grid(column=0, row=1, pady=5, sticky="NW")
 
-        ttk.Label(self.root, text="Channel 2:").pack(side=tk.LEFT, padx=10)
+        ttk.Label(self.root, text="Channel 2:").grid(
+            column=1, row=0, padx=5, sticky="NW"
+        )
         channel_2_dropdown = ttk.Combobox(
             self.root,
             textvariable=self.channel_2_var,
             values=[str(i) for i in range(1, 9)],
         )
-        channel_2_dropdown.pack(side=tk.LEFT)
+        channel_2_dropdown.grid(column=1, row=1, pady=5, sticky="NW")
 
     def update_plot(self):
         # Get data from channels
