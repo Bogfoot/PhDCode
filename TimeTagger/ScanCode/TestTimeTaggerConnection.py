@@ -39,11 +39,9 @@ data, updates = tt.getCoincCounters()
 print("Updates since last call: ", updates, "| Data: ", data)
 print("channel: ", channel_1, ", counts: ", data[channel_1])
 print("channel: ", channel_2, ", counts: ", data[channel_2])
-print("channel: ", 3, ", counts: ", data[3])
 print("channel: coincidences, counts: ", data[coincidances12])
 
-print(tt.discover())
+tt.getDeviceParams()
 
 tt.deInitialize()
-tt.getDeviceParams()
 oven.OC_close()

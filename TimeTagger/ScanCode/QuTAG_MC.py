@@ -78,6 +78,7 @@ class QuTAG:
         #     "/home/bogfootlj/Documents/PhDCode/TimeTagger/ScanCode/libtdcbase1.so"
         # )
 
+        # ADRIAN: I removed this cuzz who uses windows anyways
         # # check Python bit version
         # if sys.maxsize > 2 ** 32:
         #     # DLL 64 Bit
@@ -93,7 +94,7 @@ class QuTAG:
         # os.environ["PATH"] += full_path
 
         # load DLL
-        # ADRIAN: Changed this to load generic libraries, not just windows. This should work on both now.
+        # ADRIAN: Changed this to load generic libraries, not just windows. This should work on both now, hopefully.
         self.qutools_dll = ctypes.cdll.LoadLibrary(dll_name)
 
         self.__declareAPI()
