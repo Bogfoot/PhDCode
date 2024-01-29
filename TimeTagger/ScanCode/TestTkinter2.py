@@ -1,5 +1,6 @@
 import random
 import tkinter as tk
+from tkinter import messagebox
 from tkinter import *
 from tkinter import ttk
 
@@ -19,7 +20,8 @@ class LivePlotApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Live Plot App")
-        self.root.grid(width=800, height=800)
+        self.root.geometry("1000x8000")
+        self.root.config(bg="gray")
         self.frame = ttk.Frame(self.root)
         self.grid = ttk.Frame(
             self.frame, borderwidth=5, relief="ridge", width=800, height=800
@@ -51,7 +53,7 @@ class LivePlotApp:
             textvariable=self.channel_1_var,
             values=[str(i) for i in range(1, 9)],
         )
-        channel_1_dropdown.grid(column=0, row=1, pady=5, sticky="NW")
+        channel_1_dropdown.grid(column=0, row=1, pady=0, sticky="NW")
 
         ttk.Label(self.root, text="Channel 2:").grid(
             column=1, row=0, padx=5, sticky="NW"
@@ -61,7 +63,7 @@ class LivePlotApp:
             textvariable=self.channel_2_var,
             values=[str(i) for i in range(1, 9)],
         )
-        channel_2_dropdown.grid(column=1, row=1, pady=5, sticky="NW")
+        channel_2_dropdown.grid(column=1, row=1, pady=0, sticky="NW")
 
     def update_plot(self):
         # Get data from channels
@@ -86,7 +88,14 @@ class LivePlotApp:
         self.root.after(200, self.animation)  # 1000 milliseconds (1 second)
 
 
+def on_q_pressed(event):
+    confirm_exit = messagebox.askokcancel("Exit", "Do you want to exit the program?")
+    if confirm_exit:
+        root.destroy()
+
+
 if __name__ == "__main__":
     root = tk.Tk()
     app = LivePlotApp(root)
+    root.bind("<q>", on_q_pressed)
     root.mainloop()
