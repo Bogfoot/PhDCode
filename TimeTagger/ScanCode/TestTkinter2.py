@@ -19,6 +19,7 @@ class LivePlotApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Live Plot App")
+        self.root.grid(width=800, height=800)
         self.frame = ttk.Frame(self.root)
         self.grid = ttk.Frame(
             self.frame, borderwidth=5, relief="ridge", width=800, height=800
