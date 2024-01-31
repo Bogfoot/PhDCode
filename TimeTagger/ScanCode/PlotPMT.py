@@ -12,7 +12,7 @@ plt.figure(figsize=(10, 6))
 
 plt.plot(data["Temperature"], data["Clicks_1"], label="Clicks_1")
 plt.plot(data["Temperature"], data["Clicks_2"], label="Clicks_2")
-plt.plot(data["Temperature"], data["Correlations"], label="Correlations")
+plt.plot(data["Temperature"], data["Correlations"]*100, label="Correlations")
 
 plt.title("Temperature vs. Clicks and Correlations")
 plt.xlabel("Temperature (°C)")
