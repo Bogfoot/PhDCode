@@ -1,0 +1,19 @@
+some notes on the webcam:
+
+while I cannot use all properties of the webcam using opencv, I can
+access them using v4l2-ctl - a command-line tool.
+
+For example, I can list all the properties by using:
+
+
+v4l2-ctl -d /dev/video1 --all
+
+I can change properties like this:
+
+v4l2-ctl -d /dev/video1 --set-ctrl gain=0
+
+v4l2-ctl -d /dev/video1 --set-ctrl gain_automatic=0
+
+v4l2-ctl -d /dev/video1 --set-ctrl exposure=-1
+
+
