@@ -79,7 +79,7 @@ z2 /= 100
 perr1 = np.sqrt(np.diag(pcov1))
 np.set_printoptions(precision=3, suppress=False)
 print(
-    f"Optimized parameters for z2: P0={popt1[0]} +/- {perr1[0]}, r0={popt1[1]} +/- {perr1[1]}, w={popt1[2]} +/- {perr1[2]}, Poffset={popt1[3]} +/- {perr1[3]}"
+    f"Optimized parameters for z1: P0={popt1[0]} +/- {perr1[0]}, r0={popt1[1]} +/- {perr1[1]}, w={popt1[2]} +/- {perr1[2]}, Poffset={popt1[3]} +/- {perr1[3]}"
 )
 perr2 = np.sqrt(np.diag(pcov2))
 print(
