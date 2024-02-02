@@ -194,10 +194,10 @@ plt.legend()
 wavelength = 780e-9
 
 z1 = z1
-w1 = round(popt1[2], 5)
+w1 = round(popt1[2], 4)
 
 z2 = z2
-w2 = round(popt2[2], 5)
+w2 = round(popt2[2], 4)
 
 
 def sys2(variables):
