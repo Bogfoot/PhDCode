@@ -37,30 +37,30 @@ class LivePlotApp:
         self.fig, self.ax = plt.subplots()
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.root)
         self.canvas_widget = self.canvas.get_tk_widget()
-        self.canvas_widget.grid(column=0, row=3)
+        self.canvas_widget.grid(column=0, row=0, rowspan=10)
         self.animation()
 
     def create_widgets(self):
         # Dropdown menus for channel selection
         ttk.Label(self.root, text="Channel 1:").grid(
-            column=0, row=0, padx=5, sticky="NW"
+            column=1, row=0, padx=5, sticky="NW"
         )
         channel_1_dropdown = ttk.Combobox(
             self.root,
             textvariable=self.channel_1_var,
             values=[str(i) for i in range(1, 9)],
         )
-        channel_1_dropdown.grid(column=1, row=0, pady=0, sticky="N")
+        channel_1_dropdown.grid(column=2, row=0, pady=0, sticky="N")
 
         ttk.Label(self.root, text="Channel 2:").grid(
-            column=0, row=1, padx=5, sticky="NW"
+            column=1, row=1, padx=5, sticky="NW"
         )
         channel_2_dropdown = ttk.Combobox(
             self.root,
             textvariable=self.channel_2_var,
             values=[str(i) for i in range(1, 9)],
         )
-        channel_2_dropdown.grid(column=1, row=1, pady=0, sticky="N")
+        channel_2_dropdown.grid(column=2, row=1, pady=0, sticky="N")
 
     def update_plot(self):
         # Get data from channels
