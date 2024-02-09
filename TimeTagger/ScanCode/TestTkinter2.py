@@ -41,10 +41,13 @@ class LivePlotApp:
         self.animation()
 
     def create_widgets(self):
+        # channelLabel = []
+        # for channel in channels:
+        #     channelLabel[channel] = ttk.Label(self.root, text=f"Channel {channel}: ")
+
         # Dropdown menus for channel selection
-        ttk.Label(self.root, text="Channel 1:").grid(
-            column=1, row=0, padx=5, sticky="NW"
-        )
+        channel1Label = ttk.Label(self.root, text="Channel 1:")
+        channel1Label.grid(column=1, row=0, padx=5, sticky="NW")
         channel_1_dropdown = ttk.Combobox(
             self.root,
             textvariable=self.channel_1_var,
@@ -52,9 +55,8 @@ class LivePlotApp:
         )
         channel_1_dropdown.grid(column=2, row=0, pady=0, sticky="N")
 
-        ttk.Label(self.root, text="Channel 2:").grid(
-            column=1, row=1, padx=5, sticky="NW"
-        )
+        channel2Label = ttk.Label(self.root, text="Channel 2:")
+        channel2Label.grid(column=1, row=1, padx=5, sticky="NW")
         channel_2_dropdown = ttk.Combobox(
             self.root,
             textvariable=self.channel_2_var,
