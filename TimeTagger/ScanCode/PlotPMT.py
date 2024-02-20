@@ -2,6 +2,7 @@ import os
 import sys
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 
 
@@ -21,22 +22,30 @@ def getListOfFiles(dirName):
 dirname = sys.argv[1]
 
 listOfFiles = getListOfFiles(dirname)
-print(listOfFiles)
-print(len( listOfFiles ))
 
 # Read the data from the file, skipping rows starting with #
-dts = [pd.read_csv(file, delim_whitespace=True, comment="#") for file in listOfFiles]
-print(dts)
+column_names = ["Temperature", "ClicksH", "ClicksV", "Coincidances"]
+dts = [
+    pd.read_csv(
+        file, delim_whitespace=True, comment="#", names=column_names, encoding="latin-1"
+    )
+    for file in listOfFiles
+]
 
 # Plot the dt
 plt.figure(figsize=(10, 10))
 
 for dt in dts:
-    plt.plot(dt["Temperature"], dt["Clicks_1"] + dt["Clicks_2"], label="Sum of Clicks")
-    # plt.plot(dt["Temperature"], dt["Clicks_2"], label="Clicks 2")
-    plt.plot(dt["Temperature"], dt["Correlations"] * 100, label="Correlations")
+    # sum = dt["ClicksV"] + dt["ClicksH"]
+    min_value = dt["Coincidances"].min()
+    max_value = dt["Coincidances"].max()
+    dt["coincidance_normalized"] = (dt["Coincidances"] - min_value) / (
+        max_value - min_value
+    )
+    plt.plot(dt["Temperature"], dt["coincidance_normalized"], label="Sum of Clicks")
+    # plt.plot(dt["Temperature"], dt["Coincidances"] * 100, label="Correlations")
 
-plt.title("Temperature vs. Clicks and Correlations")
+plt.title("Phase Matching Curve")
 plt.xlabel("Temperature (°C)")
 plt.ylabel("Counts (Hz)")
 plt.legend()
