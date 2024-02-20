@@ -6,15 +6,10 @@ import pandas as pd
 
 
 def getListOfFiles(dirName):
-    # create a list of file and sub directories
-    # names in the given directory
     listOfFile = os.listdir(dirName)
     allFiles = list()
-    # Iterate over all the entries
     for entry in listOfFile:
-        # Create full path
         fullPath = os.path.join(dirName, entry)
-        # If entry is a directory then get the list of files in this directory
         if os.path.isdir(fullPath):
             allFiles = allFiles + getListOfFiles(fullPath)
         else:
@@ -23,21 +18,22 @@ def getListOfFiles(dirName):
     return allFiles
 
 
-files = []
 dirname = sys.argv[1]
 
 listOfFiles = getListOfFiles(dirname)
-
+print(listOfFiles)
+print(len( listOfFiles ))
 
 # Read the data from the file, skipping rows starting with #
 dts = [pd.read_csv(file, delim_whitespace=True, comment="#") for file in listOfFiles]
+print(dts)
 
 # Plot the dt
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(10, 10))
 
 for dt in dts:
-    plt.plot(dt["Temperature"], dt["Clicks_1"], label="Clicks 1")
-    plt.plot(dt["Temperature"], dt["Clicks_2"], label="Clicks 2")
+    plt.plot(dt["Temperature"], dt["Clicks_1"] + dt["Clicks_2"], label="Sum of Clicks")
+    # plt.plot(dt["Temperature"], dt["Clicks_2"], label="Clicks 2")
     plt.plot(dt["Temperature"], dt["Correlations"] * 100, label="Correlations")
 
 plt.title("Temperature vs. Clicks and Correlations")

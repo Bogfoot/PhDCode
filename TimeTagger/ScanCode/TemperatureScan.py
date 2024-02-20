@@ -13,9 +13,9 @@ from OC import OC
 maxclickrate = 500e3  # Hz, single photon detect, so we dont fry them
 
 # temperature scan:
-temperature_start = 35
-temperature_end = 45
-temperature_step = 0.1  # Was 0.1 initially, maybe it will not be as stable
+temperature_start = 27
+temperature_end = 100
+temperature_step = 0.2  # Was 0.1 initially, maybe it will not be as stable
 
 sleepy_sleepy_oven = 10  # s
 exposure_time_timetagger = 1  # s max allowed by the time tagger
