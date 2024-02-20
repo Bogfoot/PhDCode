@@ -45,7 +45,7 @@ data_file_name = (
     + str(temperature_start)
     + "-"
     + str(temperature_end)
-    + "degC.txt"
+    + "degC.data"
 )
 
 print("Do you wish to proceed with the scan or do you want to exit now?")
@@ -154,5 +154,8 @@ for i in range(n):
 tt.deInitialize()
 max_coinc_index = coincidances.index(np.max(coincidances))
 
+print(
+    f"Setting temperature to highest coincidence temperature: {temperature[max_coinc_index]}."
+)
 oven.set_temperature(temperature[max_coinc_index])
 oven.OC_close()

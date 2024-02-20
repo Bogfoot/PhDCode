@@ -1,13 +1,16 @@
-from scipy.optimize import fsolve
 import math
+
+from scipy.optimize import fsolve
 
 wavelength = 780e-9
 
-z1 = 261e-3
-w1 = 0.815309e-3
+z1 = 145e-3
+w1 = 0.6906716561474538e-3
+# w1 = 0.815309e-3
 
-z2 = 888e-3
-w2 = 0.952767e-3
+
+z2 = 345e-3
+w2 = 0.4744266297704088e-3
 
 
 def sys2(variables):
@@ -22,7 +25,7 @@ def w(z, w0, wavelength):
 
 
 # Initial guess for the solution
-initial_guess = [1e-3, 0]
+initial_guess = [1e-5, 0]
 
 # Solve the equations
 solutions, info, ier, mesg = fsolve(sys2, initial_guess, full_output=True)
