@@ -34,7 +34,7 @@ class OC:
         self.message = []
         self.message_time = []
         self.requested_temperature = []  # temperatrure [C]
-        self.ramp_rate = 100  # Temperature ramp rate in degrees/s. Units ship with a default of 100 C/s
+        self.ramp_rate = 0.02  # Temperature ramp rate in degrees/s. Units ship with a default of 100 C/s
         self.setpoint = (0, "")
         self.temperature = (0, "")
         self.enable_state = []
@@ -113,13 +113,17 @@ class OC:
 
         self.ramp_rate = rate
 
-        str = "!ixx1;%3.3f;100;0;%3.3f;1;0;\r" % (self.requested_temperature, rate)
+        controls = (self.requested_temperature, rate)
+        str = "!ixx1;%3.3f;100;0;%3.3f;1;0;\r" % controls
+        # str = (
+        #     f"!ixx1;{round(self.requested_temperature,3)};100;0;{round(rate,3)};1;0;\r"
+        # )
         cmd = bytes(str, "utf-8")
         success = self.send_command(cmd)
         return success
 
     def get_ramp_rate(self):
-        return self.ramp_rate[0]
+        return self.ramp_rate
 
     def get_faults(self):
         self.get_status()

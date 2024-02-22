@@ -1,0 +1,12 @@
+Temperature   Clicks_1   Clicks_2   Correlations# 28.01.2024 1560 SPDC measurement 
+# Temperature scan between 41 and 41 °C 
+# This measurement DOES NOT include the coincidence stage where we separate single photons based on polarization per channel. 
+# TEST MEASUREMENT# --------------------------------- 
+# Input laser power: 90 mW  at 780 nm (262 mA) 
+# Power at input: 65 mW  at 780 nm (262 mA) 
+# Pump polarization: 'H' (21R) = 82.1 mW)# Periodic polling: 9.12 um# Initial setup alignment at 41.0 C# Integration time:  25 s 
+# Single photon detector QE: 10% 
+# Single photon detector dead time: 5 us 
+# Time-delay of [0, 0] ns# ---------------------------------- 
+# Temperature    Clicks_1    Clicks_2    Correlations 
+# [C]    [/]    [/]    [/] 

@@ -13,12 +13,12 @@ from OC import OC
 maxclickrate = 500e3  # Hz, single photon detect, so we dont fry them
 
 # temperature scan:
-temperature_start = 27
-temperature_end = 100
-temperature_step = 0.2  # Was 0.1 initially, maybe it will not be as stable
+temperature_start = 41
+temperature_end = 42
+temperature_step = 0.1  # Was 0.1 initially, maybe it will not be as stable
 
-sleepy_sleepy_oven = 10  # s
-exposure_time_timetagger = 1  # s max allowed by the time tagger
+sleepy_sleepy_oven = 30  # s
+exposure_time_timetagger = 10  # s max allowed by the time tagger
 sleepy_sleepy_timetagger = exposure_time_timetagger + 15  # s
 
 
@@ -28,7 +28,6 @@ n = (
 temperature = np.linspace(temperature_start, temperature_end, n)
 
 # do you want to see the current status of the measurement?
-
 print("Temperature scan will be performed.")
 print("The scan will make ", n, " steps.")
 print(
@@ -40,7 +39,8 @@ print(
 # data files
 
 data_file_name = (
-    str(datetime.date.today())
+    "Data/"
+    + str(datetime.date.today())
     + "_SPDC_1560_phase_matching_fine_tsweep_"
     + str(temperature_start)
     + "-"
@@ -57,7 +57,6 @@ else:
 
 
 current_time = time.strftime("%H:%M:%S", time.localtime())
-print("Waking up! Please make me coffee!")
 print(f"Starting the finer measurement at {current_time}!")
 
 # Initialize the quTAG device
@@ -71,7 +70,7 @@ channel_2 = 2
 channels = [channel_1, channel_2]
 coincidances_12 = 33
 
-tt.enableChannels((channel_1, channel_2))
+tt.enableChannels(channels)
 time.sleep(sleepy_sleepy_timetagger)
 
 f = open(data_file_name, "w")
@@ -84,14 +83,13 @@ f.write(
 f.write("# TEST MEASUREMENT")
 f.write("# --------------------------------- \n")
 f.write("# Input laser power: 90 mW  at 780 nm (262 mA) \n")
-f.write("# Power at input: 90 mW  at 780 nm (262 mA) \n")
-f.write("# Pump polarization: 'D' (Ch1, C21R)(uW)  = 82.1 mW)")
+f.write("# Power at input: 65 mW  at 780 nm (262 mA) \n")
+f.write("# Pump polarization: 'H' (21R) = 82.1 mW)")
 f.write("# Periodic polling: 9.12 um")
-f.write("# Initial setup alignment at 22.0 C")
-f.write("# Integration time: 60 s \n")
-f.write("# Single photon detector darkcounts: 0.3 and 0.27 kHz \n")
+f.write("# Initial setup alignment at 41.0 C")
+f.write(f"# Integration time:  {sleepy_sleepy_timetagger} s \n")
 f.write("# Single photon detector QE: 10% \n")
-f.write("# Single photon detector dead time: 20 us \n")
+f.write("# Single photon detector dead time: 5 us \n")
 delays = [tt.getChannelDelay(channel) for channel in channels]
 f.write(f"# Time-delay of {delays} ns")
 f.write("# ---------------------------------- \n")
@@ -107,8 +105,7 @@ oven = OC(usb_port)  # OC3 Code from them
 
 oven.enable()
 oven.set_temperature(round(temperature[0], 2))
-print("Sleep for 10 seconds to see a different temperature")
-time.sleep(10)
+oven.set_ramp_rate(1)
 print(oven.get_temperature())
 
 # timetagger:
