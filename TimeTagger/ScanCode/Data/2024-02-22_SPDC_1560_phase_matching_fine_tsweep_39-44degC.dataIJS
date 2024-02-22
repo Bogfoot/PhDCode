@@ -1,0 +1,67 @@
+# Temperature   Clicks_1   Clicks_2   Correlations
+# 28.01.2024 1560 SPDC measurement 
+# Temperature scan between 39 and 39 °C
+# This measurement DOES NOT include the coincidence stage where we separate single photons based on polarization per channel.
+# TEST MEASUREMENT# --------------------------------- 
+# Input laser power: 90 mW  at 780 nm (262 mA) 
+# Power at input: 65 mW  at 780 nm (262 mA) 
+# Pump polarization: 'H' (21R) = 82.1 mW)# Periodic polling: 9.12 um
+# Initial setup alignment at 41.0 C
+# Integration time:  25 s 
+# Single photon detector QE: 10% 
+# Single photon detector dead time: 5 us 
+# Time-delay of [0, 0] ns
+# ---------------------------------- 
+# Temperature    Clicks_1    Clicks_2    Correlations 
+# [C]    [/]    [/]    [/] 
+39.0    6755    10250    0
+39.1    6941    10218    0
+39.2    6862    10684    0
+39.3    6913    10599    0
+39.4    6878    10253    0
+39.5    7008    10281    0
+39.6    6774    10830    0
+39.7    6985    10304    0
+39.8    7061    10534    0
+39.9    7011    10243    0
+40.0    6864    10262    0
+40.1    6811    10567    0
+40.2    6826    10529    0
+40.3    6962    10012    0
+40.4    6648    10054    0
+40.5    6737    10148    0
+40.6    6813    10268    0
+40.7    6541    10255    0
+40.8    6479    10383    0
+40.9    6432    10045    0
+41.0    6345    10028    0
+41.1    6370    9882    0
+41.2    6269    9798    0
+41.3    6383    9390    0
+41.4    6208    9246    0
+41.5    6092    9687    0
+41.6    5822    9222    0
+41.7    5659    9090    0
+41.8    5933    8827    0
+41.9    5771    8752    0
+42.0    5882    8749    0
+42.1    5743    8600    0
+42.2    5604    8483    0
+42.3    5548    8154    0
+42.4    5314    7789    0
+42.5    5425    8242    0
+42.6    5289    7950    0
+42.7    5258    8176    0
+42.8    5374    7968    0
+42.9    5175    8024    0
+43.0    4929    7994    0
+43.1    5045    7947    0
+43.2    5103    7828    0
+43.3    5306    7746    0
+43.4    4990    7937    0
+43.5    5185    7463    0
+43.6    4939    7676    0
+43.7    4917    7599    0
+43.8    4845    7277    0
+43.9    4932    7508    0
+44.0    4709    7041    0

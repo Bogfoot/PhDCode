@@ -34,7 +34,7 @@ class OC:
         self.message = []
         self.message_time = []
         self.requested_temperature = []  # temperatrure [C]
-        self.ramp_rate = 0.02  # Temperature ramp rate in degrees/s. Units ship with a default of 100 C/s
+        self.ramp_rate = 50  # Temperature ramp rate in degrees/s. Units ship with a default of 100 C/s
         self.setpoint = (0, "")
         self.temperature = (0, "")
         self.enable_state = []

@@ -2,7 +2,6 @@ import os
 import sys
 
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 
 
@@ -14,7 +13,7 @@ def getListOfFiles(dirName):
         if os.path.isdir(fullPath):
             allFiles = allFiles + getListOfFiles(fullPath)
         else:
-            if fullPath.endswith(".data"):
+            if fullPath.endswith(".dataIJS"):
                 allFiles.append(fullPath)
     return allFiles
 
@@ -34,24 +33,28 @@ dts = [
 plt.figure(figsize=(10, 10))
 
 for dt, name in zip(dts, listOfFiles):
-    label = name[:10]
-    sum = dt["ClicksV"] + dt["ClicksH"]
+    label = name[:12]
+    dt["SumOfClicks"] = dt["ClicksV"] + dt["ClicksH"]
+    min_sum = dt["SumOfClicks"].min()
+    max_sum = dt["SumOfClicks"].max()
+    dt["NormallizedSumOfClicks"] = (dt["SumOfClicks"] - min_sum) / (max_sum - min_sum)
     min_value = dt["Coincidances"].min()
     max_value = dt["Coincidances"].max()
     dt["coincidance_normalized"] = (dt["Coincidances"] - min_value) / (
-        max_value - min_valu
+        max_value - min_value
     )
-    plt.plot(
-        dt["Temperature"],
-        dt["coincidance_normalized"],
-        label="Normalized Correlations",
-    )
-    plt.plot(dt["Temperature"], sum, label=label)
+    # plt.plot(
+    #     dt["Temperature"],
+    #     dt["coincidance_normalized"],
+    #     label="Normalized Correlations",
+    # )
+    label += " Sums"
+    plt.plot(dt["Temperature"], dt["NormallizedSumOfClicks"], label=label)
 
 
-plt.title("Phase Matching Curve")
+plt.title("Clicks IJS")
 plt.xlabel("Temperature (°C)")
-plt.ylabel("Counts (Hz)")
+plt.ylabel("Normalized Counts (A.U.)")
 plt.legend()
 plt.grid(True)
 plt.show()

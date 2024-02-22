@@ -1,5 +1,3 @@
-# TODO: Change OvenLib to be a class that can be easily used
-# %% scan temperature while recording the clicks ---------- 1560 source ------- !!1!1!1!1!1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! USE THIS
 import datetime
 import time
 
@@ -7,14 +5,12 @@ import numpy as np
 import QuTAG_MC as qt
 from OC import OC
 
-# oven:
-
 # single photon detectors:
 maxclickrate = 500e3  # Hz, single photon detect, so we dont fry them
 
 # temperature scan:
-temperature_start = 41
-temperature_end = 42
+temperature_start = 30
+temperature_end = 39
 temperature_step = 0.1  # Was 0.1 initially, maybe it will not be as stable
 
 sleepy_sleepy_oven = 30  # s
@@ -28,7 +24,7 @@ n = (
 temperature = np.linspace(temperature_start, temperature_end, n)
 
 # do you want to see the current status of the measurement?
-print("Temperature scan will be performed.")
+print(f"Temperature scan will be performed from {temperature_start}-{temperature_end}.")
 print("The scan will make ", n, " steps.")
 print(
     "If everything goes according to plan, the scan will take approx. ",
@@ -74,24 +70,24 @@ tt.enableChannels(channels)
 time.sleep(sleepy_sleepy_timetagger)
 
 f = open(data_file_name, "w")
-f.write("Temperature   Clicks_1   Clicks_2   Correlations")
+f.write("# Temperature   Clicks_1   Clicks_2   Correlations\n")
 f.write("# 28.01.2024 1560 SPDC measurement \n")
-f.write(f"# Temperature scan between {temperature_start} and {temperature_start} °C \n")
+f.write(f"# Temperature scan between {temperature_start} and {temperature_start} °C\n")
 f.write(
-    "# This measurement DOES NOT include the coincidence stage where we separate single photons based on polarization per channel. \n"
+    "# This measurement DOES NOT include the coincidence stage where we separate single photons based on polarization per channel.\n"
 )
 f.write("# TEST MEASUREMENT")
 f.write("# --------------------------------- \n")
 f.write("# Input laser power: 90 mW  at 780 nm (262 mA) \n")
 f.write("# Power at input: 65 mW  at 780 nm (262 mA) \n")
 f.write("# Pump polarization: 'H' (21R) = 82.1 mW)")
-f.write("# Periodic polling: 9.12 um")
-f.write("# Initial setup alignment at 41.0 C")
+f.write("# Periodic polling: 9.12 um\n")
+f.write("# Initial setup alignment at 41.0 C\n")
 f.write(f"# Integration time:  {sleepy_sleepy_timetagger} s \n")
 f.write("# Single photon detector QE: 10% \n")
 f.write("# Single photon detector dead time: 5 us \n")
 delays = [tt.getChannelDelay(channel) for channel in channels]
-f.write(f"# Time-delay of {delays} ns")
+f.write(f"# Time-delay of {delays} ns\n")
 f.write("# ---------------------------------- \n")
 f.write("# Temperature    Clicks_1    Clicks_2    Correlations \n")
 f.write("# [C]    [/]    [/]    [/] \n")
@@ -105,11 +101,8 @@ oven = OC(usb_port)  # OC3 Code from them
 
 oven.enable()
 oven.set_temperature(round(temperature[0], 2))
-oven.set_ramp_rate(1)
-print(oven.get_temperature())
 
 # timetagger:
-
 ########################## temperature scan
 coincidances = []
 for i in range(n):
