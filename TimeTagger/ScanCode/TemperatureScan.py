@@ -10,11 +10,11 @@ maxclickrate = 500e3  # Hz, single photon detect, so we dont fry them
 
 # temperature scan:
 temperature_start = 30
-temperature_end = 39
+temperature_end = 60
 temperature_step = 0.1  # Was 0.1 initially, maybe it will not be as stable
 
 sleepy_sleepy_oven = 30  # s
-exposure_time_timetagger = 10  # s max allowed by the time tagger
+exposure_time_timetagger = 60  # s max allowed by the time tagger
 sleepy_sleepy_timetagger = exposure_time_timetagger + 15  # s
 
 
@@ -67,7 +67,7 @@ channels = [channel_1, channel_2]
 coincidances_12 = 33
 
 tt.enableChannels(channels)
-time.sleep(sleepy_sleepy_timetagger)
+time.sleep(10)
 
 f = open(data_file_name, "w")
 f.write("# Temperature   Clicks_1   Clicks_2   Correlations\n")
