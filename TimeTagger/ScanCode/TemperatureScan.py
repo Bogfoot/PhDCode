@@ -6,14 +6,14 @@ import numpy as np
 import pandas as pd
 import QuTAG_MC as qt
 from OC import OC
-from scipy import curve_fit
+from scipy.optimize import curve_fit
 
 # single photon detectors:
 maxclickrate = 500e3  # Hz, single photon detect, so we dont fry them
 
 # temperature scan:
-temperature_start = 30
-temperature_end = 60
+temperature_start = 37.5
+temperature_end = 38.8
 temperature_step = 0.01  # Was 0.1 initially, maybe it will not be as stable
 
 sleepy_sleepy_oven = 37  # s
