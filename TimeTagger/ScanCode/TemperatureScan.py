@@ -1,9 +1,12 @@
 import datetime
 import time
 
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import QuTAG_MC as qt
 from OC import OC
+from scipy import curve_fit
 
 # single photon detectors:
 maxclickrate = 500e3  # Hz, single photon detect, so we dont fry them
@@ -11,10 +14,10 @@ maxclickrate = 500e3  # Hz, single photon detect, so we dont fry them
 # temperature scan:
 temperature_start = 30
 temperature_end = 60
-temperature_step = 0.1  # Was 0.1 initially, maybe it will not be as stable
+temperature_step = 0.01  # Was 0.1 initially, maybe it will not be as stable
 
-sleepy_sleepy_oven = 30  # s
-exposure_time_timetagger = 60  # s max allowed by the time tagger
+sleepy_sleepy_oven = 37  # s
+exposure_time_timetagger = 39  # s max allowed by the time tagger
 sleepy_sleepy_timetagger = exposure_time_timetagger + 15  # s
 
 
@@ -148,4 +151,48 @@ print(
     f"Setting temperature to highest coincidence temperature: {temperature[max_coinc_index]}."
 )
 oven.set_temperature(temperature[max_coinc_index])
+
+
+##################################################
+# Define the Gaussian function
+def gaussian(x, amplitude, mean, stddev):
+    return amplitude * np.exp(-(((x - mean) / stddev) ** 2) / 2)
+
+
+# Initial guess for the parameters
+initial_guess = [1, np.mean(dt["Temperature"]), np.std(dt["Temperature"])]
+
+
+# Fit the data to the Gaussian function
+params, covariance = curve_fit(
+    gaussian, dt["Temperature"], dt["Coincidances"] * 100, p0=initial_guess
+)
+
+# Extract the fitted parameters
+amplitude, mean, stddev = params
+
+# Plot the original data and the fitted Gaussian curve
+# # Read the data from the file, skipping rows starting with #
+column_names = ["Temperature", "ClicksH", "ClicksV", "Coincidances"]
+
+dt = pd.read_csv(
+    data_file_name,
+    delim_whitespace=True,
+    comment="#",
+    names=column_names,
+    encoding="latin-1",
+)
+plt.plot(
+    dt["Temperature"],
+    gaussian(dt["Temperature"], amplitude, mean, stddev),
+    color="red",
+    label="Gaussian Fit of Correlations",
+)
+
+# Print the parameters of the fitted Gaussian curve
+print(f"Amplitude: {amplitude}")
+print(f"Mean: {mean}")
+print(f"Standard Deviation: {stddev}")
+##################################################
+
 oven.OC_close()

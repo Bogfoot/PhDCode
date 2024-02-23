@@ -16,7 +16,6 @@ dt = pd.read_csv(
 
 plt.figure(figsize=(10, 10))
 
-label = dirname[:12]
 dt["ClicksV"] = dt["ClicksV"] / 60
 dt["ClicksH"] = dt["ClicksH"] / 60
 dt["SumOfClicks"] = dt["ClicksV"] + dt["ClicksH"]
@@ -29,7 +28,7 @@ max_value = dt["Coincidances"].max()
 dt["coincidance_normalized"] = (dt["Coincidances"] - min_value) / (
     max_value - min_value
 )
-plt.plot(dt["Temperature"], dt["Coincidances"]*100, label="Correlations")
+plt.plot(dt["Temperature"], dt["Coincidances"] * 100, label="Correlations")
 
 plt.plot(dt["Temperature"], dt["SumOfClicks"], label="Sum of Clicks")
 plt.plot(dt["Temperature"], dt["ClicksH"], label="Clicks H")
@@ -49,7 +48,7 @@ initial_guess = [1, np.mean(dt["Temperature"]), np.std(dt["Temperature"])]
 
 # Fit the data to the Gaussian function
 params, covariance = curve_fit(
-    gaussian, dt["Temperature"], dt["Coincidances"]*100, p0=initial_guess
+    gaussian, dt["Temperature"], dt["Coincidances"] * 100, p0=initial_guess
 )
 
 # Extract the fitted parameters
