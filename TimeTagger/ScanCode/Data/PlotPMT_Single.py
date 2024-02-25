@@ -5,7 +5,8 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
 
-dirname = sys.argv[1]
+#dirname = sys.argv[1]
+dirname = "2024-02-22_SPDC_1560_phase_matching_fine_tsweep_30-60degC.data"
 
 
 # # Read the data from the file, skipping rows starting with #
@@ -28,11 +29,10 @@ max_value = dt["Coincidances"].max()
 dt["coincidance_normalized"] = (dt["Coincidances"] - min_value) / (
     max_value - min_value
 )
-plt.plot(dt["Temperature"], dt["Coincidances"] * 100, label="Correlations")
-
-plt.plot(dt["Temperature"], dt["SumOfClicks"], label="Sum of Clicks")
-plt.plot(dt["Temperature"], dt["ClicksH"], label="Clicks H")
-plt.plot(dt["Temperature"], dt["ClicksV"], label="Clicks V")
+plt.plot(dt["Temperature"], dt["Coincidances"] * 100, label=f"Correlations*100, max = {np.max(dt['Coincidances'])} Hz")
+plt.plot(dt["Temperature"], dt["SumOfClicks"], label=f"Sum of Clicks: Max total: {np.max(dt['SumOfClicks'])} Hz")
+plt.plot(dt["Temperature"], dt["ClicksH"], label=f"Clicks H: Max: {np.max(dt['ClicksH'])}")
+plt.plot(dt["Temperature"], dt["ClicksV"], label=f"Clicks V: Max: {np.max(dt['ClicksV'])}")
 
 
 # Fitting gaussian
@@ -66,9 +66,21 @@ plt.plot(
 print(f"Amplitude: {amplitude}")
 print(f"Mean: {mean}")
 print(f"Standard Deviation: {stddev}")
-plt.title("Clicks")
+# Annotate mean
+plt.annotate(f'Peak: {mean:.2f}', xy=(mean, amplitude),
+             xytext=(mean, amplitude+5000),
+             arrowprops=dict(facecolor='black', arrowstyle='->'))
+
+plt.hlines(y=amplitude/2, xmin=mean - stddev, xmax=mean + stddev, color='black', linewidth=2)
+# Annotate standard deviation
+plt.annotate(f'StdDev: {stddev:.2f}', xy=(mean,amplitude/2),
+             xytext=(mean+ stddev/2, amplitude /2),
+             arrowprops=dict(facecolor='black', arrowstyle='->'))
+
+plt.title("Clicks and Correlations")
+
 plt.xlabel("Temperature (°C)")
-plt.ylabel("Normalized Counts (A.U.)")
+plt.ylabel("Clicks")
 plt.legend()
 plt.grid(True)
 plt.show()
