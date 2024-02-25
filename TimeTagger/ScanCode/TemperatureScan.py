@@ -1,24 +1,23 @@
-# TODO: Change OvenLib to be a class that can be easily used
-# %% scan temperature while recording the clicks ---------- 1560 source ------- !!1!1!1!1!1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! USE THIS
 import datetime
 import time
 
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import QuTAG_MC as qt
 from OC import OC
-
-# oven:
+from scipy.optimize import curve_fit
 
 # single photon detectors:
 maxclickrate = 500e3  # Hz, single photon detect, so we dont fry them
 
 # temperature scan:
-temperature_start = 35
-temperature_end = 45
-temperature_step = 0.1  # Was 0.1 initially, maybe it will not be as stable
+temperature_start = 37.5
+temperature_end = 38.8
+temperature_step = 0.01  # Was 0.1 initially, maybe it will not be as stable
 
-sleepy_sleepy_oven = 10  # s
-exposure_time_timetagger = 1  # s max allowed by the time tagger
+sleepy_sleepy_oven = 37  # s
+exposure_time_timetagger = 39  # s max allowed by the time tagger
 sleepy_sleepy_timetagger = exposure_time_timetagger + 15  # s
 
 
@@ -28,8 +27,7 @@ n = (
 temperature = np.linspace(temperature_start, temperature_end, n)
 
 # do you want to see the current status of the measurement?
-
-print("Temperature scan will be performed.")
+print(f"Temperature scan will be performed from {temperature_start}-{temperature_end}.")
 print("The scan will make ", n, " steps.")
 print(
     "If everything goes according to plan, the scan will take approx. ",
@@ -40,12 +38,13 @@ print(
 # data files
 
 data_file_name = (
-    str(datetime.date.today())
+    "Data/"
+    + str(datetime.date.today())
     + "_SPDC_1560_phase_matching_fine_tsweep_"
     + str(temperature_start)
     + "-"
     + str(temperature_end)
-    + "degC.txt"
+    + "degC.data"
 )
 
 print("Do you wish to proceed with the scan or do you want to exit now?")
@@ -57,7 +56,6 @@ else:
 
 
 current_time = time.strftime("%H:%M:%S", time.localtime())
-print("Waking up! Please make me coffee!")
 print(f"Starting the finer measurement at {current_time}!")
 
 # Initialize the quTAG device
@@ -71,29 +69,28 @@ channel_2 = 2
 channels = [channel_1, channel_2]
 coincidances_12 = 33
 
-tt.enableChannels((channel_1, channel_2))
-time.sleep(sleepy_sleepy_timetagger)
+tt.enableChannels(channels)
+time.sleep(10)
 
 f = open(data_file_name, "w")
-f.write("Temperature   Clicks_1   Clicks_2   Correlations")
+f.write("# Temperature   Clicks_1   Clicks_2   Correlations\n")
 f.write("# 28.01.2024 1560 SPDC measurement \n")
-f.write(f"# Temperature scan between {temperature_start} and {temperature_start} °C \n")
+f.write(f"# Temperature scan between {temperature_start} and {temperature_start} °C\n")
 f.write(
-    "# This measurement DOES NOT include the coincidence stage where we separate single photons based on polarization per channel. \n"
+    "# This measurement DOES NOT include the coincidence stage where we separate single photons based on polarization per channel.\n"
 )
 f.write("# TEST MEASUREMENT")
 f.write("# --------------------------------- \n")
 f.write("# Input laser power: 90 mW  at 780 nm (262 mA) \n")
-f.write("# Power at input: 90 mW  at 780 nm (262 mA) \n")
-f.write("# Pump polarization: 'D' (Ch1, C21R)(uW)  = 82.1 mW)")
-f.write("# Periodic polling: 9.12 um")
-f.write("# Initial setup alignment at 22.0 C")
-f.write("# Integration time: 60 s \n")
-f.write("# Single photon detector darkcounts: 0.3 and 0.27 kHz \n")
+f.write("# Power at input: 65 mW  at 780 nm (262 mA) \n")
+f.write("# Pump polarization: 'H' (21R) = 82.1 mW)")
+f.write("# Periodic polling: 9.12 um\n")
+f.write("# Initial setup alignment at 41.0 C\n")
+f.write(f"# Integration time:  {sleepy_sleepy_timetagger} s \n")
 f.write("# Single photon detector QE: 10% \n")
-f.write("# Single photon detector dead time: 20 us \n")
+f.write("# Single photon detector dead time: 5 us \n")
 delays = [tt.getChannelDelay(channel) for channel in channels]
-f.write(f"# Time-delay of {delays} ns")
+f.write(f"# Time-delay of {delays} ns\n")
 f.write("# ---------------------------------- \n")
 f.write("# Temperature    Clicks_1    Clicks_2    Correlations \n")
 f.write("# [C]    [/]    [/]    [/] \n")
@@ -107,12 +104,8 @@ oven = OC(usb_port)  # OC3 Code from them
 
 oven.enable()
 oven.set_temperature(round(temperature[0], 2))
-print("Sleep for 10 seconds to see a different temperature")
-time.sleep(10)
-print(oven.get_temperature())
 
 # timetagger:
-
 ########################## temperature scan
 coincidances = []
 for i in range(n):
@@ -154,5 +147,52 @@ for i in range(n):
 tt.deInitialize()
 max_coinc_index = coincidances.index(np.max(coincidances))
 
+print(
+    f"Setting temperature to highest coincidence temperature: {temperature[max_coinc_index]}."
+)
 oven.set_temperature(temperature[max_coinc_index])
+
+
+##################################################
+# Define the Gaussian function
+def gaussian(x, amplitude, mean, stddev):
+    return amplitude * np.exp(-(((x - mean) / stddev) ** 2) / 2)
+
+
+# Initial guess for the parameters
+initial_guess = [1, np.mean(dt["Temperature"]), np.std(dt["Temperature"])]
+
+
+# Fit the data to the Gaussian function
+params, covariance = curve_fit(
+    gaussian, dt["Temperature"], dt["Coincidances"] * 100, p0=initial_guess
+)
+
+# Extract the fitted parameters
+amplitude, mean, stddev = params
+
+# Plot the original data and the fitted Gaussian curve
+# # Read the data from the file, skipping rows starting with #
+column_names = ["Temperature", "ClicksH", "ClicksV", "Coincidances"]
+
+dt = pd.read_csv(
+    data_file_name,
+    delim_whitespace=True,
+    comment="#",
+    names=column_names,
+    encoding="latin-1",
+)
+plt.plot(
+    dt["Temperature"],
+    gaussian(dt["Temperature"], amplitude, mean, stddev),
+    color="red",
+    label="Gaussian Fit of Correlations",
+)
+
+# Print the parameters of the fitted Gaussian curve
+print(f"Amplitude: {amplitude}")
+print(f"Mean: {mean}")
+print(f"Standard Deviation: {stddev}")
+##################################################
+
 oven.OC_close()
