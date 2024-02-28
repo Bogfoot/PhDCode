@@ -16,8 +16,8 @@ temperature_start = 37.5
 temperature_end = 38.8
 temperature_step = 0.01  # Was 0.1 initially, maybe it will not be as stable
 
-sleepy_sleepy_oven = 37  # s
-exposure_time_timetagger = 39  # s max allowed by the time tagger
+sleepy_sleepy_oven = 10  # s
+exposure_time_timetagger = 30  # s max allowed by the time tagger
 sleepy_sleepy_timetagger = exposure_time_timetagger + 15  # s
 
 
@@ -73,8 +73,7 @@ tt.enableChannels(channels)
 time.sleep(10)
 
 f = open(data_file_name, "w")
-f.write("# Temperature   Clicks_1   Clicks_2   Correlations\n")
-f.write("# 28.01.2024 1560 SPDC measurement \n")
+f.write("# 1560 SPDC measurement \n")
 f.write(f"# Temperature scan between {temperature_start} and {temperature_start} °C\n")
 f.write(
     "# This measurement DOES NOT include the coincidence stage where we separate single photons based on polarization per channel.\n"
@@ -93,12 +92,13 @@ delays = [tt.getChannelDelay(channel) for channel in channels]
 f.write(f"# Time-delay of {delays} ns\n")
 f.write("# ---------------------------------- \n")
 f.write("# Temperature    Clicks_1    Clicks_2    Correlations \n")
-f.write("# [C]    [/]    [/]    [/] \n")
+f.write("# [°C]    [/]    [/]    [/] \n")
 f.close()
 
 
 ########################## oven
 
+# On windows you would use "COM#", where '#' is some number
 usb_port = "/dev/ttyUSB0"  # This is for use on linux, you can also use /dev/bus/usb/... maybe depending on your setup
 oven = OC(usb_port)  # OC3 Code from them
 
