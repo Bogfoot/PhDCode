@@ -1,4 +1,6 @@
 import datetime
+import os
+import pwd
 import time
 
 import matplotlib.pyplot as plt
@@ -8,16 +10,36 @@ import QuTAG_MC as qt
 from OC import OC
 from scipy.optimize import curve_fit
 
+
+def get_uid_gid(username):
+    try:
+        user_info = pwd.getpwnam(username)
+        uid = user_info.pw_uid
+        gid = user_info.pw_gid
+        return uid, gid
+    except KeyError:
+        print(f"Error: User '{username}' not found.")
+        return None, None
+
+
+def change_ownership_recursive(path, uid, gid):
+    for root, dirs, files in os.walk(path):
+        for d in dirs:
+            os.chown(os.path.join(root, d), uid, gid)
+        for f in files:
+            os.chown(os.path.join(root, f), uid, gid)
+
+
 # single photon detectors:
 maxclickrate = 500e3  # Hz, single photon detect, so we dont fry them
 
 # temperature scan:
-temperature_start = 37.5
-temperature_end = 38.8
-temperature_step = 0.01  # Was 0.1 initially, maybe it will not be as stable
+temperature_start = 35
+temperature_end = 45
+temperature_step = 0.02  # Was 0.1 initially, maybe it will not be as stable
 
 sleepy_sleepy_oven = 10  # s
-exposure_time_timetagger = 30  # s max allowed by the time tagger
+exposure_time_timetagger = 60  # s max allowed by the time tagger
 sleepy_sleepy_timetagger = exposure_time_timetagger + 15  # s
 
 
@@ -150,10 +172,20 @@ max_coinc_index = coincidances.index(np.max(coincidances))
 print(
     f"Setting temperature to highest coincidence temperature: {temperature[max_coinc_index]}."
 )
-oven.set_temperature(temperature[max_coinc_index])
-
 
 ##################################################
+# Plot the original data and the fitted Gaussian curve
+# # Read the data from the file, skipping rows starting with #
+column_names = ["Temperature", "ClicksH", "ClicksV", "Coincidances"]
+dt = pd.read_csv(
+    data_file_name,
+    delim_whitespace=True,
+    comment="#",
+    names=column_names,
+    encoding="latin-1",
+)
+
+
 # Define the Gaussian function
 def gaussian(x, amplitude, mean, stddev):
     return amplitude * np.exp(-(((x - mean) / stddev) ** 2) / 2)
@@ -161,8 +193,6 @@ def gaussian(x, amplitude, mean, stddev):
 
 # Initial guess for the parameters
 initial_guess = [1, np.mean(dt["Temperature"]), np.std(dt["Temperature"])]
-
-
 # Fit the data to the Gaussian function
 params, covariance = curve_fit(
     gaussian, dt["Temperature"], dt["Coincidances"] * 100, p0=initial_guess
@@ -171,17 +201,6 @@ params, covariance = curve_fit(
 # Extract the fitted parameters
 amplitude, mean, stddev = params
 
-# Plot the original data and the fitted Gaussian curve
-# # Read the data from the file, skipping rows starting with #
-column_names = ["Temperature", "ClicksH", "ClicksV", "Coincidances"]
-
-dt = pd.read_csv(
-    data_file_name,
-    delim_whitespace=True,
-    comment="#",
-    names=column_names,
-    encoding="latin-1",
-)
 plt.plot(
     dt["Temperature"],
     gaussian(dt["Temperature"], amplitude, mean, stddev),
@@ -194,5 +213,13 @@ print(f"Amplitude: {amplitude}")
 print(f"Mean: {mean}")
 print(f"Standard Deviation: {stddev}")
 ##################################################
-
+mean = round(mean, 2)
+oven.set_temperature(mean)
 oven.OC_close()
+
+# Replace 'bogfootlj' with the desired username
+username = "bogfootlj"
+uid, gid = get_uid_gid(username)
+os.chdir("./Data")
+change_ownership_recursive(".", uid, gid)
+os.chdir("..")

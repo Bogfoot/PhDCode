@@ -5,8 +5,7 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
 
-#dirname = sys.argv[1]
-dirname = "2024-02-22_SPDC_1560_phase_matching_fine_tsweep_30-60degC.data"
+dirname = sys.argv[1]
 
 
 # # Read the data from the file, skipping rows starting with #

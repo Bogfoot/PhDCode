@@ -1,9 +1,10 @@
+import sys
 from time import sleep
 
 from OC import OC
 
 oven = OC("/dev/ttyUSB0")
-temp = 39.0
+temp = float(sys.argv[1])
 
 oven.enable()
 sleep(1)
