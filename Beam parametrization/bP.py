@@ -1,10 +1,8 @@
-import math
-from sympy import symbols, Eq, solve, sqrt, pi
-
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.optimize import curve_fit, fsolve
+from scipy.optimize import curve_fit
 from scipy.special import erfc
+from sympy import Eq, pi, solve, sqrt, symbols
 
 #
 # fileName = "./Beam_params.txt"
@@ -106,7 +104,7 @@ def func(r, P0, r0, w, Poffset):
     return P0 / 2 * (1 - erfc((r - r0) / (w / np.sqrt(2)))) + Poffset
 
 
-# This part needs to be calculated in mm and mW, because otherwise it doesn't converge. It can also be 
+# This part needs to be calculated in mm and mW, because otherwise it doesn't converge. It can also be
 # scaled up, but not down
 # Perform the curve fitting
 popt1, pcov1 = curve_fit(func, data1.T[0], data1.T[1])
@@ -117,26 +115,29 @@ P0_opt1, r0_opt1, w_opt1, Poffset_opt1 = popt1
 P0_opt2, r0_opt2, w_opt2, Poffset_opt2 = popt2
 # Get the errors
 P0_std1, r0_std1, w_std1, Poffset_std1 = np.sqrt(np.diag(pcov1))
+
 P0_std2, r0_std2, w_std2, Poffset_std2 = np.sqrt(np.diag(pcov2))
-#\033[93m
-print("\033[93mThe results for w1 and w2 will be in mm due to optimization reasons\033[0m")
+print("The results for w1 and w2 will be in mm due to optimization reasons.")
+
 # Comment above 'curve_fit' lines is why this is in mm, not in m
 print(f"w1 = {abs(w_opt1)} +/- {w_std1} mm")
 print(f"w2 = {abs(w_opt2)} +/- {w_std2} mm")
 
 # Define symbols
-w0, zwaist = symbols('w0 zwaist')
+w0, zwaist = symbols("w0 zwaist")
 
 # Given values
 lambda780 = 780e-9
 
 # Saling this back to meters gives pretty much the same result.
-w1 = abs(round(w_opt1/1000,10))
-w2 = abs(round(w_opt2/1000,10))
+w1 = abs(round(w_opt1 / 1000, 10))
+w2 = abs(round(w_opt2 / 1000, 10))
+
 
 # Define function for beam waist width
 def w(z, w0, _lambda):
-    return w0 * sqrt(1 + ((z * _lambda) / (pi * w0**2))**2)
+    return w0 * sqrt(1 + ((z * _lambda) / (np.pi * w0**2)) ** 2)
+
 
 # Define equations
 eq1 = Eq(w1, w(z1 - zwaist, w0, lambda780))
@@ -152,12 +153,34 @@ print("Beam waist (radius) is in um for readability.")
 print(f"Beam Waist (w0): {beam_waist_width*10**6} um")
 print(f"Beam Waist Position (z_waist): {beam_waist_position} m")
 
-z_range = np.linspace(0, 1, 1000)  # Range of z values for plotting
-w_values = w(z_range, beam_waist_width, lambda780)
+z_range = np.linspace(-0.3, 0.3, 1000)  # Range of z values for plotting
+
+z, w0 = symbols("z w0")
+
+
+# Define function for beam waist width
+def w(z, w0):
+    return w0 * sqrt(1 + ((lambda780 * z) / (pi * w0**2)) ** 2)
+
+
+# Calculate beam waist width for the given range of z values
+w_values = [w(z_value, beam_waist_width) for z_value in z_range]
+
 # Plot the waist function
-plt.plot(z_range, w_values, color='blue')
-plt.xlabel('z (meters)')
-plt.ylabel('Beam Waist Width (meters)')
-plt.title('Beam Waist Width as a function of z')
+plt.plot(z_range, w_values, color="blue")
+plt.xlabel("z (meters)")
+plt.ylabel("Beam Waist Width (meters)")
+plt.title("Beam Waist Width as a function of z")
 plt.grid(True)
+
+min_w = min(w_values)
+min_index = w_values.index(min_w)
+min_z = z_range[min_index]
+
+plt.annotate(
+    f"Minimum: {min_w*10**6:.2f} um at z = {min_z*1000:.2f} mm",
+    xy=(min_z, min_w),
+    xytext=(min_z, min_w),
+    arrowprops=dict(facecolor="black", shrink=0.05),
+)
 plt.show()
