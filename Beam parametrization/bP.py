@@ -1,4 +1,5 @@
 import math
+from sympy import symbols, Eq, solve, sqrt, pi
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -10,7 +11,7 @@ from scipy.special import erfc
 # Or use commandline arguments with fileName = sys.argv[1]...
 # data1 = np.loadtxt(fileName)
 # Load the data
-z1 = 145
+z1 = 145e-3
 data1 = np.array(
     [
         [0, 1.86],
@@ -69,7 +70,7 @@ data1 = np.array(
         [4.95, 0.00220],
     ]
 )
-z2 = 345
+z2 = 345e-3
 data2 = np.array(
     [
         [0.0, 1.866],
@@ -105,15 +106,58 @@ def func(r, P0, r0, w, Poffset):
     return P0 / 2 * (1 - erfc((r - r0) / (w / np.sqrt(2)))) + Poffset
 
 
+# This part needs to be calculated in mm and mW, because otherwise it doesn't converge. It can also be 
+# scaled up, but not down
 # Perform the curve fitting
-popt, pcov = curve_fit(func, data2.T[0], data2.T[1])
+popt1, pcov1 = curve_fit(func, data1.T[0], data1.T[1])
+popt2, pcov2 = curve_fit(func, data2.T[0], data2.T[1])
 
-# popt contains the optimized values for the parameters
-P0_opt, r0_opt, w_opt, Poffset_opt = popt
-print(P0_opt, w_opt, r0_opt, Poffset_opt)
+# Get the optimized parameters
+P0_opt1, r0_opt1, w_opt1, Poffset_opt1 = popt1
+P0_opt2, r0_opt2, w_opt2, Poffset_opt2 = popt2
+# Get the errors
+P0_std1, r0_std1, w_std1, Poffset_std1 = np.sqrt(np.diag(pcov1))
+P0_std2, r0_std2, w_std2, Poffset_std2 = np.sqrt(np.diag(pcov2))
+#\033[93m
+print("\033[93mThe results for w1 and w2 will be in mm due to optimization reasons\033[0m")
+# Comment above 'curve_fit' lines is why this is in mm, not in m
+print(f"w1 = {abs(w_opt1)} +/- {w_std1} mm")
+print(f"w2 = {abs(w_opt2)} +/- {w_std2} mm")
 
-# pcov contains the covariance matrix
-# The diagonal elements of pcov are the variances for each parameter
-# To get the standard deviation, take the square root of the diagonal elements
-P0_std, r0_std, w_std, Poffset_std = np.sqrt(np.diag(pcov))
-print(P0_std, w_std, r0_std, Poffset_std)
+# Define symbols
+w0, zwaist = symbols('w0 zwaist')
+
+# Given values
+lambda780 = 780e-9
+
+# Saling this back to meters gives pretty much the same result.
+w1 = abs(round(w_opt1/1000,10))
+w2 = abs(round(w_opt2/1000,10))
+
+# Define function for beam waist width
+def w(z, w0, _lambda):
+    return w0 * sqrt(1 + ((z * _lambda) / (pi * w0**2))**2)
+
+# Define equations
+eq1 = Eq(w1, w(z1 - zwaist, w0, lambda780))
+eq2 = Eq(w2, w(z2 - zwaist, w0, lambda780))
+
+# Solve the system of equations
+solutions = solve((eq1, eq2), (w0, zwaist))
+# Extract and format solutions
+beam_waist_width = solutions[0][0]
+beam_waist_position = solutions[0][1]
+# Print formatted solutions
+print("Beam waist (radius) is in um for readability.")
+print(f"Beam Waist (w0): {beam_waist_width*10**6} um")
+print(f"Beam Waist Position (z_waist): {beam_waist_position} m")
+
+z_range = np.linspace(0, 1, 1000)  # Range of z values for plotting
+w_values = w(z_range, beam_waist_width, lambda780)
+# Plot the waist function
+plt.plot(z_range, w_values, color='blue')
+plt.xlabel('z (meters)')
+plt.ylabel('Beam Waist Width (meters)')
+plt.title('Beam Waist Width as a function of z')
+plt.grid(True)
+plt.show()
