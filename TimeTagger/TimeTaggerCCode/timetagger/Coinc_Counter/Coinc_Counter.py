@@ -17,6 +17,7 @@ class Event(ctypes.Structure):
 
 
 # int64_t countCoincidences(Event events[], int size, long long threshold, char *unit);
+# Mostly a joke - Do not run as it will give the wrong result
 def count_coincidences(events, size, threshold, unit):
     return coincidence_counter.countCoincidences(
         events, size, threshold, unit.encode("utf-8")
@@ -25,6 +26,20 @@ def count_coincidences(events, size, threshold, unit):
 
 # int64 determineCoincidences(Event events[], int64 valid, int64 ch1, int64 ch2, double dt, double T, double maxT); # count_coincidences
 # Define the determineCoincidences function
+
+# Define the function prototype
+coincidence_counter.determineCoincidences.restype = None
+coincidence_counter.determineCoincidences.argtypes = [
+    ctypes.POINTER(Event),
+    ctypes.c_longlong,
+    ctypes.c_longlong,
+    ctypes.c_longlong,
+    ctypes.c_double,
+    ctypes.c_double,
+    ctypes.c_double,
+]
+
+
 def CountCoincidences(events, valid, ch1, ch2, dt, t, maxT):
     return coincidence_counter.determineCoincidences(
         events, valid, ch1, ch2, dt, t, maxT

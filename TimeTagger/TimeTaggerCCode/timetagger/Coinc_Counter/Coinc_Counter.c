@@ -196,7 +196,7 @@ int64_t determineCoincidences(Event events[], int64_t valid, int64_t ch1,
     }
   }
   maxt1 = Tmax2 - maxDelayInt;
-  printf("Tmax1: %ld, Tmax2: %ld, maxt1: %ld\n", Tmax1, Tmax2, maxt1);
+  // printf("Tmax1: %ld, Tmax2: %ld, maxt1: %ld\n", Tmax1, Tmax2, maxt1);
   t1 = 0;
   t2 = 0;
 

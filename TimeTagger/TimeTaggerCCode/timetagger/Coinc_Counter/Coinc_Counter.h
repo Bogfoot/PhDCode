@@ -19,12 +19,12 @@ typedef struct {
 int64_t countCoincidences(Event events[], int size, long long threshold,
                           char *unit);
 
+int64_t determineCoincidences(Event events[], int64_t valid, int64_t ch1,
+                              int64_t ch2, double dt, double T, double maxT);
+
 int64_t determineCoincidenceHistogram(Event events[], int64_t valid,
                                       int64_t ch1, int64_t ch2, double dt,
                                       double T1, double T2, int64_t *hist,
                                       int64_t histlen);
-
-int64_t determineCoincidences(Event events[], int64_t valid, int64_t ch1, int64_t ch2,
-                            double dt, double T, double maxT);
 
 #endif
