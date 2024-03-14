@@ -27,4 +27,7 @@ int64_t determineCoincidenceHistogram(Event events[], int64_t valid,
                                       double T1, double T2, int64_t *hist,
                                       int64_t histlen);
 
+int64_t determineCoincidencesWithBlocks(Event events[], int64_t valid,
+                                       int64_t ch1, int64_t ch2, int64_t n,
+                                       double dt, double T);
 #endif

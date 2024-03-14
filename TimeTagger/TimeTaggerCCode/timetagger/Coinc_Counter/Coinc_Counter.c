@@ -1,54 +1,17 @@
 #include "Coinc_Counter.h"
-// #include <Python.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-// Function to count coincidences
-int64_t countCoincidences(Event events[], int size, long long threshold,
-                          char *unit) {
-  int64_t factor = 1;
-
-  // Convert the unit to picoseconds
-  switch (unit[0]) {
-  case 'ns':
-    factor = 1000;
-    break;
-  case 'us':
-    factor = 1000000;
-    break;
-  case 'ms':
-    factor = 1000000000;
-    break;
-  case 's':
-    factor = 1000000000000;
-    break;
-  default:
-    factor = 1;
-  }
-
-  threshold *= factor;
-
-  int64_t count = 0;
-
-  for (int i = 0; i < size; i++) {
-    for (int j = i + 1; j < size; j++) {
-      if (labs(events[i].timestamp - events[j].timestamp) <= threshold) {
-        count++;
-      }
-    }
-  }
-
-  return count;
-}
-
+// Function to coincidence histograms
 int64_t determineCoincidenceHistogram(Event events[], int64_t valid,
                                       int64_t ch1, int64_t ch2, double dt,
                                       double T1, double T2, int64_t *hist,
                                       int64_t histlen) {
   double baseunit = 1e-12;
   double baseF = 1 / baseunit;
+  // Had to change this due to compiler shenanigance
   int64_t mul = dt * baseF;
   int64_t T1int, T2int, maxt1, mmod, Tmin1, Tmin2, Tmax1, Tmax2, maxDelayInt,
       dtInt = round(mul), DTint;
@@ -82,10 +45,12 @@ int64_t determineCoincidenceHistogram(Event events[], int64_t valid,
     return -5;
   }
 
+  // Had to change this due to compiler shenanigance
   mul = T1 * baseF;
   T1int = round(mul);
   mul = T2 * baseF;
   T2int = round(mul);
+  free(mul);
   maxDelayInt = T2int - T1int;
   DTint = maxDelayInt / histlen;
 
@@ -140,6 +105,7 @@ int64_t determineCoincidenceHistogram(Event events[], int64_t valid,
         mmod = (t2 - t1 - T1int) % DTint;
         if (m < histlen && t2 - t1 - T1int && mmod < dtInt) {
           hist[m]++;
+          // printf("hist[m]: %ld\n", hist[m]);
         }
       }
     }
@@ -151,7 +117,7 @@ int64_t determineCoincidenceHistogram(Event events[], int64_t valid,
 
   return 0; // No error
 }
-
+// Function to determine coincidences
 int64_t determineCoincidences(Event events[], int64_t valid, int64_t ch1,
                               int64_t ch2, double dt, double T, double maxT) {
   double baseunit = 1e-12, baseF = 1 / baseunit;
@@ -215,6 +181,7 @@ int64_t determineCoincidences(Event events[], int64_t valid, int64_t ch1,
       }
       if (abs(t2 - t1 - Tint) < dtInt) {
         cs++;
+        // printf("Found a hit.\n");
       }
     }
     if (t1 > maxt1) {
@@ -223,4 +190,108 @@ int64_t determineCoincidences(Event events[], int64_t valid, int64_t ch1,
   }
 
   return cs;
+}
+
+int64_t determineCoincidencesWithBlocks(Event events[], int64_t valid,
+                                        int64_t ch1, int64_t ch2, int64_t n,
+                                        double dt, double T) {
+  double baseunit = 1e-12, baseF = 1 / baseunit;
+  int64_t Tint = round(baseF * T);
+  int64_t dtInt = round(baseF * dt);
+  int64_t cs, i, j, t1, t2;
+
+  if ((ch1 < 0) || (ch2 < 0) || (ch1 > 8) || (ch2 > 8)) {
+    printf("please supply proper channel numbers - exiting\n");
+    return -1;
+  }
+
+  if (n < 2) {
+    n = valid;
+    return -2;
+  }
+
+  if (valid < 2) {
+    printf("if valid is not at least 2, you'll never get coincidences...\n");
+    return -3;
+  }
+
+  printf("everything seems to be fine\n");
+  cs = 0;
+
+  for (i = 0; i < n; i++) {
+    for (j = 0; j < n; j++) {
+      if (events[i].channel == ch1) {
+        if (events[j].channel == ch2) {
+          t1 = events[i].timestamp;
+          t2 = events[j].timestamp;
+        } else {
+          continue;
+        }
+      } else if (events[i].channel == ch2) {
+        if (events[j].channel == ch1) {
+          t1 = events[j].timestamp;
+          t2 = events[i].timestamp;
+        } else {
+          continue;
+        }
+      } else {
+        continue;
+      }
+      if (abs(Tint + t2 - t1) < dtInt) {
+        cs++;
+      }
+    }
+  }
+
+  return cs;
+}
+
+// Function to split events into separate arrays based on channel numbers
+void splitEventsByChannel(Event events[], int size, Event **channel1,
+                          int *channel1Size, Event **channel2,
+                          int *channel2Size) {
+  // Count occurrences of channel 1 events
+  int countChannel1 = 0;
+  for (int i = 0; i < size; i++) {
+    if (events[i].channel == 1) {
+      countChannel1++;
+    }
+  }
+
+  // Calculate size of channel 2 array
+  int countChannel2 = size - countChannel1;
+
+  // Allocate memory for channel 1 and channel 2 arrays
+  *channel1 = (Event *)malloc(countChannel1 * sizeof(Event));
+  *channel2 = (Event *)malloc(countChannel2 * sizeof(Event));
+
+  // Initialize sizes of channel 1 and channel 2 arrays
+  *channel1Size = 0;
+  *channel2Size = 0;
+
+  // Populate channel 1 and channel 2 arrays
+  for (int i = 0; i < size; i++) {
+    if (events[i].channel == 1) {
+      (*channel1)[(*channel1Size)++] = events[i];
+    } else {
+      (*channel2)[(*channel2Size)++] = events[i];
+    }
+  }
+}
+
+// Function to count coincidences between channel 1 and channel 2 events
+int countCoincidences(Event channel1[], int size1, Event channel2[], int size2,
+                      long long coincidanceWindow) {
+  int count = 0;
+  for (int i = 0; i < size1; i++) {
+    for (int j = 0; j < size2; j++) {
+      if (abs(channel1[i].timestamp - channel2[j].timestamp) <=
+          coincidanceWindow) {
+        count++;
+      } else {
+        break; // Break the inner loop if time difference exceeds threshold
+      }
+    }
+  }
+  return count;
 }

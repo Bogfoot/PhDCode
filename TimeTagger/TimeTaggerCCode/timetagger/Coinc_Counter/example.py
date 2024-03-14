@@ -12,27 +12,28 @@ size = 0
 with open("time_tags_08-03-2024.csv", "r") as f:
     valid = f.readline().strip()
     header = f.readline().strip()
+    print(header)
     csv_reader = csv.reader(f)
     for row in csv_reader:
         ch.append(int(row[0]))
         tags.append(int(row[1]))
         size += 1
-threshold = 5
-unit = "ns"
 
 events = cc.Event * size  # Assuming a maximum of 1000 events
 events = events()
-for i in range(size):
+for i in range(int(valid)):
     events[i].channel = ch[i]
     events[i].timestamp = tags[i]
+
 ch1 = 1
 ch2 = 2
-dt = 0.000000001
-t = 0
-maxT = 1e-7
+dt = 10e-9
+t = 1000e-9
+maxT = 0
+
 
 coincidences = cc.CountCoincidences(
-    events, int(valid), ch1, ch2, float(dt), float(t), float(maxT)
+    tags, ch, int(valid), ch1, ch2, float(dt), float(t), float(maxT)
 )
 print(coincidences)
 #
