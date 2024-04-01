@@ -1,6 +1,4 @@
 import datetime
-import os
-import pwd
 import time
 
 import matplotlib.pyplot as plt
@@ -9,26 +7,6 @@ import pandas as pd
 import QuTAG_MC as qt
 from OC import OC
 from scipy.optimize import curve_fit
-
-
-def get_uid_gid(username):
-    try:
-        user_info = pwd.getpwnam(username)
-        uid = user_info.pw_uid
-        gid = user_info.pw_gid
-        return uid, gid
-    except KeyError:
-        print(f"Error: User '{username}' not found.")
-        return None, None
-
-
-def change_ownership_recursive(path, uid, gid):
-    for root, dirs, files in os.walk(path):
-        for d in dirs:
-            os.chown(os.path.join(root, d), uid, gid)
-        for f in files:
-            os.chown(os.path.join(root, f), uid, gid)
-
 
 # single photon detectors:
 maxclickrate = 500e3  # Hz, single photon detect, so we dont fry them
@@ -216,10 +194,3 @@ print(f"Standard Deviation: {stddev}")
 mean = round(mean, 2)
 oven.set_temperature(mean)
 oven.OC_close()
-
-# Replace 'bogfootlj' with the desired username
-username = "bogfootlj"
-uid, gid = get_uid_gid(username)
-os.chdir("./Data")
-change_ownership_recursive(".", uid, gid)
-os.chdir("..")
