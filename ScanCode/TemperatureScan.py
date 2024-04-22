@@ -109,40 +109,43 @@ oven.set_temperature(round(temperature[0], 2))
 ########################## temperature scan
 coincidances = []
 for i in range(n):
-    print("status: ", i, "/", int(n))
-    stability_oven = False
+    try:
+        print("status: ", i, "/", int(n))
+        stability_oven = False
 
-    oven.set_temperature(round(temperature[i], 2))
-    print("current set T: = ", round(temperature[i], 2), " C")
-    while stability_oven == False:
-        time.sleep(sleepy_sleepy_oven)
-        print("current T = ", oven.get_temperature(), " C")
-        if abs(oven.get_temperature() - temperature[i]) < 0.015:
-            stability_oven = True
-            print("Temperature stable, starting a measurement.")
+        oven.set_temperature(round(temperature[i], 2))
+        print("current set T: = ", round(temperature[i], 2), " C")
+        while stability_oven == False:
+            time.sleep(sleepy_sleepy_oven)
+            print("current T = ", oven.get_temperature(), " C")
+            if abs(oven.get_temperature() - temperature[i]) < 0.015:
+                stability_oven = True
+                print("Temperature stable, starting a measurement.")
 
-    time.sleep(sleepy_sleepy_timetagger)
-    data, _ = tt.getCoincCounters()
-    f = open(data_file_name, "a")
-    f.write(
-        str(round(temperature[i], 2))
-        + "    "
-        + str(data[channel_1])
-        + "    "
-        + str(data[channel_2])
-        + "    "
-        + str(data[coincidances_12])
-        + "\n"
-    )
-    f.close()
-    coincidances.append(data[coincidances_12])
-    if (data[1] / exposure_time_timetagger) > maxclickrate:
-        oven.set_temperature(24)
-        break
-    if (data[2] / exposure_time_timetagger) > maxclickrate:
-        oven.set_temperature(24)
-        break
-    # check that the clicks are OK / that you are not rosting the single photon detectors
+        time.sleep(sleepy_sleepy_timetagger)
+        data, _ = tt.getCoincCounters()
+        with open(data_file_name, "a") as f:
+            f.write(
+                str(round(temperature[i], 2))
+                + "    "
+                + str(data[channel_1])
+                + "    "
+                + str(data[channel_2])
+                + "    "
+                + str(data[coincidances_12])
+                + "\n"
+            )
+        coincidances.append(data[coincidances_12])
+        if (data[1] / exposure_time_timetagger) > maxclickrate:
+            oven.set_temperature(24)
+            break
+        if (data[2] / exposure_time_timetagger) > maxclickrate:
+            oven.set_temperature(24)
+            break
+        # check that the clicks are OK / that you are not rosting the single photon detectors
+    except Exception as e:
+        oven.OC_close()
+        tt.deInitialize()
 
 tt.deInitialize()
 max_coinc_index = coincidances.index(np.max(coincidances))
