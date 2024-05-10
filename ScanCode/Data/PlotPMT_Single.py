@@ -16,9 +16,9 @@ dt = pd.read_csv(
 
 plt.figure(figsize=(10, 10))
 
-plt.title("Clicks and Correlations")
-plt.xlabel("Temperature (°C)")
-plt.ylabel("Clicks")
+plt.title("Clicks and Correlations", fontsize=20)
+plt.xlabel("Temperature (°C)", fontsize=20)
+plt.ylabel("Clicks", fontsize=20)
 plt.legend()
 plt.grid(True)
 
@@ -51,10 +51,12 @@ plt.plot(
     dt["Temperature"], dt["ClicksV"], label=f"Clicks V: Max: {np.max(dt['ClicksV'])}"
 )
 
-plt.show()
-exit()
 
 # Fitting gaussian
+
+
+def sinc_squared(x, A, B, C):
+    return A * (np.sinc(B * x)) ** 2 + C
 
 
 # Define the Gaussian function
@@ -104,4 +106,6 @@ plt.annotate(
     arrowprops=dict(facecolor="black", arrowstyle="->"),
 )
 
+plt.legend()
+plt.tick_params(axis="both", which="major", labelsize=14)
 plt.show()
