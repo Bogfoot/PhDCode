@@ -79,42 +79,42 @@ fig.add_trace(
 )
 
 # Add lines connecting minima
-fig.add_trace(
-    go.Scatter(
-        x=[point[0] for point in minima_points],
-        y=[point[1] for point in minima_points],
-        mode="lines",
-        line=dict(color="blue", width=2),
-        name="Minima Lines",
-    )
-)
+# fig.add_trace(
+#     go.Scatter(
+#         x=[point[0] for point in minima_points],
+#         y=[point[1] for point in minima_points],
+#         mode="lines",
+#         line=dict(color="blue", width=2),
+#         name="Minima Lines",
+#     )
+# )
 
 # Add lines connecting maxima
-fig.add_trace(
-    go.Scatter(
-        x=[point[0] for point in maxima_points],
-        y=[point[1] for point in maxima_points],
-        mode="lines",
-        line=dict(color="red", width=2),
-        name="Maxima Lines",
-    )
-)
+# fig.add_trace(
+#     go.Scatter(
+#         x=[point[0] for point in maxima_points],
+#         y=[point[1] for point in maxima_points],
+#         mode="lines",
+#         line=dict(color="red", width=2),
+#         name="Maxima Lines",
+#     )
+# )
 
-if visibility is not None:
-    for i in range(len(vis)):
-        fig.add_annotation(
-            x=maxima_points[i][0],
-            y=maxima_points[i][1],
-            text=f"Visibility: {vis[i]*100:.4f}%",
-            showarrow=True,
-            arrowhead=2,
-            arrowsize=1,
-            arrowwidth=2,
-            arrowcolor="black",
-            ax=40,
-            ay=-40,
-            bgcolor="white",
-        )
+# if visibility is not None:
+#     for i in range(len(vis)):
+#         fig.add_annotation(
+#             x=maxima_points[i][0],
+#             y=maxima_points[i][1],
+#             text=f"Visibility: {vis[i]*100:.4f}%",
+#             showarrow=True,
+#             arrowhead=2,
+#             arrowsize=1,
+#             arrowwidth=2,
+#             arrowcolor="black",
+#             ax=40,
+#             ay=-40,
+#             bgcolor="white",
+#         )
 
 # Add legend point for ratios
 fig.add_trace(
