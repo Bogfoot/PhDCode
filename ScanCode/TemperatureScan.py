@@ -8,9 +8,6 @@ import QuTAG_MC as qt
 from OC import OC
 from scipy.optimize import curve_fit
 
-# single photon detectors:
-maxclickrate = 500e3  # Hz, single photon detect, so we dont fry them
-
 # temperature scan:
 temperature_start = 35
 temperature_end = 45
