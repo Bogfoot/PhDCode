@@ -35,9 +35,6 @@ def initialize_selected_channels():
     return {ch: tk.BooleanVar(value=True) for ch in channels}
 
 
-selected_channels = None
-
-
 # Function to format x-axis labels
 def format_time(x, _):
     if x < 60:
@@ -70,23 +67,14 @@ def plot_singles(ax):
         if selected_channels[ch].get():
             t_data = singles_data[ch]["t"]
             counts_data = singles_data[ch]["counts"]
-            if t_data and counts_data:
-                last_value = counts_data[-1]
-                label = f"Ch {ch}: {last_value}"  # Show the last value
-                ax.plot(t_data, counts_data, label=label, linewidth=2)
-                plotted = True
+            if counts_data:
+                latest_count = counts_data[-1]
+                ax.plot(t_data, counts_data, label=f"Ch{ch} ({latest_count})")
+            plotted = True
     if plotted:
-        legend = ax.legend(
-            loc="upper center",
-            bbox_to_anchor=(0.5, 1.15),
-            fancybox=False,
-            shadow=False,
-            ncol=5,
-        )
-        legend.get_frame().set_alpha(legend_opacity)
+        ax.legend(loc="upper left")
     ax.xaxis.set_major_formatter(FuncFormatter(format_time))
-    ax.tick_params(axis="x", labelsize=10)
-    ax.tick_params(axis="y", labelsize=10)
+    ax.grid(True)
 
 
 def plot_coincidences(ax):
@@ -95,29 +83,61 @@ def plot_coincidences(ax):
     ax.set_xlabel(time_label, fontsize=12, fontweight="bold")
     ax.set_ylabel(f"Countrate [1/{expTime/1000}s]", fontsize=12, fontweight="bold")
     plotted = False
-    active_channels = [ch for ch in channels if selected_channels[ch].get()]
     for coinc in coincidences:
-        ch1, ch2 = map(int, coinc.split("/"))
-        if ch1 in active_channels and ch2 in active_channels:
+        if (
+            selected_channels[int(coinc[0])].get()
+            and selected_channels[int(coinc[2])].get()
+        ):
             t_data = coincidences_data[coinc]["t"]
             counts_data = coincidences_data[coinc]["counts"]
-            if t_data and counts_data:
-                last_value = counts_data[-1]
-                label = f"Coinc {coinc}: {last_value}"  # Show the last value
-                ax.plot(t_data, counts_data, label=label, linewidth=2)
-                plotted = True
+            if counts_data:
+                # Calculate adjusted coincidences by subtracting noise
+                noise = [
+                    singles_data[int(coinc[0])]["counts"][i]
+                    * singles_data[int(coinc[2])]["counts"][i]
+                    * coincWin
+                    / 1e12
+                    for i in range(len(t_data))
+                ]
+                adjusted_counts = [
+                    counts_data[i] - noise[i] for i in range(len(t_data))
+                ]
+                latest_count = counts_data[-1]
+                latest_adjusted = adjusted_counts[-1]
+                ax.plot(
+                    t_data,
+                    counts_data,
+                    label=f"Coinc {coinc} ({latest_count}, {latest_adjusted:.2f})",
+                )
+            plotted = True
     if plotted:
-        legend = ax.legend(
-            loc="upper center",
-            bbox_to_anchor=(0.5, 1.15),
-            fancybox=False,
-            shadow=False,
-            ncol=5,
-        )
-        legend.get_frame().set_alpha(legend_opacity)
+        ax.legend(loc="upper left")
     ax.xaxis.set_major_formatter(FuncFormatter(format_time))
-    ax.tick_params(axis="x", labelsize=10)
-    ax.tick_params(axis="y", labelsize=10)
+    ax.grid(True)
+
+
+# Tkinter setup
+root = tk.Tk()
+root.title("QuTAG MC Data Plotter")
+
+mainframe = ttk.Frame(root, padding="10 10 10 10")
+mainframe.grid(column=0, row=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+root.columnconfigure(0, weight=1)
+root.rowconfigure(0, weight=1)
+
+# Initialize selected channels after Tk root is created
+selected_channels = initialize_selected_channels()
+
+# Create a figure for the plots
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8))
+
+canvas = FigureCanvasTkAgg(fig, master=mainframe)
+canvas_widget = canvas.get_tk_widget()
+canvas_widget.grid(column=0, row=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+
+# Add buttons
+button_frame = ttk.Frame(mainframe, padding="5 5 5 5")
+button_frame.grid(column=0, row=1, sticky=(tk.W, tk.E))
 
 
 def show_singles():
@@ -174,108 +194,26 @@ def submit_exposure_time(text):
         print("Invalid input. Please enter an integer between 1 and 10000.")
 
 
-# Initialize Tkinter
-root = tk.Tk()
-root.title("QuTAG Plotter App")
-# root.state('zoomed')  # Start the application maximized
+singles_button = ttk.Button(button_frame, text="Show Singles", command=show_singles)
+singles_button.grid(column=0, row=0, sticky=tk.W)
 
-# Initialize selected_channels after creating the root window
-selected_channels = initialize_selected_channels()
-
-# Create a notebook for tabs
-notebook = ttk.Notebook(root)
-notebook.pack(fill=tk.BOTH, expand=True)
-
-# Create frames for each tab
-plotting_tab = ttk.Frame(notebook)
-settings_tab = ttk.Frame(notebook)
-
-# Add tabs to the notebook
-notebook.add(plotting_tab, text="Plotting")
-notebook.add(settings_tab, text="Settings")
-
-# Plotting tab
-main_frame = ttk.Frame(plotting_tab)
-main_frame.pack(fill=tk.BOTH, expand=True)
-
-# Create Matplotlib canvas
-canvas = plt.Figure()
-ax1 = canvas.add_subplot(211)
-ax2 = canvas.add_subplot(212)
-canvas_widget = FigureCanvasTkAgg(canvas, master=main_frame)
-canvas_widget.get_tk_widget().pack(fill=tk.BOTH, expand=True)
-
-button_frame = ttk.Frame(plotting_tab)
-button_frame.pack()
-
-h, w = 2, 10
-tk.Button(button_frame, text="Singles", command=show_singles, height=h, width=w).pack(
-    side=tk.LEFT
+coincidences_button = ttk.Button(
+    button_frame, text="Show Coincidences", command=show_coincidences
 )
-tk.Button(
-    button_frame, text="Coincidences", command=show_coincidences, height=h, width=w
-).pack(side=tk.LEFT)
-tk.Button(button_frame, text="Both", command=show_both, height=h, width=w).pack(
-    side=tk.LEFT
-)
-tk.Label(button_frame, text="Exposure time (ms):").pack(side=tk.LEFT)
+coincidences_button.grid(column=1, row=0, sticky=tk.W)
 
-exposure_textbox = ttk.Entry(button_frame, width=5)
-exposure_textbox.insert(0, str(int(exposure_time * 1000)))
-exposure_textbox.pack(side=tk.LEFT)
+both_button = ttk.Button(button_frame, text="Show Both", command=show_both)
+both_button.grid(column=2, row=0, sticky=tk.W)
+
+# Key bindings
+root.bind("1", lambda event: show_singles())
+root.bind("2", lambda event: show_coincidences())
+root.bind("3", lambda event: show_both())
 
 
-def on_exposure_enter(event):
-    submit_exposure_time(exposure_textbox.get())
-    root.focus_set()
-
-
-exposure_textbox.bind("<Return>", on_exposure_enter)
-
-# Settings tab
-settings_frame = ttk.Frame(settings_tab)
-settings_frame.pack(fill=tk.BOTH, expand=True)
-
-ttk.Label(settings_frame, text="Channel Settings", font=("Arial", 14)).pack(pady=10)
-
-for ch in channels:
-    ttk.Checkbutton(
-        settings_frame, text=f"Channel {ch}", variable=selected_channels[ch]
-    ).pack(anchor="w")
-
-
-def open_channel_settings():
-    channel_settings_window = tk.Toplevel()
-    channel_settings_window.title("Channel Settings")
-    ttk.Label(
-        channel_settings_window, text="Channel settings can be configured here."
-    ).pack(pady=10)
-    ttk.Button(
-        channel_settings_window, text="Close", command=channel_settings_window.destroy
-    ).pack(pady=5)
-
-
-ttk.Button(
-    settings_frame, text="Open Channel Settings", command=open_channel_settings
-).pack(pady=20)
-
-
-def on_key_press(event):
-    if event.char == "1":
-        show_singles()
-    elif event.char == "2":
-        show_coincidences()
-    elif event.char == "3":
-        show_both()
-    elif event.char == "q":
-        on_close()
-
-
-root.bind("<KeyPress>", on_key_press)
-
-
+# Update plot data function
 def update_plot():
-    global running, newdata
+    global newdata
     while running:
         root.update_idletasks()
         root.update()
@@ -286,7 +224,6 @@ def update_plot():
         else:
             newdata += 1
             time_val = newdata * expTime / 1000
-            # print(f"Time: {time_val}s, Data: {data}")
             # Singles
             for ch in channels:
                 singles_data[ch]["t"].append(time_val)
@@ -311,7 +248,7 @@ def update_plot():
             else:
                 root.after(0, plot_singles, ax1)
                 root.after(0, plot_coincidences, ax2)
-            root.after(0, canvas_widget.draw)
+            root.after(0, canvas.draw)
 
 
 def on_close():
