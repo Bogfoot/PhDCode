@@ -15,6 +15,7 @@ print(f"Psi: {Psi}")
 PsiDensityMatrix = np.outer(Psi, Psi)
 print(f"PsiDensityMatrix =\n{PsiDensityMatrix}")
 
+print(f"Trace of Psi^2: {np.trace(np.matmul(Psi,Psi))}")
 
 # Define the labels with Bra-Ket notation
 labels = ["|HH⟩", "|HV⟩", "|VH⟩", "|VV⟩"]
