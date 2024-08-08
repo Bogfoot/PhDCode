@@ -64,4 +64,4 @@ bell_state = 1 / np.sqrt(2) * np.array([1, 0, 0, 1], dtype=complex)
 print("Fidelity with actual : " + str(qLib.fidelity(bell_state, rho_approx)))
 # Giveds the density matrix rho
 print(rho_approx)
-print(np.trace(np.real(rho_approx)))
+print(np.trace(np.matmul(rho_approx, rho_approx)))

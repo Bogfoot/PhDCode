@@ -1,21 +1,34 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+
+def calcDensityMatrix(psi):
+    return np.outer(psi, np.conj(psi))
+
+
+def tensorProduct(psi, phi):
+    return np.outer(psi, phi)
+
+
+def purityOfState(psi):
+    return np.trace(np.matmul(psi, psi))
+
+
 H = 1 / np.sqrt(2) * np.array([1, 0])
 V = 1 / np.sqrt(2) * np.array([0, 1])
 
-HH = np.outer(H, H)
+HH = tensorProduct(H, H)
 print(f"HH: {HH}")
-VV = np.outer(V, V)
+VV = tensorProduct(V, V)
 print(f"VV: {VV}")
 
 Psi = HH + VV
 print(f"Psi: {Psi}")
 
-PsiDensityMatrix = np.outer(Psi, Psi)
+PsiDensityMatrix = calcDensityMatrix(Psi)
 print(f"PsiDensityMatrix =\n{PsiDensityMatrix}")
 
-print(f"Trace of Psi^2: {np.trace(np.matmul(Psi,Psi))}")
+print(f"Purity of PsiDensityMatrix: {purityOfState(PsiDensityMatrix)}")
 
 # Define the labels with Bra-Ket notation
 labels = ["|HH⟩", "|HV⟩", "|VH⟩", "|VV⟩"]
