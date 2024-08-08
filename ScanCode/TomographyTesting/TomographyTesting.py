@@ -1,14 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.preprocessing import normalize
-
-
-def norm(matrix):
-    return FrobeniusNorm(matrix)
-
-
-def FrobeniusNorm(matrix):
-    return np.sqrt(np.trace(np.matmul(matrix.T, matrix)))
 
 
 def calcDensityMatrix(psi):
@@ -28,19 +19,20 @@ V = 1 / np.sqrt(2) * np.array([0, 1])
 
 D = H + V
 A = H - V
-
-
 DA = tensorProduct(D, A)
-DA = DA / norm(DA)
+normDA = np.linalg.norm(DA)
+DA = DA / np.linalg.norm(DA)
+print(f" Norm of DA: {normDA}")
 print(f"DA: {DA}")
 AD = tensorProduct(A, D)
-AD = AD / norm(AD)
-
-for a in [DA, AD]:
-    print(f"The Frobenious norm of {a} is {norm(a)}")
+AD = DA / np.linalg.norm(AD)
+normAD = np.linalg.norm(AD)
+print(f" Norm of AD: {normAD}")
 print(f"AD: {AD}")
 Phi = DA + AD
-Phi = Phi / norm(Phi)
+normPhi = np.linalg.norm(Phi)
+Phi = Phi / np.linalg.norm(Phi)
+print(f" Norm of Phi: {normPhi}")
 print(f"Phi: {Phi}")
 PhiDensityMatrix = calcDensityMatrix(Phi)
 print(f"PhiDensityMatrix =\n{PhiDensityMatrix}")
