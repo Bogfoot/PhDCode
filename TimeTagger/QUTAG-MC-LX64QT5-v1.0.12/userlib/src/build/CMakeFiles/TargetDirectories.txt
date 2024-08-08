@@ -1,0 +1,3 @@
+/home/bogfootlj/Documents/PhDCode/TimeTagger/QUTAG-MC-LX64QT5-v1.0.12/userlib/src/build/CMakeFiles/example0.dir
+/home/bogfootlj/Documents/PhDCode/TimeTagger/QUTAG-MC-LX64QT5-v1.0.12/userlib/src/build/CMakeFiles/edit_cache.dir
+/home/bogfootlj/Documents/PhDCode/TimeTagger/QUTAG-MC-LX64QT5-v1.0.12/userlib/src/build/CMakeFiles/rebuild_cache.dir
