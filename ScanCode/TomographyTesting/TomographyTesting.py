@@ -1,5 +1,14 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.preprocessing import normalize
+
+
+def norm(matrix):
+    return FrobeniusNorm(matrix)
+
+
+def FrobeniusNorm(matrix):
+    return np.sqrt(np.trace(np.matmul(matrix.T, matrix)))
 
 
 def calcDensityMatrix(psi):
@@ -16,6 +25,26 @@ def purityOfState(psi):
 
 H = 1 / np.sqrt(2) * np.array([1, 0])
 V = 1 / np.sqrt(2) * np.array([0, 1])
+
+D = H + V
+A = H - V
+
+
+DA = tensorProduct(D, A)
+DA = DA / norm(DA)
+print(f"DA: {DA}")
+AD = tensorProduct(A, D)
+AD = AD / norm(AD)
+
+for a in [DA, AD]:
+    print(f"The Frobenious norm of {a} is {norm(a)}")
+print(f"AD: {AD}")
+Phi = DA + AD
+Phi = Phi / norm(Phi)
+print(f"Phi: {Phi}")
+PhiDensityMatrix = calcDensityMatrix(Phi)
+print(f"PhiDensityMatrix =\n{PhiDensityMatrix}")
+print(f"Purity of PhiDensityMatrix: {purityOfState(PhiDensityMatrix)}")
 
 HH = tensorProduct(H, H)
 print(f"HH: {HH}")
@@ -72,4 +101,4 @@ fig = plt.figure(figsize=(12, 6))
 ax1 = fig.add_subplot(111, projection="3d")
 plot_3d_bars(ax1, PsiDensityMatrix, "Real Parts")
 
-plt.show()
+# plt.show()
