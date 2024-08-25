@@ -17,6 +17,14 @@ def purityOfState(psi):
 H = 1 / np.sqrt(2) * np.array([1, 0])
 V = 1 / np.sqrt(2) * np.array([0, 1])
 
+# Testing with just H
+HH = tensorProduct(H, H)
+HHDensityMatrix = calcDensityMatrix(H)
+print(f"HHDensityMatrix: {HHDensityMatrix}")
+print(f"Purity of HHDensityMatrix: {purityOfState(HHDensityMatrix)}")
+
+
+# Testing with D and A
 D = H + V
 A = H - V
 DA = tensorProduct(D, A)
@@ -38,7 +46,7 @@ PhiDensityMatrix = calcDensityMatrix(Phi)
 print(f"PhiDensityMatrix =\n{PhiDensityMatrix}")
 print(f"Purity of PhiDensityMatrix: {purityOfState(PhiDensityMatrix)}")
 
-HH = tensorProduct(H, H)
+# Testing with bell states
 print(f"HH: {HH}")
 VV = tensorProduct(V, V)
 print(f"VV: {VV}")
@@ -93,4 +101,4 @@ fig = plt.figure(figsize=(12, 6))
 ax1 = fig.add_subplot(111, projection="3d")
 plot_3d_bars(ax1, PsiDensityMatrix, "Real Parts")
 
-# plt.show()
+plt.show()

@@ -1,35 +1,22 @@
+import sys
+
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import QuantumTomography as qLib
 
 # Coincidence counts for 9 measurements.
 # Each row is the coincidence counts for detector pairs 1 H1H2 (1/4),2 H1V2 (1/3),3 V1H2 (2/4), and 4 V1V2 (2/3) respectfully
-singles_counts = np.array(
-    [
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-    ]
-)
+file_path = sys.argv[1]
+data = pd.read_csv(file_path)
 
-coincidence_counts = np.array(
-    [
-        [21885.6, 177.2, 99.6, 9957],
-        [9586.8, 202.6, 84.4, 4141],
-        [12591.6, 190.2, 84.8, 5945],
-        [8620.2, 145.6, 111, 3882.2],
-        [850.8, 162.6, 93.6, 1080.2],
-        [16495.8, 169.8, 103.8, 11933],
-        [11715.8, 156.4, 112.8, 5440.6],
-        [16751.2, 178.6, 106, 11743],
-        [2144.2, 164.4, 99.6, 1356.6],
-    ]
-)
+# Extract singles counts (columns 3-6) and coincidence counts (columns 7-10)
+singles_counts = data[["1", "2", "3", "4"]].values[:9]  # Taking the first 9 rows
+coincidence_counts = data[["1/4", "1/3", "2/4", "2/3"]].values[
+    :9
+]  # Taking the first 9 rows
+
+# print(f"Singles counts:\n{singles_counts}\n coincidence_counts:\n{coincidence_counts}")
 
 
 # Measurement basis for 9 measurements
@@ -55,7 +42,10 @@ tomo_obj = qLib.Tomography()
 
 # Run tomography
 [rho_approx, intensity, fval] = tomo_obj.StateTomography(
-    measurements, coincidence_counts  # , singles=singles_counts, window=400ps
+    measurements,
+    coincidence_counts,
+    singles=singles_counts,
+    window=np.array([0.4, 0.4, 0.4, 0.4])
 )
 # Print Results
 tomo_obj.printLastOutput()
@@ -65,3 +55,52 @@ print("Fidelity with actual : " + str(qLib.fidelity(bell_state, rho_approx)))
 # Giveds the density matrix rho
 print(rho_approx)
 print(np.trace(np.matmul(rho_approx, rho_approx)))
+
+real_parts = rho_approx.real
+imaginary_parts = rho_approx.imag
+
+# Define the labels with Bra-Ket notation
+labels = ["|HH⟩", "|HV⟩", "|VH⟩", "|VV⟩"]
+
+
+# Function to plot 3D bar chart
+def plot_3d_bars(ax, values, title):
+    # Define the coordinates for the bars
+    _x = np.arange(values.shape[0])
+    _y = np.arange(values.shape[1])
+    _xx, _yy = np.meshgrid(_x, _y)
+    x, y = _xx.ravel(), _yy.ravel()
+
+    # Define the heights of the bars
+    z = np.zeros_like(x)
+    dx = dy = 0.5
+    dz = values.ravel()
+
+    # Plot the bars
+    ax.bar3d(x, y, z, dx, dy, dz, shade=True)
+
+    # Set labels and title
+    ax.set_xlabel("X")
+    ax.set_ylabel("Y")
+    ax.set_zlabel("Value")
+    ax.set_title(title)
+
+    # Set tick labels with Bra-Ket notation
+    ax.set_xticks(_x)
+    ax.set_xticklabels(labels)
+    ax.set_yticks(_y)
+    ax.set_yticklabels(labels[::-1])
+
+
+# Create a figure with two subplots
+fig = plt.figure(figsize=(12, 6))
+
+# Plot the real parts
+ax1 = fig.add_subplot(121, projection="3d")
+plot_3d_bars(ax1, real_parts, "Real Parts")
+
+# Plot the imaginary parts
+ax2 = fig.add_subplot(122, projection="3d")
+plot_3d_bars(ax2, imaginary_parts, "Imaginary Parts")
+
+plt.show()
