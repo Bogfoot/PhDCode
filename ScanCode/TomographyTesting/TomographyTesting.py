@@ -31,21 +31,21 @@ VH = tensorProduct(V, H)
 Phiplus = 1 / np.sqrt(2) * (HH + VV)
 print(f"Phiplus: {Phiplus}")
 PhiplusDensityMatrix = calcDensityMatrix(Phiplus)
-print(f"PhiplusDensityMatrix =\n{PhiplusDensityMatrix}")
+
 Phiminus = 1 / np.sqrt(2) * (HH - VV)
 print(f"Phiminus: {Phiminus}")
 PhiminusDensityMatrix = calcDensityMatrix(Phiminus)
-print(f"PhiminusDensityMatrix =\n{PhiminusDensityMatrix}")
 
 Psiplus = 1 / np.sqrt(2) * (HV + VH)
 print(f"Psiplus: {Psiplus}")
 PsiplusDensityMatrix = calcDensityMatrix(Psiplus)
-print(f"PsiplusDensityMatrix =\n{PsiplusDensityMatrix}")
 
 Psiminus = 1 / np.sqrt(2) * (HV - VH)
 print(f"Psiminus: {Psiminus}")
 PsiminusDensityMatrix = calcDensityMatrix(Psiminus)
-print(f"PsiminusDensityMatrix =\n{PsiminusDensityMatrix}")
+
+PhiIMinus = 1 / np.sqrt(2) * (HV - VH * 1j)
+PhiIminusDensityMatrix = calcDensityMatrix(PhiIMinus)
 
 # Define the labels with Bra-Ket notation
 labels = ["|HH⟩", "|HV⟩", "|VH⟩", "|VV⟩"]
@@ -89,11 +89,18 @@ rhos = [
     PsiminusDensityMatrix,
     PhiplusDensityMatrix,
     PhiminusDensityMatrix,
+    PhiIminusDensityMatrix,
 ]
 
-for rho in rhos:
-    ax1 = fig.add_subplot(111, projection="3d")  # Create a new subplot
-    plot_3d_bars(ax1, rho, "Real Parts")  # Replace with your 3D plotting function
-    plt.show()  # Show the current plot
-    sleep(5)  # Pause for 5 seconds
-    plt.clf()  # Clear the figure for the next plot
+# ax1 = fig.add_subplot(331, projection="3d")  # Create a new subplot
+# plot_3d_bars(ax1, rhos[0], "Psi Plus")  # Replace with your 3D plotting function
+# ax2 = fig.add_subplot(332, projection="3d")  # Create a new subplot
+# plot_3d_bars(ax2, rhos[2], "Psi Minus")  # Replace with your 3D plotting function
+# ax3 = fig.add_subplot(333, projection="3d")  # Create a new subplot
+# plot_3d_bars(ax3, rhos[1], "Phi Plus")  # Replace with your 3D plotting function
+# ax4 = fig.add_subplot(334, projection="3d")  # Create a new subplot
+# plot_3d_bars(ax4, rhos[3], "Phi Minus")  # Replace with your 3D plotting function
+ax5 = fig.add_subplot(335, projection="3d")  # Create a new subplot
+rhos[4] = rhos[4].real + rhos[4].imag
+plot_3d_bars(ax5, rhos[4], "Phi I Minus")  # Replace with your 3D plotting function
+plt.show()

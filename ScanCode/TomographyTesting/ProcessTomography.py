@@ -1,7 +1,8 @@
 import pandas as pd
 
 # Load the CSV file
-file_path = "Data/Tomography/DataForTomography_2024-07-31_09_42_28.csv"  # Replace with your actual file path
+dir_name = "Data/Tomography/"
+file_path = "../Data/Tomography/DataForTomography_2024-08-22_10_45_35.csv"  # Replace with your actual file path
 data = pd.read_csv(file_path)
 
 # Calculate the average for each data column for each combination of angles

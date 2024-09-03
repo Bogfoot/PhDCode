@@ -45,16 +45,29 @@ tomo_obj = qLib.Tomography()
     measurements,
     coincidence_counts,
     singles=singles_counts,
-    window=np.array([0.4, 0.4, 0.4, 0.4])
+    window=np.array([0.4, 0.4, 0.4, 0.4]),
 )
 # Print Results
 tomo_obj.printLastOutput()
 print("----------------")
-bell_state = 1 / np.sqrt(2) * np.array([1, 0, 0, 1], dtype=complex)
-print("Fidelity with actual : " + str(qLib.fidelity(bell_state, rho_approx)))
+phi_plus = 1 / np.sqrt(2) * np.array([1, 0, 0, -1], dtype=complex)
+phi_plus_I = 1 / np.sqrt(2) * np.array([1, 0, 0, 1j], dtype=complex)
+psi_plus = 1 / np.sqrt(2) * np.array([1, 0, 0, 1], dtype=complex)
+psi_minus = 1 / np.sqrt(2) * np.array([0, 1, 1, 0], dtype=complex)
+phi_minus = 1 / np.sqrt(2) * np.array([0, 1, -1, 0], dtype=complex)
+
+print("Fidelity with actual : " + str(qLib.fidelity(phi_plus_I, rho_approx)))
 # Giveds the density matrix rho
 print(rho_approx)
 print(np.trace(np.matmul(rho_approx, rho_approx)))
+
+bell_states = [phi_plus, phi_plus_I, psi_plus, psi_minus, phi_minus]
+
+for state in bell_states:
+    print()
+    print(state)
+    print("Fidelity with actual : " + str(qLib.fidelity(state, rho_approx)))
+    
 
 real_parts = rho_approx.real
 imaginary_parts = rho_approx.imag
