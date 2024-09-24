@@ -15,10 +15,10 @@ except ImportError:
 
 # Initialize QuTAG device
 tt = QuTAG_MC.QuTAG()
-exposure_time = 0.1
+exposure_time = 0.5
 tt.setExposureTime(int(exposure_time * 1000))
 _, coincWin, expTime = tt.getDeviceParams()
-print(f"Coincidence window: {coincWin}\nBins, exposure time: {expTime} ms")
+print(f"Coincidence window: {coincWin} Bins\nExposure time: {expTime} ms")
 
 # Initialize data structures
 channels = [1, 2, 3, 4]
@@ -29,14 +29,73 @@ newdata = 0
 running = True
 current_plot = "both"
 legend_opacity = 0
-legend_font_size = 20
+contrast_str = "phi+I"
+bell_states = ["phi+","phi+I","phi-","phi-I"]
 
+selected_channels = None
+
+
+# Set the continue scan flag to True when "Continue Scanning" button is pressed
+def continue_tomography():
+    global continue_scan
+    continue_scan = True
+
+# Tomography function
+def run_tomography():
+    global continue_scan
+    channels = [1, 2, 3, 4]
+    coincidences = {"1/4": 36, "1/3": 34, "2/4": 37, "2/3": 35}
+    angles = [0, 22.5, 45]
+    exposure_time_timetagger = 1
+
+    # Set exposure time and get parameters from the time-tagger
+    tt.setExposureTime(exposure_time_timetagger * 1000)
+    _, coincWin, expTime = tt.getDeviceParams()
+    print(f"Coincidence window: {coincWin}\nExposure time: {expTime} ms")
+
+    # Create file to save tomography data
+    data_for_tomography = f"Data/DataForTomography_{datetime.date.today()}_{strftime('%H_%M_%S', localtime())}.csv"
+    with open(data_for_tomography, "w") as f:
+        f.write("# angle,other_angle,1,2,3,4,1/4,1/3,2/4,2/3\n")
+
+    # Perform the tomography scan
+    for angle in angles:
+        for other_angle in angles:
+            print(f"Scanning: {angle} and {other_angle}")
+            sleep(exposure_time_timetagger)  # Simulate waiting for exposure
+
+            # Get data from the time-tagger
+            data, updates = tt.getCoincCounters()
+            logdata = [angle, other_angle]
+
+            if updates > 0:
+                # Collect singles and coincidence data
+                for ch in channels:
+                    logdata.append(data[ch])
+                for coinc in coincidences:
+                    logdata.append(data[coincidences[coinc]])
+            else:
+                print("No data received.")
+
+            # Log the collected data
+            logdata_str = ",".join(map(str, logdata))
+            print(logdata_str)
+            with open(data_for_tomography, "a") as f:
+                f.write(logdata_str + "\n")
+
+            # Update the plots in the GUI
+            update_plot()
+
+            # Show the "Continue Scanning" button and wait for user interaction
+            display_continue_button()
+            while not continue_scan:
+                sleep(0.1)  # Wait for the user to press "Continue Scanning"
+            continue_scan = False
+            hide_continue_button()
+    print("Tomography complete.")
 
 def initialize_selected_channels():
     return {ch: tk.BooleanVar(value=True) for ch in channels}
-
-
-selected_channels = None
 
 
 # Function to format x-axis labels
@@ -57,9 +116,42 @@ def format_time(x, _):
         return f"{int(d)}d {int(h):02d}:{int(m):02d}:{int(s):02d}"
 
 
+def update_Contrast():
+    global contrast_str
+    if  coincidences_data["1/4"]["counts"][-1] > coincidences_data["2/4"]["counts"][-1] or coincidences_data["2/3"]["counts"][-1] > coincidences_data["1/3"]["counts"][-1]:
+        coinc14 = coincidences_data["1/4"]["counts"][-1]
+        coinc23 = coincidences_data["2/3"]["counts"][-1]
+        coinc13 = coincidences_data["1/3"]["counts"][-1]
+        coinc24 = coincidences_data["2/4"]["counts"][-1]
+    else:
+        coinc14 = coincidences_data["1/3"]["counts"][-1]
+        coinc23 = coincidences_data["2/4"]["counts"][-1]
+        coinc13 = coincidences_data["1/4"]["counts"][-1]
+        coinc24 = coincidences_data["2/3"]["counts"][-1]
+
+    # Update contrast based on the selected Bell state
+    if contrast_str == "phi+":
+        # Logic for phi+
+        return (coinc14 + coinc23) / (coinc13 + coinc24)
+    elif contrast_str == "phi+I":
+        # Logic for phi+I
+        return (coinc14 + coinc23) / (coinc13 + coinc24)
+    elif contrast_str == "phi-":
+        # Logic for phi-
+        return (coinc14 + coinc23) / (coinc13 + coinc24)
+    elif contrast_str == "phi-I":
+        # Logic for phi-I
+        return (coinc14 + coinc23) / (coinc13 + coinc24)
+
 # Plotting functions
 time_label = "Time [dd hh:mm:ss]"
 
+# Function to update contrast string when radio button is selected
+def select_state():
+    global contrast_str
+    contrast_str = selected_state.get()
+    plot_coincidences(ax2)
+    canvas_widget.draw()
 
 def plot_singles(ax):
     ax.cla()
@@ -83,7 +175,6 @@ def plot_singles(ax):
             fancybox=False,
             shadow=False,
             ncol=5,
-            fontsize=legend_font_size,
         )
         legend.get_frame().set_alpha(legend_opacity)
     ax.xaxis.set_major_formatter(FuncFormatter(format_time))
@@ -93,7 +184,7 @@ def plot_singles(ax):
 
 def plot_coincidences(ax):
     ax.cla()
-    ax.set_title("Coincidences", fontsize=14, fontweight="bold")
+    ax.set_title(f"Coincidences | {contrast_str} {round(update_Contrast(),2)}", fontsize=14, fontweight="bold")
     ax.set_xlabel(time_label, fontsize=12, fontweight="bold")
     ax.set_ylabel(f"Countrate [1/{expTime/1000}s]", fontsize=12, fontweight="bold")
     plotted = False
@@ -108,6 +199,7 @@ def plot_coincidences(ax):
                 label = f"Coinc {coinc}: {last_value}"  # Show the last value
                 ax.plot(t_data, counts_data, label=label, linewidth=2)
                 plotted = True
+    
     if plotted:
         legend = ax.legend(
             loc="upper center",
@@ -115,9 +207,9 @@ def plot_coincidences(ax):
             fancybox=False,
             shadow=False,
             ncol=5,
-            fontsize=legend_font_size,
         )
         legend.get_frame().set_alpha(legend_opacity)
+        
     ax.xaxis.set_major_formatter(FuncFormatter(format_time))
     ax.tick_params(axis="x", labelsize=10)
     ax.tick_params(axis="y", labelsize=10)
@@ -177,13 +269,38 @@ def submit_exposure_time(text):
         print("Invalid input. Please enter an integer between 1 and 10000.")
 
 
+def open_channel_settings():
+    channel_settings_window = tk.Toplevel()
+    channel_settings_window.title("Channel Settings")
+    ttk.Label(
+        channel_settings_window, text="Channel settings can be configured here."
+    ).pack(pady=10)
+    ttk.Button(
+        channel_settings_window, text="Close", command=channel_settings_window.destroy
+    ).pack(pady=5)
+
+
+
+def on_key_press(event):
+    if event.char == "1":
+        show_singles()
+    elif event.char == "2":
+        show_coincidences()
+    elif event.char == "3":
+        show_both()
+    elif event.char == "q":
+        on_close()
+
 # Initialize Tkinter
 root = tk.Tk()
 root.title("QuTAG Plotter App")
-# root.state('zoomed')  # Start the application maximized
+root.state('zoomed')  # Start the application maximized
 
 # Initialize selected_channels after creating the root window
 selected_channels = initialize_selected_channels()
+selected_state = tk.StringVar(value=bell_states[0])  # Default to the first state
+
+# selected_state = initialize_selected_states()
 
 # Create a notebook for tabs
 notebook = ttk.Notebook(root)
@@ -212,15 +329,20 @@ button_frame = ttk.Frame(plotting_tab)
 button_frame.pack()
 
 h, w = 2, 10
-tk.Button(button_frame, text="Singles", command=show_singles, height=h, width=w).pack(
+singles_button = tk.Button(button_frame, text="Singles", command=show_singles, height=h, width=w).pack(
     side=tk.LEFT
 )
-tk.Button(
+# ToolTip(singles_button, "Show the Singles plot")
+
+coincidences_button = tk.Button(
     button_frame, text="Coincidences", command=show_coincidences, height=h, width=w
 ).pack(side=tk.LEFT)
-tk.Button(button_frame, text="Both", command=show_both, height=h, width=w).pack(
+# ToolTip(coincidences_button, "Show the Coincidences plot")
+
+both_button = tk.Button(button_frame, text="Both", command=show_both, height=h, width=w).pack(
     side=tk.LEFT
 )
+
 tk.Label(button_frame, text="Exposure time (ms):").pack(side=tk.LEFT)
 
 exposure_textbox = ttk.Entry(button_frame, width=5)
@@ -237,45 +359,41 @@ exposure_textbox.bind("<Return>", on_exposure_enter)
 
 # Settings tab
 settings_frame = ttk.Frame(settings_tab)
-settings_frame.pack(fill=tk.BOTH, expand=True)
+# settings_frame.pack(fill=tk.BOTH, expand=True)
+# Center the content inside settings_frame
+settings_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
 ttk.Label(settings_frame, text="Channel Settings", font=("Arial", 14)).pack(pady=10)
-
-for ch in channels:
-    ttk.Checkbutton(
-        settings_frame, text=f"Channel {ch}", variable=selected_channels[ch]
-    ).pack(anchor="w")
-
-
-def open_channel_settings():
-    channel_settings_window = tk.Toplevel()
-    channel_settings_window.title("Channel Settings")
-    ttk.Label(
-        channel_settings_window, text="Channel settings can be configured here."
-    ).pack(pady=10)
-    ttk.Button(
-        channel_settings_window, text="Close", command=channel_settings_window.destroy
-    ).pack(pady=5)
-
-
+# Pack the button just below the two frames
 ttk.Button(
     settings_frame, text="Open Channel Settings", command=open_channel_settings
-).pack(pady=20)
+).pack(side=tk.TOP, pady=20)
+
+# Settings tab (modification for bell_states radio buttons)
+ttk.Label(settings_frame, text="Select Bell State", font=("Arial", 14)).pack(pady=10)
 
 
-def on_key_press(event):
-    global legend_font_size
-    if event.char == "1":
-        legend_font_size = 20
-        show_singles()
-    elif event.char == "2":
-        legend_font_size = 20
-        show_coincidences()
-    elif event.char == "3":
-        legend_font_size = 12
-        show_both()
-    elif event.char == "q":
-        on_close()
+# Create a frame for checkboxes and radio buttons side by side
+checkbox_frame = ttk.Frame(settings_frame)
+checkbox_frame.pack(side=tk.LEFT, padx=10, pady=10, fill=tk.Y)
+
+radiobutton_frame = ttk.Frame(settings_frame)
+radiobutton_frame.pack(side=tk.LEFT, padx=10, pady=10, fill=tk.Y)
+
+# Add checkboxes to the checkbox_frame
+ttk.Label(checkbox_frame, text="Channel Settings", font=("Arial", 14)).pack(anchor="n")
+for ch in channels:
+    ttk.Checkbutton(
+        checkbox_frame, text=f"Channel {ch}", variable=selected_channels[ch]
+    ).pack(anchor="w", pady=5)
+
+# Add radio buttons to the radiobutton_frame
+ttk.Label(radiobutton_frame, text="Bell States", font=("Arial", 14)).pack(anchor="n")
+for state in bell_states:
+    ttk.Radiobutton(
+        radiobutton_frame, text=state, variable=selected_state, value=state, command=select_state
+    ).pack(anchor="n", pady=5)
+   
 
 
 root.bind("<KeyPress>", on_key_press)
@@ -318,7 +436,8 @@ def update_plot():
             else:
                 root.after(0, plot_singles, ax1)
                 root.after(0, plot_coincidences, ax2)
-            root.after(0, canvas_widget.draw)
+        root.after(0, canvas_widget.draw)
+            
 
 
 def on_close():
@@ -339,6 +458,44 @@ def start_update_thread():
     update_thread.start()
 
 
+# Function to display the continue button during tomography
+continue_button = None
+
+def start_tomography():
+    # Hide "Run Tomography" button and start tomography in a new thread
+    tomography_button.pack_forget()
+    tomography_thread = threading.Thread(target=QuickTomography.run_tomography, 
+                                         args=(tt, update_plot, display_continue_button, hide_continue_button))
+    tomography_thread.start()
+
+def display_continue_button():
+    # Display the "Continue Scanning" button when waiting for input
+    root.after(0, lambda: continue_button.pack(side=tk.LEFT))
+
+def hide_continue_button():
+    # Hide the "Continue Scanning" button after user presses it
+    root.after(0, lambda: continue_button.pack_forget())
+
+def continue_tomography():
+    # Set the flag to True so the tomography process can continue
+    QuickTomography.set_continue_scan(True)
+
+# Function to display the "Continue Scanning" button
+
+def display_continue_button():
+    root.after(0, lambda: continue_button.pack(side=tk.LEFT))
+
+# Function to hide the "Continue Scanning" button
+def hide_continue_button():
+    root.after(0, lambda: continue_button.pack_forget())
+
+# Button to start the tomography process
+tomography_button = tk.Button(button_frame, text="Run Tomography", command=start_tomography, height=2, width=20)
+tomography_button.pack(side=tk.LEFT)
+
+# Button for continuing the tomography scan (initially hidden)
+continue_button = tk.Button(button_frame, text="Continue Scanning", command=continue_tomography, height=2, width=20)
+continue_button.pack_forget()
 start_update_thread()
 
 # Run the Tkinter main loop
