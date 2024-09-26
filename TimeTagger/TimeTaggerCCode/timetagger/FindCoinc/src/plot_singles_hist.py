@@ -8,7 +8,7 @@ file_path = sys.argv[1]
 data = pd.read_csv(file_path, header=None)
 
 # Extract the values from the CSV file
-x = np.array(data[0].values)
+x = np.array(data[0].values - (data[0].values)[0])
 y = np.array(data[1].values)
 
 
@@ -17,9 +17,9 @@ plt.figure(figsize=(10, 6))
 plt.plot(x, y, marker='o', linestyle='-', color='b', label='Values')
 
 # Adding labels and title
-plt.xlabel('Time Delay [ns]')
-plt.ylabel('Coincidences')
-plt.title(f'Time delay plot from {x[0]} to {x[-1]} ')
+plt.xlabel('Time [s]')
+plt.ylabel('Singles')
+plt.title(f'Singles plot, Total singles = {np.sum(y)}')
 
 # Display grid and legend
 plt.grid(True)
@@ -27,5 +27,3 @@ plt.legend()
 
 # Show plot
 plt.show()
-
-print(np.sum(y))

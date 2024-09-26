@@ -60,7 +60,7 @@ int countCoincidencesWithDelay(const std::vector<Event>& channel1, const std::ve
     size_t i = 0, j = 0;
 
     while (i < channel1.size() && j < channel2.size()) {
-        long long t1 = channel1[i].timestamp - delay;  // Apply the delay to channel1's timestamp
+        long long t1 = channel1[i].timestamp + delay;  // Apply the delay to channel1's timestamp
         long long t2 = channel2[j].timestamp;
 
         if (std::abs(t1 - t2) <= delta) {
@@ -74,7 +74,7 @@ int countCoincidencesWithDelay(const std::vector<Event>& channel1, const std::ve
         }
     }
 
-	// std::cout << "Coincidences between " << channel1[0].channel << " and " << channel2[0].channel << " for delay of " << delay << std::endl;
+	std::cout << "Coincidences between " << channel1[0].channel << " and " << channel2[0].channel << " for delay of " << delay << " are " << coincidenceCount << std::endl;
     return coincidenceCount;
 }
 
